@@ -1,0 +1,11 @@
+lib/Regexp/Sudoku.pm
+Makefile.PL
+MANIFEST
+t/000_basic.t
+t/950_pod.t
+t/960_pod_coverage.t
+t/980_versions.t
+t/981_permissions.t
+t/982_git.t
+Changes
+README
