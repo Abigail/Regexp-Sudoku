@@ -10,116 +10,272 @@ use experimental 'lexical_subs';
 
 our $VERSION = '2021060901';
 
+use Hash::Util::FieldHash qw [fieldhash];
+use List::Util            qw [min];
+
 use Exporter ();
 our @ISA       = qw [Exporter];
 our @EXPORT    = qw [sudoku];
 our @EXPORT_OK = qw [run_sudoku];
 
 my $DEFAULT_SIZE    = 9;
-my $CELL_SENTINEL   = ";";
-my $CLAUSE_SENTINEL = ":";
+my $CELL_SENTINEL   = "\n";
+my $CLAUSE_SENTINEL = "\n";
 my $CLAUSE_LIST     = ",";
 
-#
-# Given a cell name, and a value, return a sub string, and sub pattern
-# which sets the capture '$cell' to '$value'
-#
-my sub clue ($cell, $value) {
-    my $substr = $value;
-    my $subpat = "(?<$cell>$value)";
+my $NR_OF_DIGITS    =  9;
+my $NR_OF_LETTERS   = 26;
+my $NR_OF_SYMBOLS   = $NR_OF_DIGITS + $NR_OF_LETTERS;
 
-    map {$_ . $CELL_SENTINEL} $substr, $subpat;
+
+fieldhash my %size;
+fieldhash my %values;
+fieldhash my %box_width;
+fieldhash my %box_height;
+fieldhash my %values_range;
+fieldhash my %cell2houses;
+fieldhash my %house2cells;
+fieldhash my %clues;
+fieldhash my %string;
+fieldhash my %pattern;
+
+################################################################################
+#
+# new ($class)
+#
+# Create an uninitialized object.
+#
+################################################################################
+
+sub new ($class) {bless \do {my $v} => $class}
+
+
+################################################################################
+#
+# init_sizes ($self, $size)
+#
+# Initialize the sizes of the soduko.
+#
+# Calls init_size () and init_box () doing the work.
+#
+# TESTS: 010_size.t
+#
+################################################################################
+
+sub init_sizes ($self, $size) {
+    $self -> init_size ($size);
+    $self -> init_box  ();
 }
 
 
+################################################################################
 #
-# Given a cell name, and a list of values, return a sub string and a
-# sub pattern allowing the cell to pick up one of those values.
-# The values should be alpha numerical.
+# init_size ($self, $size)
 #
-my sub empty ($cell, $values) {
-    my $substr = $values;
-    my $subpat = "[$values]*(?<$cell>[$values])[$values]*";
+# Initialize the size of a sudoku. If the size is not given, use the default.
+#
+# TESTS: 010_size.t
+#
+################################################################################
 
-    map {$_ . $CELL_SENTINEL} $substr, $subpat;
+sub init_size ($self, $size) {
+    $size {$self} = $size || $DEFAULT_SIZE;
 }
 
 
+################################################################################
 #
-# Given two cell names, and a list of possible values, return a sub string
-# an sub pattern which matches iff the values in the cell differ.
+# size ($self)
 #
-my sub diff_clause ($cell1, $cell2, $values) {
-    my $substr = "";
-    my @chars  = split // => $values;
-    for my $c (@chars) {
-        $substr .= join "" => $c, grep {$_ ne $c} @chars;
-        $substr .= $CLAUSE_LIST;
-    }
-    my $subpat = "(?:[$values]+$CLAUSE_LIST)*"                             .
-                 "\\g{$cell1}[$values]*\\g{$cell2}[$values]*$CLAUSE_LIST"  .
-                 "(?:[$values]+$CLAUSE_LIST)*";
+# Returns the size of the sudoku. If there is no size supplied, use 
+# the default (9).
+#
+# TESTS: 010_size.t
+#
+################################################################################
 
-    map {$_ . $CLAUSE_SENTINEL} $substr, $subpat;
+sub size ($self) {
+    $size {$self}
 }
 
 
+################################################################################
 #
-# Take the clues, and return a structure which maps cell
-# names to clue values. For now, we take the clues as a 2-d array
+# init_values ($self, $values)
 #
-sub make_clues ($in_clues) {
-    my $clues = {};
-    #
-    # Turn a string into an array
-    #
-    if (!ref $in_clues) {
-        my @rows = grep {/\S/} split /\n/ => $in_clues;
-        $in_clues = [map {[split]} @rows];
-    }
-    foreach my $r (keys @$in_clues) {
-        foreach my $c (keys @{$$in_clues [$r]}) {
-            my $val  = $$in_clues [$r] [$c] or next;
-            my $cell = "R" . ($r + 1) . "C" . ($c + 1);
-            $$clues {$cell} = $val;
+# Initializes the values. If given, use them. Else, calculate them from
+# the size (1-9, A-Z), as many as needed. If more values are given than
+# the size of the sudoku, trim them. If not enough, ignore the given
+# values and calculate them.
+#
+# TESTS: 020_values.t
+#
+################################################################################
+
+sub init_values ($self, $values) {
+    my $size   = $self -> size;
+    if ($values) {
+        if (length ($values) > $size) {
+            $values = substr $values, $size;
+        }
+        if (length ($values) < $size) {
+            $values = undef;
         }
     }
-    $clues;
+    if (!$values) {
+        $values = join "" => 1 .. min $size, $NR_OF_DIGITS;
+        if ($size > $NR_OF_DIGITS) {
+            $values .= join "" =>
+                map {chr (ord ('A') + $_ - $NR_OF_DIGITS - 1)}
+                    ($NR_OF_DIGITS + 1) .. min $size, $NR_OF_SYMBOLS;
+        }
+    }
+
+    $values {$self} = $values;
+
+    $self -> init_values_range ();
 }
 
 
-sub sudoku (%args) {
-    state $def_values = join "" => 1 .. 9, 'A' .. 'Z';
-    my $size   = $args {size}   || $DEFAULT_SIZE;
-    my $values = $args {values} || substr $def_values, 0, $size;
-    my $clues  = make_clues $args {clues} || [];
+################################################################################
+#
+# init_value_ranges ($self)
+#
+# Processes the values to turn them into ranges for use in a character class
+#
+# TESTS: 020_values.t
+#
+################################################################################
 
-    #
-    # Find the width and height of a box. If the size of the sudoku
-    # is a square, the width and height of a box are equal, and the
-    # square root of the size of the sudoku. Else, we'll find the
-    # most squarish width and height (with the width larger than the
-    # height).
-    #
+sub init_values_range ($self) {
+    my @values = sort {$a cmp $b} $self -> values;
+    my $range  = "";
+    while (@values) {
+        my $end = 0;
+        for (my $i = 0; $i < @values; $i ++) {
+            last if ord ($values [0]) != ord ($values [$i]) - $i;
+            $end = $i;
+        }
+        if ($end <= 1) {$range .= $values [0]}
+        if ($end == 1) {$range .= $values [1]}
+        if ($end >  1) {$range .= $values [0] . "-" . $values [$end]}
+        splice @values, 0, $end + 1;
+    }
+    
+    $values_range {$self} = $range;
+}
+
+
+################################################################################
+#
+# values ($self)
+#
+# Return the set of values used in the sudoku. In list context, this will
+# be an array of characters; in scalar context, a string.
+#
+# TESTS: 020_values.t
+#
+################################################################################
+
+sub values ($self) {
+    wantarray ? split // => $values {$self} : $values {$self};
+}
+
+
+################################################################################
+#
+# values_range ($self)
+#
+# Return the set of values used in the sudoku, as ranges to be used in
+# a character class. Calls $self -> values () to get the values.
+#
+# TESTS: 020_values.t
+#
+################################################################################
+
+sub values_range ($self) {
+    $values_range {$self}
+}
+
+
+################################################################################
+#
+# box_init ($self)
+#
+# Find the width and height of a box. If the size of the sudoku is a square,
+# the width and height of a box are equal, and the square root of the size
+# of the sudoku. Else, we'll find the most squarish width and height (with
+# the width larger than the height). The width and height are stored as
+# attributes. If they are already set, the function immediately returns.
+#
+# TESTS: 030_values.t
+#
+################################################################################
+
+sub init_box ($self) {
+    return if $box_height {$self} && $box_width {$self};
+    my $size = $self -> size;
     my $box_height = int sqrt $size;
     $box_height -- while $size % $box_height;
     my $box_width  = $size / $box_height;
 
+    $box_height {$self} = $box_height;
+    $box_width  {$self} = $box_width;
+}
 
-    #
-    # For each of the cells, record in which houses they are.
-    # For each house, record which cells they contain.
-    #
-    # Cells are named R1C1, R1C2, ..., RnCn, with R1C1 in the
-    # top left corner and RnCn in the bottom right.
-    #
-    # Rows are named     R1, ..., Rn
-    # Columns are named  C1, ..., Cn
-    # Boxes are named   B11, ..., Bmp (m * p == n)
-    #
 
-    my %cell2houses;
-    my %house2cells;
+################################################################################
+#
+# box_height ($self)
+# box_width  ($self)
+#
+# Return the height and width of a box in the sudoku. These methods will
+# call $self -> box_init first, to calculate the values if necessary.
+#
+# TESTS: 030_values.t
+#
+################################################################################
+
+sub box_height ($self) {
+    $box_height {$self};
+}
+
+sub box_width ($self) {
+    $box_width {$self};
+}
+
+
+################################################################################
+#
+# house_init ($self)
+#
+# Calculate which cells go into which houses.
+#
+# For each of the cells, record in which houses they are.
+# For each house, record which cells they contain.
+#
+# Cells are named R1C1, R1C2, ..., RnCn, with R1C1 in the
+# top left corner and RnCn in the bottom right.
+#
+# Rows are named     R1, ..., Rn
+# Columns are named  C1, ..., Cn
+# Boxes are named   B11, ..., Bmp (m * p == n)
+#
+# house_init () is called from cell2houses () and house2cells ().
+# It will return immediately if the mappings are set up.
+#
+# TESTS: 040_houses.t
+#
+################################################################################
+
+sub init_houses ($self) {
+    return if $house2cells {$self} && $cell2houses {$self};
+
+    my %c2h;
+    my %h2c;
+    my $size       = $self -> size;
+    my $box_width  = $self -> box_width;
+    my $box_height = $self -> box_height;
     for my $r (1 .. $size) {
         for my $c (1 .. $size) {
             my $cell   = "R${r}C${c}";
@@ -130,120 +286,351 @@ sub sudoku (%args) {
             my $h      =  1 + int (($r - 1) / $box_height);
             my $box    = "B${h}${w}";
 
-            $cell2houses {$cell} {$_}    = 
-            $house2cells {$_}    {$cell} = 1 for $row, $column, $box;
+            $c2h {$cell} {$_} = $h2c {$_} {$cell} = 1 for $row, $column, $box;
         }
     }
 
+    $cell2houses {$self} = \%c2h;
+    $house2cells {$self} = \%h2c;
+}
+
+
+################################################################################
+#
+# cell2houses ($self, $cell)
+#
+# Give the name of a cell, return the names of all the houses this cell
+# is part off.
+#
+# TESTS: 040_houses.t
+#
+################################################################################
+
+sub cell2houses ($self, $cell) {
+    keys %{$cell2houses {$self} {$cell} || {}}
+}
+
+
+################################################################################
+#
+# house2cells ($self, $house)
+#
+# Give the name of a house, return the names of all the cells in this house.
+#
+# TESTS: 040_houses.t
+#
+################################################################################
+
+sub house2cells ($self, $house) {
+    keys %{$house2cells {$self} {$house} || {}}
+}
+
+
+################################################################################
+#
+# cells ($self)
+#
+# Return the names of all the cells in the sudoku.
+#
+# TESTS: 040_houses.t
+#
+################################################################################
+
+sub cells  ($self) {
+    keys %{$cell2houses  {$self}}
+}
+
+
+################################################################################
+#
+# houses ($self)
+#
+# Return the names of all the houses in the sudoku.
+#
+# TESTS: 040_houses.t
+#
+################################################################################
+
+sub houses ($self) {
+    keys %{$house2cells  {$self}}
+}
+
+
+################################################################################
+#
+# init_clues ($self, $clues)
+#
+# Take the supplied clues (if any!), and return a structure which maps cell
+# names to clue values.
+#
+# The clues could be one of:
+#   - A 2-d array, with false values indicating the cell doesn't have a clue.
+#   - A string, newlines separating rows, and whitespace clues. A value
+#     of 0 indicates no clue.
+#
+# We wil populate the clues attribute, mapping cell names to clue values.
+# Cells without clues won't be set.
+#
+# TESTS: 050_houses.t
+#
+################################################################################
+
+sub init_clues ($self, $in_clues) {
+    my $clues = {};
+    if ($in_clues) {
+        #
+        # Turn a string into an array
+        #
+        if (!ref $in_clues) {
+            my @rows  = grep {/\S/} split /\n/ => $in_clues;
+            $in_clues = [map {[split]} @rows];
+        }
+        foreach my $r (keys @$in_clues) {
+            foreach my $c (keys @{$$in_clues [$r]}) {
+                my $val  = $$in_clues [$r] [$c] or next;
+                my $cell = "R" . ($r + 1) . "C" . ($c + 1);
+                $$clues {$cell} = $val;
+            }
+        }
+    }
+    $clues {$self} = $clues;
+}
+
+
+################################################################################
+#
+# clues ($self)
+#
+# Return an hashref mapping cell names to clues.
+#
+# TESTS: 050_houses.t
+#
+################################################################################
+
+sub clues ($self) {
+    $clues {$self};
+}
+
+
+################################################################################
+#
+# clue ($self, $cell)
+#
+# Returns the clue in the given cell. If the cell does not have a clue,
+# return false.
+#
+# TESTS: 050_houses.t
+#
+################################################################################
+
+sub clue ($self, $cell) {
+    $clues {$self} {$cell}
+}
+
+
+################################################################################
+#
+# init ($self, %args)
+#
+# Configure the Regexp::Sudoku object. 
+#
+################################################################################
+
+
+sub init ($self, %args) {
     #
-    # Construct a string and a pattern
+    # Copy some values into attributes. If they're undefined, that's fine.
     #
+    if ($args {size} && $args {size} > $NR_OF_SYMBOLS) {
+        $args {size} = $NR_OF_SYMBOLS;
+    }
+
+    $self -> init_sizes              ($args {size});
+    $self -> init_values             ($args {values});
+    $self -> init_houses             ();
+    $self -> init_clues              ($args {clues});
+
+    $self -> init_string_and_pattern ();
+
+    $self;
+}
+
+
+################################################################################
+#
+# make_clue ($self, $cell, $value)
+#
+# Given a cell name, and a value, return a sub string, and sub pattern
+# which sets the capture '$cell' to '$value'
+#
+# TESTS: 110_make_clue.t
+#        120_make_cell.t
+#
+################################################################################
+
+sub make_clue ($self, $cell, $value) {
+    my $substr = $value;
+    my $subpat = "(?<$cell>$value)";
+
+    map {$_ . $CELL_SENTINEL} $substr, $subpat;
+}
+
+
+################################################################################
+#
+# make_empty ($cell)
+#
+# Given a cell name, return a sub string and a sub pattern allowing the
+# cell to pick up one of the values in the sudoku.
+#
+# TESTS: 100_make_empty.t
+#        120_make_cell.t
+#
+################################################################################
+
+sub make_empty ($self, $cell) {
+    my $substr = $self -> values;
+    my $range  = $self -> values_range;
+    my $subpat = "[$range]*(?<$cell>[$range])[$range]*";
+
+    map {$_ . $CELL_SENTINEL} $substr, $subpat;
+}
+
+
+################################################################################
+#
+# make_cell ($cell)
+#
+# Given a cell name, return a substring and subpattern to set a value for
+# this cell. Either the cell has a clue (and we dispatch to make_clue),
+# or not (and we dispatch to make_empty).
+#
+# TESTS: 120_make_cell.t
+#
+################################################################################
+
+sub make_cell ($self, $cell) {
+    my $clue = $self -> clue ($cell);
+
+    $clue ? $self -> make_clue  ($cell, $clue)
+          : $self -> make_empty ($cell);
+}
+
+
+
+################################################################################
+#
+# make_diff_clause ($self, $cell1, $cell2)
+#
+# Given two cell names, return a sub string and a sub pattern which matches
+# iff the values in the cell differ.
+#
+# TESTS: 150_make_diff_clause.t
+#
+################################################################################
+
+sub make_diff_clause ($self, $cell1, $cell2) {
+    my $substr = "";
+    my @values = $self -> values;
+    my $range  = $self -> values_range;
+    for my $c (@values) {
+        $substr .= join "" => $c, grep {$_ ne $c} @values;
+        $substr .= $CLAUSE_LIST;
+    }
+    my $subpat = "(?:[$range]+$CLAUSE_LIST)*"                             .
+                 "\\g{$cell1}[$range]*\\g{$cell2}[$range]*$CLAUSE_LIST"  .
+                 "(?:[$range]+$CLAUSE_LIST)*";
+
+    map {$_ . $CLAUSE_SENTINEL} $substr, $subpat;
+}
+
+
+################################################################################
+#
+# must_differ ($self, $cell1, $cell2)
+#
+# Returns a true value if the two given cells must have different values.
+#
+# TESTS: 140_must_differ.t
+#
+################################################################################
+
+sub must_differ ($self, $cell1, $cell2) {
+    my %seen;
+    $seen {$_} ++ for $self -> cell2houses ($cell1),
+                      $self -> cell2houses ($cell2);
+
+   (grep {$_ > 1} values %seen) ? 1 : 0;
+}
+
+
+################################################################################
+#
+# init_string_and_pattern ($self)
+#
+# Create the string we're going to match against, and the pattern
+# we use to match.
+#
+################################################################################
+
+sub init_string_and_pattern ($self) {
     my $string  = "";
     my $pattern = "";
 
-    my @cells = sort keys %cell2houses;
-
-    foreach my $i (keys @cells) {
+    my @cells   = sort $self -> cells;
+    for my $i (keys @cells) {
+        #
+        # First the part which picks up a value for this cell
+        #
         my $cell1 = $cells [$i];
-        #
-        # First, pick a value. If there is a clue, use the clue.
-        # Else, pick one of the possible values.
-        #
-        my ($substr, $subpat);
-        if (my $value = $$clues {$cell1}) {
-            ($substr, $subpat) = clue  ($cell1, $value);
-        }
-        else {
-            ($substr, $subpat) = empty ($cell1, $values);
-        }
+        my ($substr, $subpat) = $self -> make_cell ($cell1);
         $string  .= $substr;
         $pattern .= $subpat;
 
         #
-        # For each of the previous cells, if they share a house,
-        # they need to be different.
+        # Now, for all the previous cell, if they must differ,
+        # add a clause for that.
         #
-        for (my $j = 0; $j < $i; $j ++) {
-            my $cell2  = $cells [$j];
-            if (grep {$cell2houses {$cell1} {$_}}
-                       keys %{$cell2houses {$cell2}}) {
-                #
-                # Cells share a house, so they must be different.
-                #
-                my ($substr, $subpat) = diff_clause ($cell1, $cell2, $values);
+        for my $j (0 .. $i - 1) {
+            my $cell2 = $cells [$j];
+            if ($self -> must_differ ($cell1, $cell2)) {
+                my ($substr, $subpat) =
+                             $self -> make_diff_clause ($cell1, $cell2);
                 $string  .= $substr;
                 $pattern .= $subpat;
             }
         }
     }
 
-    ($string, "^$pattern\$");
+    $string  {$self} =       $string;
+    $pattern {$self} = "^" . $pattern . '$';
 }
 
 
-sub run_sudoku ($string, $pattern, $size) {
-    if ($string =~ $pattern) {
-        my $out = "";
-        foreach my $r (1 .. $size) {
-            $out .= join " ", map {$+ {"R${r}C${_}"}} 1 .. $size;
-            $out .= "\n";
-        }
-        return $out;
-    }
+################################################################################
+#
+# string ($self)
+#
+# Return the string we're matching against.
+#
+################################################################################
+
+sub string ($self) {
+    $string {$self}
 }
 
-__END__
 
-my $clues9 = [
-   [5, 3, 0,   0, 7, 0,   0, 0, 0],
-   [6, 0, 0,   1, 9, 5,   0, 0, 0],
-   [0, 9, 8,   0, 0, 0,   0, 6, 0],
+################################################################################
+#
+# pattern ($self)
+#
+# Return the pattern we're matching with.
+#
+################################################################################
 
-   [8, 0, 0,   0, 6, 0,   0, 0, 3],
-   [4, 0, 0,   8, 0, 3,   0, 0, 1],
-   [7, 0, 0,   0, 2, 0,   0, 0, 6],
-
-   [0, 6, 0,   0, 0, 0,   2, 8, 0],
-   [0, 0, 0,   4, 1, 9,   0, 0, 5],
-   [0, 0, 0,   0, 8, 0,   0, 7, 9],
-];
-
-my $clues6 = [
-    [0, 0, 0,   0, 0, 1],
-    [0, 5, 6,   0, 0, 0],
-
-    [0, 4, 5,   0, 0, 6],
-    [0, 0, 0,   0, 4, 5],
-
-    [0, 0, 0,   5, 0, 0],
-    [5, 0, 1,   3, 0, 0],
-];
-
-my $clues =  $clues6;
-my $size  = @$clues;
-
-my ($string, $pattern) = sudoku (size  => $size,
-                                 clues => $clues);
-say run_sudoku ($string, $pattern, $size);
-
-__END__
-
-# say $string;
-# say $pattern;
-
-if ($string =~ /^$pattern$/) {
-    for (my $r = 1; $r <= $size; $r ++) {
-        for (my $c = 1; $c <= $size; $c ++) {
-            print $+ {"R${r}C${c}"} . " ";
-        }
-        print "\n";
-    }
+sub pattern ($self) {
+    $pattern {$self}
 }
-else {
-    say "No match"
-}
-
-1;
 
 __END__
 
@@ -268,7 +655,7 @@ L<< git://github.com/Abigail/Regexp-Sudoku.git >>.
 
 =head1 AUTHOR
 
-Abigail, L<< mailto:cpan@abigail.be >>.
+Abigail, L<< mailto:cpan@abigail.freedom.nl >>.
 
 =head1 COPYRIGHT and LICENSE
 
