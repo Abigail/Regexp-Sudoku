@@ -17,6 +17,10 @@ BEGIN {
 
 ok defined $Regexp::Sudoku::VERSION, "VERSION is set";
 
+my $sudoku = Regexp::Sudoku:: -> new;
+
+isa_ok $sudoku, 'Regexp::Sudoku';
+
 Test::NoWarnings::had_no_warnings () if $r;
 
 done_testing;
