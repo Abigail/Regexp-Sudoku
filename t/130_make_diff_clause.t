@@ -36,9 +36,9 @@ for my $size (4, 9, 16) {
     }
     $exp_str .= $SENTINEL;
 
-    my $exp_pat = "(?:[$range]+,)*"                            .
+    my $exp_pat = "(?:[$range]{$size},)*"                      .
                   "\\g{$cell1}[$range]*\\g{$cell2}[$range]*,"  .
-                  "(?:[$range]+,)*" . $SENTINEL;
+                  "(?:[$range]{$size},)*" . $SENTINEL;
 
     my ($got_str, $got_pat) = $sudoku -> make_diff_clause ($cell1, $cell2);
 

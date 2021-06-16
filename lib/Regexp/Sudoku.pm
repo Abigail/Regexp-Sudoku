@@ -533,13 +533,14 @@ sub make_diff_clause ($self, $cell1, $cell2) {
     my $substr = "";
     my @values = $self -> values;
     my $range  = $self -> values_range;
+    my $size   = $self -> size;
     for my $c (@values) {
         $substr .= join "" => $c, grep {$_ ne $c} @values;
         $substr .= $CLAUSE_LIST;
     }
-    my $subpat = "(?:[$range]+$CLAUSE_LIST)*"                             .
+    my $subpat = "(?:[$range]{$size}$CLAUSE_LIST)*"                      .
                  "\\g{$cell1}[$range]*\\g{$cell2}[$range]*$CLAUSE_LIST"  .
-                 "(?:[$range]+$CLAUSE_LIST)*";
+                 "(?:[$range]{$size}$CLAUSE_LIST)*";
 
     map {$_ . $CLAUSE_SENTINEL} $substr, $subpat;
 }
