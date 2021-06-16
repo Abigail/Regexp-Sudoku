@@ -1,0 +1,57 @@
+#!/opt/perl/bin/perl
+
+use 5.032;
+
+use strict;
+use warnings;
+no  warnings 'syntax';
+
+use experimental 'signatures';
+use experimental 'lexical_subs';
+
+use lib qw [lib ../lib];
+
+use Regexp::Sudoku;
+use Time::HiRes qw [time];
+
+undef $/;
+my $input = <>;
+
+$input =~ s/\n==\n.*//s;  # Skip anything after '=='.
+
+#
+# Figure out the size
+#
+my @lines = split /\n/ => $input;
+my @first = $lines [0] =~ /\S+/g;
+my $size  = @first;
+
+my $sudoku  =  Regexp::Sudoku:: -> new -> init (size => $size, clues => $input);
+my $string  = $sudoku -> string;
+my $pattern = $sudoku -> pattern;
+
+my $start    = time;
+my $match    = $string =~ $pattern;
+my $end      = time;
+my $run_time = $end - $start;
+my $hours    = int ($run_time / 3600);
+my $minutes  = int ($run_time /   60) % 60;
+my $seconds  =      $run_time - 3600 * $hours - 60 * $minutes;
+
+if ($match) {
+    foreach my $r (1 .. $size) {
+        foreach my $c (1 .. $size) {
+            my $cell = "R${r}C${c}";
+            print " " if $c > 1;
+            print $+ {$cell};
+        }
+        print "\n";
+    }
+}
+else {
+    print "No match!";
+}
+
+printf "Runtime: %02d:%02d:%07.4f\n", $hours, $minutes, $seconds;
+
+__END__
