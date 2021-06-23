@@ -336,8 +336,39 @@ sub house2cells ($self, $house) {
 #
 ################################################################################
 
-sub cells  ($self) {
-    keys %{$cell2houses  {$self}}
+sub cells  ($self, $sorted = 0) {
+    my @cells = sort keys %{$cell2houses  {$self}};
+    if ($sorted) {
+        #
+        # For each cell, determine how many different clues it sees.
+        #
+        my %sees;
+        foreach my $cell1 (@cells) {
+            next if $self -> clue ($cell1);  # Don't care about clues
+            foreach my $cell2 (@cells) {
+                if ($self -> clue ($cell2) &&
+                    $self -> must_differ ($cell1, $cell2)) {
+                    $sees {$cell1} {$self -> clue ($cell2)} = 1;
+                }
+            }
+        }
+
+        @cells = map  {$$_ [0]}
+                 sort {$$b [1] <=> $$a [1]  ||           # Clues first
+                       $$b [2] <=> $$a [2]  ||           # Favour nr clues seen
+                       $$b [3] <=> $$a [3]  ||           # More houses is better
+                       $$a [0] cmp $$b [0]}
+                 map  {
+                     [$_,                                # Cell name
+                      $self -> clue ($_) ? 1 : 0,        # Is a clue
+                      scalar keys (%{$sees {$_} || {}}), # Nr of clues cell sees
+                      scalar $self -> cell2houses ($_),  # Nr of houses
+                                                         #       cell is in
+                     ]
+                 }
+                 @cells;
+    }
+    @cells;
 }
 
 
@@ -578,12 +609,14 @@ sub init_string_and_pattern ($self) {
     my $string  = "";
     my $pattern = "";
 
-    my @cells   = sort $self -> cells;
+    my @cells   = $self -> cells (1);
+
     for my $i (keys @cells) {
         #
         # First the part which picks up a value for this cell
         #
         my $cell1 = $cells [$i];
+
         my ($substr, $subpat) = $self -> make_cell ($cell1);
         $string  .= $substr;
         $pattern .= $subpat;
