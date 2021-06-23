@@ -14,10 +14,27 @@ use lib qw [lib ../lib];
 use Regexp::Sudoku;
 use Time::HiRes qw [time];
 
+my $input;
 undef $/;
-my $input = <>;
+if (@ARGV) {
+    my $file = pop @ARGV;
+    $input = do {local @ARGV = $file; <>};
+}
+else {
+    $input = <>;
+}
 
-$input =~ s/\n==\n.*//s;  # Skip anything after '=='.
+my @sections = split /\n==\n/ => $input;
+my $clues = shift @sections;
+
+my ($arg_section) = grep {/^Args/} @sections;
+my $args = {};
+if ($arg_section) {
+    $arg_section =~ s/^.*\n//;  # Remove header
+    $args = eval $arg_section;
+    die "Cannot parse $arg_section" if $@;
+}
+
 
 #
 # Figure out the size
@@ -26,7 +43,10 @@ my @lines = split /\n/ => $input;
 my @first = $lines [0] =~ /\S+/g;
 my $size  = @first;
 
-my $sudoku  =  Regexp::Sudoku:: -> new -> init (size => $size, clues => $input);
+my $sudoku  =  Regexp::Sudoku:: -> new -> init (size  => $size,
+                                                clues => $clues,
+                                                %$args,
+                                                @ARGV);
 my $string  = $sudoku -> string;
 my $pattern = $sudoku -> pattern;
 
