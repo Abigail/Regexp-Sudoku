@@ -43,6 +43,17 @@ sub run_sudoku ($file) {
     my ($solution) = grep {/^Solution/} @chunks;
 
     #
+    # Find args, if any
+    #
+    my ($arg_section) = grep {/^Args/} @chunks;
+    my  $args = {};
+    if ($arg_section) {
+        $arg_section =~ s/^.*\n//;
+        $args = eval $arg_section;
+        die $@ if $@;
+    }
+
+    #
     # Find the size
     #
     my ($first) = split /\n/ => $clues;
@@ -59,7 +70,8 @@ sub run_sudoku ($file) {
         # Sudoku object
         #
         my $sudoku = Regexp::Sudoku:: -> new -> init (size  => $size,
-                                                      clues => $clues);
+                                                      clues => $clues,
+                                                      %$args);
 
         ok $sudoku, "Regexp::Sudoku object";
         return unless $sudoku;
