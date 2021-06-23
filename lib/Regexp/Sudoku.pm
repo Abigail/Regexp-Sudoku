@@ -38,6 +38,7 @@ fieldhash my %house2cells;
 fieldhash my %clues;
 fieldhash my %string;
 fieldhash my %pattern;
+fieldhash my %nrc;
 
 ################################################################################
 #
@@ -268,11 +269,11 @@ sub box_width ($self) {
 #
 ################################################################################
 
-sub init_houses ($self) {
+sub init_houses ($self, %args) {
     return if $house2cells {$self} && $cell2houses {$self};
 
-    my %c2h;
-    my %h2c;
+    my $c2h;
+    my $h2c;
     my $size       = $self -> size;
     my $box_width  = $self -> box_width;
     my $box_height = $self -> box_height;
@@ -286,14 +287,43 @@ sub init_houses ($self) {
             my $h      =  1 + int (($r - 1) / $box_height);
             my $box    = "B${h}${w}";
 
-            $c2h {$cell} {$_} = $h2c {$_} {$cell} = 1 for $row, $column, $box;
+            $$c2h {$cell} {$_} = $$h2c {$_} {$cell} = 1 for $row, $column, $box;
         }
     }
 
-    $cell2houses {$self} = \%c2h;
-    $house2cells {$self} = \%h2c;
+    if ($size == 9) {
+        $self -> init_nrc_houses ($c2h, $h2c) if $args {nrc};
+    }
+
+    $cell2houses {$self} = $c2h;
+    $house2cells {$self} = $h2c;
 }
 
+
+################################################################################
+#
+# init_nrc_houses ($self)
+#
+# For NRC style puzzles, handle creating the houses. It gets the
+# $c2h and $h2c structures from init_houses, and is expected to
+# modify those structures.
+#
+################################################################################
+
+sub init_nrc_houses ($self, $c2h, $h2c) {
+    my @top_left = ([2, 2], [2, 6], [6, 2], [6, 6]);
+    foreach my $i (keys @top_left) {
+        my $top_left = $top_left [$i];
+        my $house = "NRC" . ($i + 1);
+        foreach my $dr (0 .. 2) {
+            foreach my $dc (0 .. 2) {
+                my $cell = "R" . ($$top_left [0] + $dr) .
+                           "C" . ($$top_left [1] + $dc);
+                $$c2h {$cell} {$house} = $$h2c {$house} {$cell} = 1;
+            }
+        }
+    }
+}
 
 ################################################################################
 #
@@ -478,7 +508,7 @@ sub init ($self, %args) {
 
     $self -> init_sizes              ($args {size});
     $self -> init_values             ($args {values});
-    $self -> init_houses             ();
+    $self -> init_houses             (%args {nrc});
     $self -> init_clues              ($args {clues});
 
     $self -> init_string_and_pattern ();
