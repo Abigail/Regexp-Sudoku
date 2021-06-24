@@ -53,6 +53,21 @@ sub new ($class) {bless \do {my $v} => $class}
 
 ################################################################################
 #
+# sub cell_name ($row, $column)
+#
+# Given a row number and a cell number, return the name of the cell.
+#
+# TESTS: 060-cell_name.t
+#
+################################################################################
+
+sub cell_name ($row, $column) {
+    "R" . $row . "C" . $column
+}
+
+
+################################################################################
+#
 # init_sizes ($self, $size)
 #
 # Initialize the sizes of the soduko.
@@ -279,7 +294,7 @@ sub init_houses ($self, %args) {
     my $box_height = $self -> box_height;
     for my $r (1 .. $size) {
         for my $c (1 .. $size) {
-            my $cell   = "R${r}C${c}";
+            my $cell   = cell_name $r, $c;
             my $row    = "R${r}";
             my $column = "C${c}";
 
@@ -317,8 +332,8 @@ sub init_nrc_houses ($self, $c2h, $h2c) {
         my $house = "NRC" . ($i + 1);
         foreach my $dr (0 .. 2) {
             foreach my $dc (0 .. 2) {
-                my $cell = "R" . ($$top_left [0] + $dr) .
-                           "C" . ($$top_left [1] + $dc);
+                my $cell = cell_name $$top_left [0] + $dr,
+                                     $$top_left [1] + $dc;
                 $$c2h {$cell} {$house} = $$h2c {$house} {$cell} = 1;
             }
         }
@@ -449,7 +464,7 @@ sub init_clues ($self, $in_clues) {
         foreach my $r (keys @$in_clues) {
             foreach my $c (keys @{$$in_clues [$r]}) {
                 my $val  = $$in_clues [$r] [$c] or next;
-                my $cell = "R" . ($r + 1) . "C" . ($c + 1);
+                my $cell = cell_name $r + 1, $c + 1;
                 $$clues {$cell} = $val;
             }
         }
