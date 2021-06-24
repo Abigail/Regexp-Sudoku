@@ -248,7 +248,7 @@ sub box_width ($self) {
 
 ################################################################################
 #
-# house_init ($self)
+# init_houses ($self)
 #
 # Calculate which cells go into which houses.
 #
