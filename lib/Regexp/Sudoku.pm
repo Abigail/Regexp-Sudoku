@@ -283,6 +283,9 @@ sub create_house ($self, $name, @cells) {
 ################################################################################
 #
 # init_houses ($self)
+#      init_rows    ($self)
+#      init_columns ($self)
+#      init_boxes   ($self)
 #
 # Calculate which cells go into which houses.
 #
@@ -296,41 +299,69 @@ sub create_house ($self, $name, @cells) {
 # Columns are named  C1, ..., Cn
 # Boxes are named   B11, ..., Bmp (m * p == n)
 #
-# house_init () is called from cell2houses () and house2cells ().
-# It will return immediately if the mappings are set up.
+# init_houses () calls init_rows (), init_columns () and init_boxes (),
+# to set up the rows, columns and boxes.
+# For NRC sudokus, it calls init_nrc_houses ().
 #
 # TESTS: 041-houses.t
 #
 ################################################################################
 
-sub init_houses ($self, %args) {
-    return if $house2cells {$self} && $cell2houses {$self};
+sub init_rows ($self) {
+    my $size = $self -> size;
+    for my $r (1 .. $size) {
+        my $row_name = "R$r";
+        my @cells    = map {cell_name $r, $_} 1 .. $size;
+        $self -> create_house ($row_name, @cells);
+    }
+    $self;
+}
 
-    my $c2h;
-    my $h2c;
+sub init_columns ($self) {
+    my $size = $self -> size;
+    for my $c (1 .. $size) {
+        my $col_name = "C$c";
+        my @cells    = map {cell_name $_, $c} 1 .. $size;
+        $self -> create_house ($col_name, @cells);
+    }
+    $self;
+}
+
+sub init_boxes ($self) {
     my $size       = $self -> size;
     my $box_width  = $self -> box_width;
     my $box_height = $self -> box_height;
-    for my $r (1 .. $size) {
-        for my $c (1 .. $size) {
-            my $cell   = cell_name $r, $c;
-            my $row    = "R${r}";
-            my $column = "C${c}";
 
-            my $w      =  1 + int (($c - 1) / $box_width);
-            my $h      =  1 + int (($r - 1) / $box_height);
-            my $box    = "B${h}${w}";
-
-            $$c2h {$cell} {$_} = $$h2c {$_} {$cell} = 1 for $row, $column, $box;
+    my $bc = $size / $box_width;
+    my $br = $size / $box_height;
+    for my $r (1 .. $br) {
+        for my $c (1 .. $bc) {
+            my $box_name = "B${r}${c}";
+            my $tlr = 1 + ($r - 1) * $box_height;
+            my $tlc = 1 + ($c - 1) * $box_width;
+            my @cells;
+            for my $dr (1 .. $box_height) {
+                for my $dc (1 .. $box_width) {
+                    my $cell = cell_name $tlr + $dr - 1, $tlc + $dc - 1;
+                    push @cells => $cell;
+                }
+            }
+            $self -> create_house ($box_name, @cells);
         }
     }
+    $self;
+}
 
-    if ($size == 9) {
-        $self -> init_nrc_houses ($c2h, $h2c) if $args {nrc};
+sub init_houses ($self, %args) {
+    $self -> init_rows;
+    $self -> init_columns;
+    $self -> init_boxes;
+
+    if ($self -> size == 9) {
+        $self -> init_nrc_houses if $args {nrc}
     }
 
-    $cell2houses {$self} = $c2h;
-    $house2cells {$self} = $h2c;
+    $self;
 }
 
 
@@ -338,24 +369,26 @@ sub init_houses ($self, %args) {
 #
 # init_nrc_houses ($self)
 #
-# For NRC style puzzles, handle creating the houses. It gets the
-# $c2h and $h2c structures from init_houses, and is expected to
-# modify those structures.
+# For NRC style puzzles, handle creating the houses.
+#
+# TESTS: TODO
 #
 ################################################################################
 
-sub init_nrc_houses ($self, $c2h, $h2c) {
+sub init_nrc_houses ($self) {
     my @top_left = ([2, 2], [2, 6], [6, 2], [6, 6]);
     foreach my $i (keys @top_left) {
         my $top_left = $top_left [$i];
         my $house = "NRC" . ($i + 1);
+        my @cells;
         foreach my $dr (0 .. 2) {
             foreach my $dc (0 .. 2) {
                 my $cell = cell_name $$top_left [0] + $dr,
                                      $$top_left [1] + $dc;
-                $$c2h {$cell} {$house} = $$h2c {$house} {$cell} = 1;
+                push @cells => $cell;
             }
         }
+        $self -> create_house ($house, @cells);
     }
 }
 
