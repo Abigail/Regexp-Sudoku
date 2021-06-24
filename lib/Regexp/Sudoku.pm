@@ -263,6 +263,25 @@ sub box_width ($self) {
 
 ################################################################################
 #
+# create_house ($self, $house_name, @cells)
+#
+# Create a house with the given name, containing the passed in cells.
+#
+# TESTS: 040-create_house.t
+#
+################################################################################
+
+sub create_house ($self, $name, @cells) {
+    for my $cell (@cells) {
+        $cell2houses {$self} {$cell} {$name} = 1;
+        $house2cells {$self} {$name} {$cell} = 1;
+    }
+    $self;
+}
+
+
+################################################################################
+#
 # init_houses ($self)
 #
 # Calculate which cells go into which houses.
