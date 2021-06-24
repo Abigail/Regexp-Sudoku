@@ -358,7 +358,8 @@ sub init_houses ($self, %args) {
     $self -> init_boxes;
 
     if ($self -> size == 9) {
-        $self -> init_nrc_houses if $args {nrc}
+        $self -> init_nrc_houses     if $args {nrc};
+        $self -> init_asterisk_house if $args {asterisk};
     }
 
     $self;
@@ -391,6 +392,41 @@ sub init_nrc_houses ($self) {
         $self -> create_house ($house, @cells);
     }
 }
+
+
+################################################################################
+#
+# sub init_asterisk ($self)
+#
+# An asterisk sudoku has an additional house: one cell from each box.
+# This method initializes that house.
+#
+# An asterisk is defined for a 9 x 9 sudoku as follows:
+#
+#     . . .  . . .  . . .
+#     . . .  . * .  . . .
+#     . . *  . . .  * . .
+#
+#     . . .  . . .  . . .
+#     . * .  . * .  . * .
+#     . . .  . . .  . . .
+#
+#     . . *  . . .  * . .
+#     . . .  . * .  . . .
+#     . . .  . . .  . . .
+#
+# TESTS: TODO
+#
+################################################################################
+
+sub init_asterisk_house ($self) {
+    $self -> create_house ("AS" => map {cell_name @$_}
+                                       [3, 3], [2, 5], [3, 7],
+                                       [5, 2], [5, 5], [5, 8],
+                                       [7, 3], [8, 5], [7, 7]);
+    $self;
+}
+
 
 ################################################################################
 #
@@ -573,9 +609,14 @@ sub init ($self, %args) {
         $args {size} = $NR_OF_SYMBOLS;
     }
 
+    #
+    # Init parameters we want to pass on to init_house
+    #
+    my @house_params = qw [nrc asterisk];
+
     $self -> init_sizes              ($args {size});
     $self -> init_values             ($args {values});
-    $self -> init_houses             (%args {nrc});
+    $self -> init_houses             (%args {@house_params});
     $self -> init_clues              ($args {clues});
 
     $self -> init_string_and_pattern ();
