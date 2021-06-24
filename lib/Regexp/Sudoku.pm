@@ -299,7 +299,7 @@ sub create_house ($self, $name, @cells) {
 # house_init () is called from cell2houses () and house2cells ().
 # It will return immediately if the mappings are set up.
 #
-# TESTS: 040_houses.t
+# TESTS: 041-houses.t
 #
 ################################################################################
 
