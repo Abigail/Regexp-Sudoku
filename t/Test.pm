@@ -64,6 +64,9 @@ sub run_sudoku ($file) {
     #
     my ($name)   = $test =~ /^Name:\s*(.*)/m;
         $name  //= "Sudoku size $size";
+    if ($test =~ /^Author:\s*(.*)/m) {
+        $name .= " by $1";
+    }
 
     subtest $name => sub {
         #
