@@ -38,7 +38,6 @@ fieldhash my %house2cells;
 fieldhash my %clues;
 fieldhash my %string;
 fieldhash my %pattern;
-fieldhash my %nrc;
 
 ################################################################################
 #
