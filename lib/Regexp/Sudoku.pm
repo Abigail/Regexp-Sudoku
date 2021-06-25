@@ -760,11 +760,17 @@ sub init_string_and_pattern ($self) {
         $pattern .= $subpat;
 
         #
-        # Now, for all the previous cell, if they must differ,
+        # Now, for all the previous cells, if they must differ,
         # add a clause for that.
         #
         for my $j (0 .. $i - 1) {
             my $cell2 = $cells [$j];
+            #
+            # If both cells are a clue, we don't need a restriction
+            # between the cells.
+            #
+            next if $self -> clue ($cell1) && $self -> clue ($cell2);
+
             if ($self -> must_differ ($cell1, $cell2)) {
                 my ($substr, $subpat) =
                              $self -> make_diff_clause ($cell1, $cell2);
