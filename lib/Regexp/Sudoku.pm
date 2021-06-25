@@ -389,8 +389,9 @@ sub init_houses ($self, %args) {
     $self -> init_boxes;
 
     if ($self -> size == 9) {
-        $self -> init_nrc_houses     if $args {nrc};
-        $self -> init_asterisk_house if $args {asterisk};
+        $self -> init_nrc_houses      if $args {nrc};
+        $self -> init_asterisk_house  if $args {asterisk};
+        $self -> init_girandola_house if $args {girandola};
     }
 
     $self;
@@ -455,6 +456,40 @@ sub init_asterisk_house ($self) {
                                        [3, 3], [2, 5], [3, 7],
                                        [5, 2], [5, 5], [5, 8],
                                        [7, 3], [8, 5], [7, 7]);
+    $self;
+}
+
+
+################################################################################
+#
+# sub init_girandola_house ($self)
+#
+# An asterisk sudoku has an additional house: one cell from each box.
+# This method initializes that house.
+#
+# An asterisk is defined for a 9 x 9 sudoku as follows:
+#
+#     * . .  . . .  . . *
+#     . . .  . * .  . . .
+#     . . .  . . .  . . .
+#
+#     . . .  . . .  . . .
+#     . * .  . * .  . * .
+#     . . .  . . .  . . .
+#
+#     . . .  . . .  . . .
+#     . . .  . * .  . . .
+#     * . .  . . .  . . *
+#
+# TESTS: 048-init_girandola_house
+#
+################################################################################
+
+sub init_girandola_house ($self) {
+    $self -> create_house ("GR" => map {cell_name @$_}
+                                       [1, 1], [2, 5], [1, 9],
+                                       [5, 2], [5, 5], [5, 8],
+                                       [9, 1], [8, 5], [9, 9]);
     $self;
 }
 
@@ -643,7 +678,7 @@ sub init ($self, %args) {
     #
     # Init parameters we want to pass on to init_house
     #
-    my @house_params = qw [nrc asterisk];
+    my @house_params = qw [nrc asterisk girandola];
 
     $self -> init_sizes              ($args {size});
     $self -> init_values             ($args {values});
