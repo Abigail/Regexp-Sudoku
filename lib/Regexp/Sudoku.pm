@@ -282,28 +282,13 @@ sub create_house ($self, $name, @cells) {
 
 ################################################################################
 #
-# init_houses ($self)
-#      init_rows    ($self)
-#      init_columns ($self)
-#      init_boxes   ($self)
+# init_rows ($self)
 #
-# Calculate which cells go into which houses.
+# Initialize the rows in the sudoku. Calculates which cells belong to which
+# rows, and calls create_house for each row. Called from init_houses.
+# Rows are named "R1" .. "Rn", where n is the size of the sudoku.
 #
-# For each of the cells, record in which houses they are.
-# For each house, record which cells they contain.
-#
-# Cells are named R1C1, R1C2, ..., RnCn, with R1C1 in the
-# top left corner and RnCn in the bottom right.
-#
-# Rows are named     R1, ..., Rn
-# Columns are named  C1, ..., Cn
-# Boxes are named   B11, ..., Bmp (m * p == n)
-#
-# init_houses () calls init_rows (), init_columns () and init_boxes (),
-# to set up the rows, columns and boxes.
-# For NRC sudokus, it calls init_nrc_houses ().
-#
-# TESTS: 041-houses.t
+# TESTS: 041-init_rows
 #
 ################################################################################
 
@@ -317,6 +302,19 @@ sub init_rows ($self) {
     $self;
 }
 
+
+################################################################################
+#
+# init_columns ($self)
+#
+# Initialize the columns in the sudoku. Calculates which cells belong to which
+# columns, and calls create_house for each column. Called from init_houses.
+# Columns are named "C1" .. "Cn", where n is the size of the sudoku.
+#
+# TESTS: 042-init_columns
+#
+################################################################################
+
 sub init_columns ($self) {
     my $size = $self -> size;
     for my $c (1 .. $size) {
@@ -327,6 +325,19 @@ sub init_columns ($self) {
     $self;
 }
 
+
+################################################################################
+#
+# init_boxes ($self)
+#
+# Initialize the boxes in the sudoku. Calculates which cells belong to which
+# boxes, and calls create_house for each box. Called from init_houses.
+# Columns are named "B1-1" .. "Bh-w" where we have h rows of w boxes.
+#
+# TESTS: 043-init_boxes
+#
+################################################################################
+
 sub init_boxes ($self) {
     my $size       = $self -> size;
     my $box_width  = $self -> box_width;
@@ -336,7 +347,7 @@ sub init_boxes ($self) {
     my $br = $size / $box_height;
     for my $r (1 .. $br) {
         for my $c (1 .. $bc) {
-            my $box_name = "B${r}${c}";
+            my $box_name = "B${r}-${c}";
             my $tlr = 1 + ($r - 1) * $box_height;
             my $tlc = 1 + ($c - 1) * $box_width;
             my @cells;
@@ -351,6 +362,27 @@ sub init_boxes ($self) {
     }
     $self;
 }
+
+
+################################################################################
+#
+# init_houses ($self)
+#      init_rows    ($self)
+#      init_columns ($self)
+#      init_boxes   ($self)
+#
+# Calculate which cells go into which houses.
+#
+# Calls init_rows (), init_columns (), and init_boxes () to initialize
+# the rows, columns and boxes. 
+#
+# Depending on the parameters, it may call:
+#   - init_nrc_houses () 
+#   - init_asterisk_house ()
+#
+# TESTS: 045-init_houses.t
+#
+################################################################################
 
 sub init_houses ($self, %args) {
     $self -> init_rows;

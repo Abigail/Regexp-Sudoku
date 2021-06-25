@@ -39,7 +39,7 @@ foreach my $size (sort {$a <=> $b} keys %$boxes) {
 
         for my $w (1 .. $bh) {
             for my $h (1 .. $bw) {
-                push @exp_houses => "B${h}${w}";
+                push @exp_houses => "B${h}-${w}";
             }
         }
 
@@ -50,7 +50,7 @@ foreach my $size (sort {$a <=> $b} keys %$boxes) {
                 my $column = "C${c}";
                 my $w      =  1 + int (($c - 1) / $bw);
                 my $h      =  1 + int (($r - 1) / $bh);
-                my $box    = "B${h}${w}";
+                my $box    = "B${h}-${w}";
 
                 push @exp_cells => $cell;
                 $exp_cell2houses {$cell}   {$row}    = 1;
