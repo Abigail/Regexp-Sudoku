@@ -15,6 +15,7 @@ our $r = eval "require Test::NoWarnings; 1";
 use Test;
 
 run_sudoku "sudokus/sudoku_9_wikipedia";
+run_sudoku "sudokus/sudoku_9_hanabi";
 # run_sudoku "sudokus/sudoku_9_17-clue";   # Takes way too long.
 
 
