@@ -428,7 +428,7 @@ sub init_nrc_houses ($self) {
 
 ################################################################################
 #
-# sub init_asterisk ($self)
+# sub init_asterisk_house ($self)
 #
 # An asterisk sudoku has an additional house: one cell from each box.
 # This method initializes that house.
@@ -447,7 +447,7 @@ sub init_nrc_houses ($self) {
 #     . . .  . * .  . . .
 #     . . .  . . .  . . .
 #
-# TESTS: TODO
+# TESTS: 047-init_asterisk_house.t
 #
 ################################################################################
 
@@ -481,7 +481,7 @@ sub init_asterisk_house ($self) {
 #     . . .  . * .  . . .
 #     * . .  . . .  . . *
 #
-# TESTS: 048-init_girandola_house
+# TESTS: 048-init_girandola_house.t
 #
 ################################################################################
 
