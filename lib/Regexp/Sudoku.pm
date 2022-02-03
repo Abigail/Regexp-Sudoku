@@ -1,6 +1,6 @@
 package Regexp::Sudoku;
 
-use 5.032;
+use 5.028;
 use strict;
 use warnings;
 no  warnings 'syntax';

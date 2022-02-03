@@ -1,6 +1,6 @@
 package Test;
 
-use 5.032;
+use 5.028;
 
 use strict;
 use warnings;
