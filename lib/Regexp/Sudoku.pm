@@ -617,7 +617,8 @@ sub init_clues ($self, $in_clues) {
         }
         foreach my $r (keys @$in_clues) {
             foreach my $c (keys @{$$in_clues [$r]}) {
-                my $val  = $$in_clues [$r] [$c] or next;
+                my $val  = $$in_clues [$r] [$c];
+                next if !$val || $val eq ".";
                 my $cell = cell_name $r + 1, $c + 1;
                 $$clues {$cell} = $val;
             }

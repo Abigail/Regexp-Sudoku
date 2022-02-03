@@ -15,15 +15,15 @@ our $r = eval "require Test::NoWarnings; 1";
 use Regexp::Sudoku;
 
 my $test = << '--';  # Does not have to have a solution
-5  3  0  0  7  0  0  0  0
-6  0  0  1  9  5  0  0  0
-0  9  8  0  0  0  0  6  0
-8  0  0  0  6  0  0  0  3
-4  0  0  8  0  3  0  0  1
-7  0  0  0  2  0  0  0  6
-0  6  0  0  0  0  2  8  0
-0  0  0  4  1  9  0  0  5
-0  0  0  0  8  0  0  7  9
+5  3  0  .  7  0  0  .  .
+6  0  .  1  9  5  0  .  0
+0  9  8  .  .  .  .  6  0
+8  0  0  0  6  0  .  .  3
+4  .  0  8  .  3  0  .  1
+7  0  .  .  2  0  .  0  6
+0  6  .  .  0  .  2  8  0
+.  0  .  4  1  9  .  0  5
+0  .  .  0  8  .  0  7  9
 --
 
 my $sudoku = Regexp::Sudoku:: -> new -> init (size  => 9,
@@ -37,7 +37,7 @@ for my $r (keys @rows) {
         my $exp_val = $row [$c];
         my $cell    = "R" . ($r + 1) . "C" . ($c + 1);
         my $got_val = $sudoku -> clue ($cell);
-        if ($exp_val) {
+        if ($exp_val && $exp_val ne '.') {
             $$exp_clues {$cell} = $exp_val;
             is  $got_val, $exp_val, "Clue for cell $cell";
         }
