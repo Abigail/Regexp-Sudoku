@@ -80,19 +80,19 @@ sub run_sudoku ($file) {
         return unless $sudoku;
 
         #
-        # Get the string and pattern
+        # Get the subject and pattern
         #
-        my $string  = $sudoku -> string;
+        my $subject = $sudoku -> subject;
         my $pattern = $sudoku -> pattern;
 
-        ok $string,  "Got a string";
+        ok $subject, "Got a subject";
         ok $pattern, "Got a pattern";
-        return unless $string && $pattern;
+        return unless $subject && $pattern;
 
         #
         # Do the actual match
         #
-        my $r = $string =~ $pattern;
+        my $r = $subject =~ $pattern;
         ok $r, "Match";
         return unless $r;
 

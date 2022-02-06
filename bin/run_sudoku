@@ -47,11 +47,11 @@ my $sudoku  =  Regexp::Sudoku:: -> new -> init (size  => $size,
                                                 clues => $clues,
                                                 %$args,
                                                 @ARGV);
-my $string  = $sudoku -> string;
-my $pattern = $sudoku -> pattern;
+my $subject  = $sudoku -> subject;
+my $pattern  = $sudoku -> pattern;
 
 my $start    = time;
-my $match    = $string =~ $pattern;
+my $match    = $subject =~ $pattern;
 my $end      = time;
 my $run_time = $end - $start;
 my $hours    = int ($run_time / 3600);

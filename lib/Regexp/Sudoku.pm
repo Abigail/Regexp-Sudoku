@@ -36,7 +36,7 @@ fieldhash my %values_range;
 fieldhash my %cell2houses;
 fieldhash my %house2cells;
 fieldhash my %clues;
-fieldhash my %string;
+fieldhash my %subject;
 fieldhash my %pattern;
 
 ################################################################################
@@ -686,7 +686,7 @@ sub init ($self, %args) {
     $self -> init_houses             (%args {@house_params});
     $self -> init_clues              ($args {clues});
 
-    $self -> init_string_and_pattern ();
+    $self -> init_subject_and_pattern ();
 
     $self;
 }
@@ -696,7 +696,7 @@ sub init ($self, %args) {
 #
 # make_clue ($self, $cell, $value)
 #
-# Given a cell name, and a value, return a sub string, and sub pattern
+# Given a cell name, and a value, return a sub subject, and sub pattern
 # which sets the capture '$cell' to '$value'
 #
 # TESTS: 110_make_clue.t
@@ -705,10 +705,10 @@ sub init ($self, %args) {
 ################################################################################
 
 sub make_clue ($self, $cell, $value) {
-    my $substr = $value;
+    my $subsub = $value;
     my $subpat = "(?<$cell>$value)";
 
-    map {$_ . $CELL_SENTINEL} $substr, $subpat;
+    map {$_ . $CELL_SENTINEL} $subsub, $subpat;
 }
 
 
@@ -716,7 +716,7 @@ sub make_clue ($self, $cell, $value) {
 #
 # make_empty ($cell)
 #
-# Given a cell name, return a sub string and a sub pattern allowing the
+# Given a cell name, return a sub subject and a sub pattern allowing the
 # cell to pick up one of the values in the sudoku.
 #
 # TESTS: 100_make_empty.t
@@ -725,11 +725,11 @@ sub make_clue ($self, $cell, $value) {
 ################################################################################
 
 sub make_empty ($self, $cell) {
-    my $substr = $self -> values;
+    my $subsub = $self -> values;
     my $range  = $self -> values_range;
     my $subpat = "[$range]*(?<$cell>[$range])[$range]*";
 
-    map {$_ . $CELL_SENTINEL} $substr, $subpat;
+    map {$_ . $CELL_SENTINEL} $subsub, $subpat;
 }
 
 
@@ -737,7 +737,7 @@ sub make_empty ($self, $cell) {
 #
 # make_cell ($cell)
 #
-# Given a cell name, return a substring and subpattern to set a value for
+# Given a cell name, return a subsubject and subpattern to set a value for
 # this cell. Either the cell has a clue (and we dispatch to make_clue),
 # or not (and we dispatch to make_empty).
 #
@@ -758,7 +758,7 @@ sub make_cell ($self, $cell) {
 #
 # make_diff_clause ($self, $cell1, $cell2)
 #
-# Given two cell names, return a sub string and a sub pattern which matches
+# Given two cell names, return a sub subject and a sub pattern which matches
 # iff the values in the cell differ.
 #
 # TESTS: 150_make_diff_clause.t
@@ -766,19 +766,19 @@ sub make_cell ($self, $cell) {
 ################################################################################
 
 sub make_diff_clause ($self, $cell1, $cell2) {
-    my $substr = "";
+    my $subsub = "";
     my @values = $self -> values;
     my $range  = $self -> values_range;
     my $size   = $self -> size;
     for my $c (@values) {
-        $substr .= join "" => $c, grep {$_ ne $c} @values;
-        $substr .= $CLAUSE_LIST;
+        $subsub .= join "" => $c, grep {$_ ne $c} @values;
+        $subsub .= $CLAUSE_LIST;
     }
     my $subpat = "(?:[$range]{$size}$CLAUSE_LIST)*"                      .
                  "\\g{$cell1}[$range]*\\g{$cell2}[$range]*$CLAUSE_LIST"  .
                  "(?:[$range]{$size}$CLAUSE_LIST)*";
 
-    map {$_ . $CLAUSE_SENTINEL} $substr, $subpat;
+    map {$_ . $CLAUSE_SENTINEL} $subsub, $subpat;
 }
 
 
@@ -803,15 +803,15 @@ sub must_differ ($self, $cell1, $cell2) {
 
 ################################################################################
 #
-# init_string_and_pattern ($self)
+# init_subject_and_pattern ($self)
 #
-# Create the string we're going to match against, and the pattern
+# Create the subject we're going to match against, and the pattern
 # we use to match.
 #
 ################################################################################
 
-sub init_string_and_pattern ($self) {
-    my $string  = "";
+sub init_subject_and_pattern ($self) {
+    my $subject  = "";
     my $pattern = "";
 
     my @cells   = $self -> cells (1);
@@ -822,8 +822,8 @@ sub init_string_and_pattern ($self) {
         #
         my $cell1 = $cells [$i];
 
-        my ($substr, $subpat) = $self -> make_cell ($cell1);
-        $string  .= $substr;
+        my ($subsub, $subpat) = $self -> make_cell ($cell1);
+        $subject .= $subsub;
         $pattern .= $subpat;
 
         #
@@ -839,29 +839,29 @@ sub init_string_and_pattern ($self) {
             next if $self -> clue ($cell1) && $self -> clue ($cell2);
 
             if ($self -> must_differ ($cell1, $cell2)) {
-                my ($substr, $subpat) =
+                my ($subsub, $subpat) =
                              $self -> make_diff_clause ($cell1, $cell2);
-                $string  .= $substr;
+                $subject .= $subsub;
                 $pattern .= $subpat;
             }
         }
     }
 
-    $string  {$self} =       $string;
+    $subject  {$self} =       $subject;
     $pattern {$self} = "^" . $pattern . '$';
 }
 
 
 ################################################################################
 #
-# string ($self)
+# subject ($self)
 #
-# Return the string we're matching against.
+# Return the subject we're matching against.
 #
 ################################################################################
 
-sub string ($self) {
-    $string {$self}
+sub subject ($self) {
+    $subject {$self}
 }
 
 

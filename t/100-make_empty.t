@@ -29,8 +29,8 @@ my @tests = (
 );
 
 foreach my $test (@tests) {
-    my ($size, $values, $exp_str, $exp_pat, $name) = @$test;
-    $exp_str .= $SENTINEL;
+    my ($size, $values, $exp_sub, $exp_pat, $name) = @$test;
+    $exp_sub .= $SENTINEL;
     $exp_pat .= $SENTINEL;
     my %args = ();
        $args {size}   = $size   if $size;
@@ -38,10 +38,10 @@ foreach my $test (@tests) {
 
     my $sudoku = Regexp::Sudoku:: -> new -> init (%args);
 
-    my ($got_str, $got_pat) = $sudoku -> make_empty ($cell);
+    my ($got_sub, $got_pat) = $sudoku -> make_empty ($cell);
 
     subtest $name => sub {
-        is $got_str, $exp_str, "Substring";
+        is $got_sub, $exp_sub, "Subject";
         is $got_pat, $exp_pat, "Pattern";
     }
 }
