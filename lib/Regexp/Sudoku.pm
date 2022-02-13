@@ -12,6 +12,7 @@ our $VERSION = '2021060901';
 
 use Hash::Util::FieldHash qw [fieldhash];
 use List::Util            qw [min];
+use Math::Sequence::DeBruijn;
 
 use Exporter ();
 our @ISA       = qw [Exporter];
@@ -756,12 +757,36 @@ sub make_cell ($self, $cell) {
 
 ################################################################################
 #
+# semi_debruijn_seq
+#
+# Return, for the given values, a De Bruijn sequence of size 2 with
+#  1) Duplicates removed and
+#  2) The first character copied to the end
+#
+# TESTS: TODO
+#
+################################################################################
+
+sub semi_debruijn_seq ($self, $values = $values {$self}) {
+    state $cache;
+    $$cache {$values} //= do {
+        my $seq = debruijn ($values, 2);
+        $seq .= substr $seq, 0, 1;  # Copy first char to the end.
+        $seq  =~ s/(.)\g{1}/$1/g;   # Remove duplicates.
+        $seq;
+    };
+}
+
+
+
+################################################################################
+#
 # make_diff_clause ($self, $cell1, $cell2)
 #
 # Given two cell names, return a sub subject and a sub pattern which matches
 # iff the values in the cell differ.
 #
-# TESTS: 150_make_diff_clause.t
+# TESTS: 140_make_diff_clause.t
 #
 ################################################################################
 
@@ -769,16 +794,11 @@ sub make_diff_clause ($self, $cell1, $cell2) {
     my $subsub = "";
     my @values = $self -> values;
     my $range  = $self -> values_range;
-    my $size   = $self -> size;
-    for my $c (@values) {
-        $subsub .= join "" => $c, grep {$_ ne $c} @values;
-        $subsub .= $CLAUSE_LIST;
-    }
-    my $subpat = "(?:[$range]{$size}$CLAUSE_LIST)*"                      .
-                 "\\g{$cell1}[$range]*\\g{$cell2}[$range]*$CLAUSE_LIST"  .
-                 "(?:[$range]{$size}$CLAUSE_LIST)*";
 
-    map {$_ . $CLAUSE_SENTINEL} $subsub, $subpat;
+    my $seq = $self -> semi_debruijn_seq;
+    my $pat = "[$range]*\\g{$cell1}\\g{$cell2}[$range]*";
+
+    map {$_ . $CLAUSE_SENTINEL} $seq, $pat;
 }
 
 
@@ -788,7 +808,7 @@ sub make_diff_clause ($self, $cell1, $cell2) {
 #
 # Returns a true value if the two given cells must have different values.
 #
-# TESTS: 140_must_differ.t
+# TESTS: 150_must_differ.t
 #
 ################################################################################
 

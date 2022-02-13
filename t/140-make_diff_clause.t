@@ -21,9 +21,10 @@ my $cell2 = "R3C1";
 
 my %range = (4  =>  '1-4',
              9  =>  '1-9',
+            12  =>  '1-9A-C',
             16  =>  '1-9A-G');
 
-for my $size (4, 9, 16) {
+for my $size (sort {$a <=> $b} keys %range) {
     my $sudoku  = Regexp::Sudoku:: -> new -> init (size => $size);
     my $exp_str = "";
     my @values  = map {$_ >= 10 ? chr (ord ('A') + $_ - 10) : $_} 1 .. $size;
@@ -36,14 +37,24 @@ for my $size (4, 9, 16) {
     }
     $exp_str .= $SENTINEL;
 
-    my $exp_pat = "(?:[$range]{$size},)*"                      .
-                  "\\g{$cell1}[$range]*\\g{$cell2}[$range]*,"  .
-                  "(?:[$range]{$size},)*" . $SENTINEL;
+    my $exp_pat = "[$range]*\\g{$cell1}\\g{$cell2}[$range]*" . $SENTINEL;
 
     my ($got_str, $got_pat) = $sudoku -> make_diff_clause ($cell1, $cell2);
 
     subtest "Size: $size", sub {
-        is $got_str, $exp_str, "String";
+        subtest "Allowed pairs in string" => sub {
+            foreach my $ch1 (@values) {
+                foreach my $ch2 (@values) {
+                    my $pair = "$ch1$ch2";
+                    if ($ch1 eq $ch2) {
+                        ok index ($got_str, $pair) <  0, "'$pair' not in string"
+                    }
+                    else {
+                        ok index ($got_str, $pair) >= 0, "'$pair' in string"
+                    }
+                }
+            }
+        };
         is $got_pat, $exp_pat, "Pattern";
     };
 }
