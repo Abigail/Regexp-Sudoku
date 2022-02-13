@@ -24,8 +24,6 @@ my @tests = (
                    "Small size"],
     [12, '',       '123456789ABC', "[1-9A-C]*(?<$cell>[1-9A-C])[1-9A-C]*",
                    "Larger size"],
-    [6,  'CAB321', 'CAB321',       "[1-3A-C]*(?<$cell>[1-3A-C])[1-3A-C]*",
-                   "Custom values"],
 );
 
 foreach my $test (@tests) {

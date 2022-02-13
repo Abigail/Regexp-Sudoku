@@ -27,10 +27,6 @@ my @tests = (
                    "Max size"],
     [{size => 42}, "123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ",  "1-9A-Z",
                    "Over sized"],
-    [{size =>  9, values => "ZYXWVUTSR"}, "ZYXWVUTSR",     "R-Z",
-                   "Custom values"],
-    [{size =>  9, values => "ABC123XYZ"}, "ABC123XYZ",     "1-3A-CX-Z",
-                   "Custom values, different ranges"],
 );
 
 

@@ -117,34 +117,22 @@ sub size ($self) {
 
 ################################################################################
 #
-# init_values ($self, $values)
+# init_values ($self)
 #
-# Initializes the values. If given, use them. Else, calculate them from
-# the size (1-9, A-Z), as many as needed. If more values are given than
-# the size of the sudoku, trim them. If not enough, ignore the given
-# values and calculate them.
+# Initializes the values. We calculate them from the range (1-9, A-Z),
+# as many as needed.
 #
 # TESTS: 020_values.t
 #
 ################################################################################
 
-sub init_values ($self, $values) {
+sub init_values ($self) {
     my $size   = $self -> size;
-    if ($values) {
-        if (length ($values) > $size) {
-            $values = substr $values, $size;
-        }
-        if (length ($values) < $size) {
-            $values = undef;
-        }
-    }
-    if (!$values) {
-        $values = join "" => 1 .. min $size, $NR_OF_DIGITS;
-        if ($size > $NR_OF_DIGITS) {
-            $values .= join "" =>
-                map {chr (ord ('A') + $_ - $NR_OF_DIGITS - 1)}
-                    ($NR_OF_DIGITS + 1) .. min $size, $NR_OF_SYMBOLS;
-        }
+    my $values = join "" => 1 .. min $size, $NR_OF_DIGITS;
+    if ($size > $NR_OF_DIGITS) {
+        $values .= join "" =>
+            map {chr (ord ('A') + $_ - $NR_OF_DIGITS - 1)}
+                ($NR_OF_DIGITS + 1) .. min $size, $NR_OF_SYMBOLS;
     }
 
     $values {$self} = $values;
@@ -165,19 +153,13 @@ sub init_values ($self, $values) {
 
 sub init_values_range ($self) {
     my @values = sort {$a cmp $b} $self -> values;
-    my $range  = "";
-    while (@values) {
-        my $end = 0;
-        for (my $i = 0; $i < @values; $i ++) {
-            last if ord ($values [0]) != ord ($values [$i]) - $i;
-            $end = $i;
-        }
-        if ($end <= 1) {$range .= $values [0]}
-        if ($end == 1) {$range .= $values [1]}
-        if ($end >  1) {$range .= $values [0] . "-" . $values [$end]}
-        splice @values, 0, $end + 1;
-    }
-    
+    my $size   = $self -> size;
+    my $range  = "1-";
+
+    if    ($size <  10) {$range .=         $values [-1];}
+    elsif ($size == 10) {$range .= "9A";                }
+    else                {$range .= "9A-" . $values [-1];}
+
     $values_range {$self} = $range;
 }
 
@@ -683,7 +665,7 @@ sub init ($self, %args) {
     my @house_params = qw [nrc asterisk girandola];
 
     $self -> init_sizes              ($args {size});
-    $self -> init_values             ($args {values});
+    $self -> init_values;
     $self -> init_houses             (%args {@house_params});
     $self -> init_clues              ($args {clues});
 
