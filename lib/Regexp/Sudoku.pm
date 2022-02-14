@@ -19,14 +19,13 @@ our @ISA       = qw [Exporter];
 our @EXPORT    = qw [sudoku];
 our @EXPORT_OK = qw [run_sudoku];
 
-my $DEFAULT_SIZE    = 9;
-my $CELL_SENTINEL   = "\n";
-my $CLAUSE_SENTINEL = "\n";
-my $CLAUSE_LIST     = ",";
+my $DEFAULT_SIZE   = 9;
+my $SENTINEL       = "\n";
+my $CLAUSE_LIST    = ",";
 
-my $NR_OF_DIGITS    =  9;
-my $NR_OF_LETTERS   = 26;
-my $NR_OF_SYMBOLS   = $NR_OF_DIGITS + $NR_OF_LETTERS;
+my $NR_OF_DIGITS   =  9;
+my $NR_OF_LETTERS  = 26;
+my $NR_OF_SYMBOLS  = $NR_OF_DIGITS + $NR_OF_LETTERS;
 
 
 fieldhash my %size;
@@ -725,7 +724,7 @@ sub make_clue ($self, $cell, $value) {
     my $subsub = $value;
     my $subpat = "(?<$cell>$value)";
 
-    map {$_ . $CELL_SENTINEL} $subsub, $subpat;
+    map {$_ . $SENTINEL} $subsub, $subpat;
 }
 
 
@@ -746,7 +745,7 @@ sub make_empty ($self, $cell) {
     my $range  = $self -> values_range;
     my $subpat = "[$range]*(?<$cell>[$range])[$range]*";
 
-    map {$_ . $CELL_SENTINEL} $subsub, $subpat;
+    map {$_ . $SENTINEL} $subsub, $subpat;
 }
 
 
@@ -814,7 +813,7 @@ sub make_diff_clause ($self, $cell1, $cell2) {
     my $seq = $self -> semi_debruijn_seq;
     my $pat = "[$range]*\\g{$cell1}\\g{$cell2}[$range]*";
 
-    map {$_ . $CLAUSE_SENTINEL} $seq, $pat;
+    map {$_ . $SENTINEL} $seq, $pat;
 }
 
 
