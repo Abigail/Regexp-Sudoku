@@ -372,9 +372,10 @@ sub init_houses ($self, %args) {
     $self -> init_boxes;
 
     if ($self -> size == 9) {
-        $self -> init_nrc_houses      if $args {nrc};
-        $self -> init_asterisk_house  if $args {asterisk};
-        $self -> init_girandola_house if $args {girandola};
+        $self -> init_nrc_houses        if $args {nrc};
+        $self -> init_asterisk_house    if $args {asterisk};
+        $self -> init_girandola_house   if $args {girandola};
+        $self -> init_center_dot_house  if $args {center_dot};
     }
 
     $self;
@@ -473,6 +474,39 @@ sub init_girandola_house ($self) {
                                        [1, 1], [2, 5], [1, 9],
                                        [5, 2], [5, 5], [5, 8],
                                        [9, 1], [8, 5], [9, 9]);
+    $self;
+}
+
+################################################################################
+#
+# sub init_center_dot_house ($self)
+#
+# An asterisk sudoku has an additional house: one cell from each box.
+# This method initializes that house.
+#
+# An asterisk is defined for a 9 x 9 sudoku as follows:
+#
+#     . . .  . . .  . . .
+#     . * .  . * .  . * .
+#     . . .  . . .  . . .
+#
+#     . . .  . . .  . . .
+#     . * .  . * .  . * .
+#     . . .  . . .  . . .
+#
+#     . . .  . . .  . . .
+#     . * .  . * .  . * .
+#     . . .  . . .  . . .
+#
+# TESTS: 049-init_center_dot_house.t
+#
+################################################################################
+
+sub init_center_dot_house ($self) {
+    $self -> create_house ("CD" => map {cell_name @$_}
+                                       [2, 2], [2, 5], [2, 8],
+                                       [5, 2], [5, 5], [5, 8],
+                                       [8, 2], [8, 5], [8, 8]);
     $self;
 }
 
@@ -662,7 +696,7 @@ sub init ($self, %args) {
     #
     # Init parameters we want to pass on to init_house
     #
-    my @house_params = qw [nrc asterisk girandola];
+    my @house_params = qw [nrc asterisk girandola center_dot];
 
     $self -> init_sizes              ($args {size});
     $self -> init_values;
