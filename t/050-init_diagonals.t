@@ -20,10 +20,10 @@ use Regexp::Sudoku::Constants qw [:Diagonals];
 
 sub exp_cells ($type, $size) {
     my @exp_cells;
-    if ($type == $MAIN) {
+    if ($type eq $MAIN) {
         @exp_cells = map {sprintf "R%dC%d", $_, $_} 1 .. $size;
     }
-    elsif ($type == $MINOR) {
+    elsif ($type eq $MINOR) {
         @exp_cells = map {sprintf "R%dC%d", $size - $_ + 1, $_} 1 .. $size;
     }
     
@@ -41,7 +41,7 @@ sub test ($name, $type, $size = 9) {
 
     subtest $name, sub {
         foreach my $target_type ($MAIN, $MINOR) {
-            if ($type & $target_type) {
+            if ($type &. $target_type) {
                 my $name = $type2name {$target_type};
                 my @exp_cells = exp_cells $target_type, $size;
                 my %exp_cells = map {$_ => 1} @exp_cells;

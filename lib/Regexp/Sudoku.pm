@@ -578,14 +578,14 @@ sub init_diagonals ($self, %args) {
     #
     # Top left to bottom right
     #
-    if ($diagonals & $MAIN) {
+    if ($diagonals &. $MAIN) {
         $self -> create_house ("DM" => map {cell_name $_, $_} 1 .. $size)
     }
 
     #
     # Bottom left to top right
     #
-    if ($diagonals & $MINOR) {
+    if ($diagonals &. $MINOR) {
         $self -> create_house ("Dm" => map {cell_name $size - $_ + 1, $_}
                                                               1 .. $size)
     }
