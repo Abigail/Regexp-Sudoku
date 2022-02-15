@@ -13,6 +13,7 @@ our $VERSION = '2021060901';
 use Hash::Util::FieldHash qw [fieldhash];
 use List::Util            qw [min];
 use Math::Sequence::DeBruijn;
+use Regexp::Sudoku::Constants qw [:Diagonals];
 
 use Exporter ();
 our @ISA       = qw [Exporter];
@@ -56,7 +57,7 @@ sub new ($class) {bless \do {my $v} => $class}
 #
 # Given a row number and a cell number, return the name of the cell.
 #
-# TESTS: 060-cell_name.t
+# TESTS: 090-cell_name.t
 #
 ################################################################################
 
@@ -377,6 +378,7 @@ sub init_houses ($self, %args) {
     }
 
     $self -> init_center_dot_house      if $args {center_dot};
+    $self -> init_diagonals (%args)     if $args {diagonals};
 
     $self;
 }
@@ -528,6 +530,72 @@ sub init_center_dot_house ($self) {
 
 ################################################################################
 #
+# sub init_diagonals ($self)
+#
+# If we have diagonals, it means cells on one or more diagonals 
+# should differ. This method initializes the houses for that.
+#
+# The main diagonal for a 9 x 9 sudoku is defined as follows:
+#
+#     * . .  . . .  . . .
+#     . * .  . . .  . . .
+#     . . *  . . .  . . .
+#
+#     . . .  * . .  . . .
+#     . . .  . * .  . . .
+#     . . .  . . *  . . .
+#
+#     . . .  . . .  * . .
+#     . . .  . . .  . * .
+#     . . .  . . .  . . *
+#
+# The minor diagonal for a 9 x 9 sudoku is defined as follows:
+#
+#     . . .  . . .  . . *
+#     . . .  . . .  . * .
+#     . . .  . . .  * . .
+#
+#     . . .  . . *  . . .
+#     . . .  . * .  . . .
+#     . . .  * . .  . . .
+#
+#     . . *  . . .  . . .
+#     . * .  . . .  . . .
+#     * . .  . . .  . . .
+#
+# TESTS: 050-init_diagonals.t
+#
+################################################################################
+
+sub init_diagonals ($self, %args) {
+    #
+    # For now, just do the main and minor diagonals
+    #
+    my $diagonals = $args {diagonals} or return $self;
+
+    my $size = $self -> size;
+
+    #
+    # Top left to bottom right
+    #
+    if ($diagonals & $MAIN) {
+        $self -> create_house ("DM" => map {cell_name $_, $_} 1 .. $size)
+    }
+
+    #
+    # Bottom left to top right
+    #
+    if ($diagonals & $MINOR) {
+        $self -> create_house ("Dm" => map {cell_name $size - $_ + 1, $_}
+                                                              1 .. $size)
+    }
+
+    $self
+}
+
+
+################################################################################
+#
 # cell2houses ($self, $cell)
 #
 # Give the name of a cell, return the names of all the houses this cell
@@ -633,7 +701,7 @@ sub houses ($self) {
 # We wil populate the clues attribute, mapping cell names to clue values.
 # Cells without clues won't be set.
 #
-# TESTS: 050_houses.t
+# TESTS: 080-clues.t
 #
 ################################################################################
 
@@ -711,7 +779,7 @@ sub init ($self, %args) {
     #
     # Init parameters we want to pass on to init_house
     #
-    my @house_params = qw [nrc asterisk girandola center_dot];
+    my @house_params = qw [nrc asterisk girandola center_dot diagonals];
 
     $self -> init_sizes              ($args {size});
     $self -> init_values;
