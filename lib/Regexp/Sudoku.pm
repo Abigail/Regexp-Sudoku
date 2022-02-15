@@ -695,8 +695,9 @@ sub houses ($self) {
 #
 # The clues could be one of:
 #   - A 2-d array, with false values indicating the cell doesn't have a clue.
+#     A "." will also be consider to be not a clue.
 #   - A string, newlines separating rows, and whitespace clues. A value
-#     of 0 indicates no clue.
+#     of 0 or "." indicates no clue.
 #
 # We wil populate the clues attribute, mapping cell names to clue values.
 # Cells without clues won't be set.
