@@ -374,8 +374,9 @@ sub init_houses ($self, %args) {
         $self -> init_nrc_houses        if $args {nrc};
         $self -> init_asterisk_house    if $args {asterisk};
         $self -> init_girandola_house   if $args {girandola};
-        $self -> init_center_dot_house  if $args {center_dot};
     }
+
+    $self -> init_center_dot_house      if $args {center_dot};
 
     $self;
 }
@@ -502,11 +503,26 @@ sub init_girandola_house ($self) {
 ################################################################################
 
 sub init_center_dot_house ($self) {
-    $self -> create_house ("CD" => map {cell_name @$_}
-                                       [2, 2], [2, 5], [2, 8],
-                                       [5, 2], [5, 5], [5, 8],
-                                       [8, 2], [8, 5], [8, 8]);
-    $self;
+    my $width  = $self -> box_width;
+    my $height = $self -> box_height;
+    my $size   = $self -> size;
+
+    #
+    # We can only do center dots if boxes are odd sized width and heigth.
+    #
+    return $self unless $width % 2 && $height % 2;
+
+    my $width_start  = ($width  + 1) / 2;
+    my $height_start = ($height + 1) / 2;
+
+    my @center_cells;
+    for (my $x = $width_start; $x <= $size; $x += $width) {
+        for (my $y = $height_start; $y <= $size; $y += $height) {
+            push @center_cells => [$x, $y];
+        }
+    }
+
+    $self -> create_house ("CD" => map {cell_name @$_} @center_cells);
 }
 
 
