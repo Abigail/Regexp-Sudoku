@@ -23,7 +23,18 @@ my %aliases = qw [
     SUB           SUB1
     MINOR_SUPER   MINOR_SUPER1
     MINOR_SUB     MINOR_SUB1
+    CROSS         CROSS0
+    DOUBLE        CROSS1
 ];
+
+my %sets = (
+    TRIPLE    => [qw [CROSS CROSS1]],
+    ARGYLE    => [qw [CROSS1 CROSS4]],
+    CROSS0    => [qw [SUB0 MINOR_SUB0]],
+);
+foreach my $i (1 .. 35) {
+    $sets {"CROSS$i"} = ["SUB$i", "SUPER$i", "MINOR_SUB$i", "MINOR_SUPER$i"];
+}
 
 my      @tokens =  map {("SUB$_", "SUPER$_")} "", 0 .. 35;
 push    @tokens => map {"MINOR_$_"} @tokens;
@@ -60,18 +71,17 @@ print <<"--";
 #
 --
 
-is $::CROSS,   $::MAIN |. $::MINOR, '$CROSS combines $MAIN and $MINOR';
-is $::DOUBLE,  $::SUPER |. $::SUB |. $::MINOR_SUPER |. $::MINOR_SUB,
-               '$DOUBLE combines $SUPER, $SUB, $MINOR_SUPER, $MINOR_SUB';
-is $::TRIPLE,  $::SUPER |. $::SUB |. $::MINOR_SUPER |. $::MINOR_SUB |.
-               $::MAIN  |. $::MINOR,
-               '$TRIPLE combines $MAIN, $MINOR, $SUPER, $SUB, ' .
-                                '$MINOR_SUPER, $MINOR_SUB';
-is $::ARGYLE,  $::SUPER  |. $::SUB  |. $::MINOR_SUPER  |. $::MINOR_SUB |.
-               $::SUPER4 |. $::SUB4 |. $::MINOR_SUPER4 |. $::MINOR_SUB4,
-               '$ARGYLE combines $SUPER, $SUB, $MINOR_SUPER, $MINOR_SUB, ' .
-                              '$SUPER4, $SUB4, $MINOR_SUPER4, $MINOR_SUB4';
-                            
+foreach my $name (sort keys %sets) {
+    my $elements = $sets {$name};
+    my $test_name = "\$$name combines " . join ", " => map {"\$$_"} @$elements;
+       $test_name =~ s/.*\K, / and /;
+    no strict 'refs';
+    my $result = ${shift @$elements};
+    while (@$elements) {
+        $result |.= ${shift @$elements};
+    }
+    is $$name, $result, $test_name;
+}
 
 Test::NoWarnings::had_no_warnings () if $r;
 

@@ -17,6 +17,7 @@ push @tokens  => map {($_, "MINOR_$_")} map {("SUB$_", "SUPER$_")} "", 1 .. 35;
 my   @aliases =  qw [MAIN MINOR SUB0 MINOR_SUB0
                      SUB SUPER MINOR_SUP MINOR_SUPER];
 my   @sets    =  qw [CROSS DOUBLE TRIPLE ARGYLE];
+push @sets    => map {"CROSS$_"} 0 .. 35;
 
 use Exporter ();
 our @ISA         = qw [Exporter];
@@ -40,11 +41,17 @@ our $SUB         = our $SUB1;
 our $MINOR_SUPER = our $MINOR_SUPER1;
 our $MINOR_SUB   = our $MINOR_SUB1;
 
-our $CROSS       = $MAIN   |. $MINOR;
-our $DOUBLE      = $SUPER  |. $SUB |. $MINOR_SUPER |. $MINOR_SUB;
-our $TRIPLE      = $DOUBLE |. $CROSS;
-our $ARGYLE      = $DOUBLE |. our $SUB4 |. our $SUPER4 |.
-                              our $MINOR_SUB4 |. our $MINOR_SUPER4;
+foreach my $i (0 .. 35) {
+    no strict 'refs';
+    no warnings 'once';
+    ${"CROSS$i"} = ${"SUB$i"}   |. ${"MINOR_SUB$i"} |.
+                   ${"SUPER$i"} |. ${"MINOR_SUPER$i"};
+}
+
+our $CROSS       = our $CROSS0;
+our $DOUBLE      = our $CROSS1;
+our $TRIPLE      = $CROSS  |.     $CROSS1;
+our $ARGYLE      = $CROSS1 |. our $CROSS4;
 
 1;
 
