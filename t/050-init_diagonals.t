@@ -27,7 +27,7 @@ my %type2info = (
     $MAIN           =>  ["DM",    0,  0,  0],
     $MINOR          =>  ["Dm",    1,  0,  0],
 );
-foreach my $i (1 .. 35) {
+foreach my $i (1 .. 34) {
     no strict 'refs';
     $type2info {${"SUPER$i"}}       = ["DMS$i", 0,   0,  $i];
     $type2info {${"SUB$i"}}         = ["DMs$i", 0,  $i,   0];

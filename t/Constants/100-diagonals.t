@@ -32,11 +32,11 @@ my %sets = (
     ARGYLE    => [qw [CROSS1 CROSS4]],
     CROSS0    => [qw [SUB0 MINOR_SUB0]],
 );
-foreach my $i (1 .. 35) {
+foreach my $i (1 .. 34) {
     $sets {"CROSS$i"} = ["SUB$i", "SUPER$i", "MINOR_SUB$i", "MINOR_SUPER$i"];
 }
 
-my      @tokens =  map {("SUB$_", "SUPER$_")} "", 0 .. 35;
+my      @tokens =  map {("SUB$_", "SUPER$_")} "", 0 .. 34;
 push    @tokens => map {"MINOR_$_"} @tokens;
 #
 # Aliases

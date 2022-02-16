@@ -12,12 +12,12 @@ use experimental 'lexical_subs';
 our $VERSION     = '202202015';
 
 my   @tokens  =  qw [SUPER0 MINOR_SUPER0];
-push @tokens  => map {($_, "MINOR_$_")} map {("SUB$_", "SUPER$_")} "", 1 .. 35;
+push @tokens  => map {($_, "MINOR_$_")} map {("SUB$_", "SUPER$_")} "", 1 .. 34;
 
 my   @aliases =  qw [MAIN MINOR SUB0 MINOR_SUB0
                      SUB SUPER MINOR_SUP MINOR_SUPER];
 my   @sets    =  qw [CROSS DOUBLE TRIPLE ARGYLE];
-push @sets    => map {"CROSS$_"} 0 .. 35;
+push @sets    => map {"CROSS$_"} 0 .. 34;
 
 use Exporter ();
 our @ISA         = qw [Exporter];
@@ -41,7 +41,7 @@ our $SUB         = our $SUB1;
 our $MINOR_SUPER = our $MINOR_SUPER1;
 our $MINOR_SUB   = our $MINOR_SUB1;
 
-foreach my $i (0 .. 35) {
+foreach my $i (0 .. 34) {
     no strict 'refs';
     no warnings 'once';
     ${"CROSS$i"} = ${"SUB$i"}   |. ${"MINOR_SUB$i"} |.
