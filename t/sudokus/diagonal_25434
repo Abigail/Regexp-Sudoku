@@ -25,7 +25,7 @@ Solution
 ==
 Args
 use Regexp::Sudoku::Constants qw [:Diagonals];
-{diagonals => $DEFAULT}
+{diagonals => $CROSS}
 ==
 Name: Default diagonals (Griddlers 25434)
 URL: https://www.griddlers.net/sudoku/-/sudoku/25434
