@@ -567,6 +567,7 @@ sub init_center_dot_house ($self) {
 #
 ################################################################################
 
+
 sub init_diagonals ($self, %args) {
     #
     # For now, just do the main and minor diagonals
@@ -575,20 +576,52 @@ sub init_diagonals ($self, %args) {
 
     my $size = $self -> size;
 
+    my sub has_bit ($vec) {$vec =~ /[^\x{00}]/};
     #
     # Top left to bottom right
     #
-    if ($diagonals &. $MAIN) {
+    if (has_bit ($diagonals &. $MAIN)) {
         $self -> create_house ("DM" => map {cell_name $_, $_} 1 .. $size)
     }
 
     #
     # Bottom left to top right
     #
-    if ($diagonals &. $MINOR) {
+    if (has_bit ($diagonals &. $MINOR)) {
         $self -> create_house ("Dm" => map {cell_name $size - $_ + 1, $_}
                                                               1 .. $size)
     }
+
+    #
+    # Offsets
+    #
+    foreach my $s (1 .. $size - 1) {
+        my ($sub, $super, $minor_sub, $minor_super) = do {
+            no strict 'refs';
+            (${"SUB$s"}, ${"SUPER$s"}, ${"MINOR_SUB$s"}, ${"MINOR_SUPER$s"});
+        };
+        if (has_bit ($diagonals &. $super)) {
+            my $name = "DMS$s";
+            $self -> create_house ($name =>
+                            map {cell_name $_, $_ + $s} 1 .. $size - $s);
+        }
+        if (has_bit ($diagonals &. $sub)) {
+            my $name = "DMs$s";
+            $self -> create_house ($name =>
+                            map {cell_name $_, $_ - $s} 1 + $s .. $size);
+        }
+        if (has_bit ($diagonals &. $minor_super)) {
+            my $name = "DmS$s";
+            $self -> create_house ($name =>
+                     map {cell_name $size - $_ + 1, $_ - $s} 1 + $s .. $size);
+        }
+        if (has_bit ($diagonals &. $minor_sub)) {
+            my $name = "Dms$s";
+            $self -> create_house ($name =>
+                     map {cell_name $size - $_ + 1, $_ + $s} 1 .. $size - $s);
+        }
+    }
+
 
     $self
 }
