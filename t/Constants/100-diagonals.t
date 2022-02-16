@@ -34,7 +34,7 @@ push    @tokens => qw [MAIN MINOR SUPER SUB MINOR_SUPER MINOR_SUB];
 #
 # Sets
 #
-push    @tokens => qw [DEFAULT];
+push    @tokens => qw [DEFAULT DOUBLE TRIPLE ARGYLE];
 
 foreach my $token (@tokens) {
     no strict 'refs';
@@ -61,6 +61,17 @@ print <<"--";
 --
 
 is $::DEFAULT, $::MAIN |. $::MINOR, '$DEFAULT combines $MAIN and $MINOR';
+is $::DOUBLE,  $::SUPER |. $::SUB |. $::MINOR_SUPER |. $::MINOR_SUB,
+               '$DOUBLE combines $SUPER, $SUB, $MINOR_SUPER, $MINOR_SUB';
+is $::TRIPLE,  $::SUPER |. $::SUB |. $::MINOR_SUPER |. $::MINOR_SUB |.
+               $::MAIN  |. $::MINOR,
+               '$TRIPLE combines $MAIN, $MINOR, $SUPER, $SUB, ' .
+                                '$MINOR_SUPER, $MINOR_SUB';
+is $::ARGYLE,  $::SUPER  |. $::SUB  |. $::MINOR_SUPER  |. $::MINOR_SUB |.
+               $::SUPER4 |. $::SUB4 |. $::MINOR_SUPER4 |. $::MINOR_SUB4,
+               '$ARGYLE combines $SUPER, $SUB, $MINOR_SUPER, $MINOR_SUB, ' .
+                              '$SUPER4, $SUB4, $MINOR_SUPER4, $MINOR_SUB4';
+                            
 
 Test::NoWarnings::had_no_warnings () if $r;
 
