@@ -34,7 +34,7 @@ push    @tokens => qw [MAIN MINOR SUPER SUB MINOR_SUPER MINOR_SUB];
 #
 # Sets
 #
-push    @tokens => qw [DEFAULT DOUBLE TRIPLE ARGYLE];
+push    @tokens => qw [CROSS DOUBLE TRIPLE ARGYLE];
 
 foreach my $token (@tokens) {
     no strict 'refs';
@@ -60,7 +60,7 @@ print <<"--";
 #
 --
 
-is $::DEFAULT, $::MAIN |. $::MINOR, '$DEFAULT combines $MAIN and $MINOR';
+is $::CROSS,   $::MAIN |. $::MINOR, '$CROSS combines $MAIN and $MINOR';
 is $::DOUBLE,  $::SUPER |. $::SUB |. $::MINOR_SUPER |. $::MINOR_SUB,
                '$DOUBLE combines $SUPER, $SUB, $MINOR_SUPER, $MINOR_SUB';
 is $::TRIPLE,  $::SUPER |. $::SUB |. $::MINOR_SUPER |. $::MINOR_SUB |.
