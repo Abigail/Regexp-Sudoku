@@ -11,13 +11,17 @@ use experimental 'lexical_subs';
 
 our $VERSION     = '202202015';
 
-my   @tokens = qw [MAIN MINOR];
-push @tokens => map {($_, "MINOR_$_")} map {("SUB$_", "SUPER$_")} "", 2 .. 35;
+my   @tokens  =  qw [SUPER0 MINOR_SUPER0];
+push @tokens  => map {($_, "MINOR_$_")} map {("SUB$_", "SUPER$_")} "", 1 .. 35;
+
+my   @aliases =  qw [MAIN MINOR SUB0 MINOR_SUB0
+                     SUB SUPER MINOR_SUP MINOR_SUPER];
+my   @sets    =  qw [DEFAULT];
 
 use Exporter ();
 our @ISA         = qw [Exporter];
 our %EXPORT_TAGS = (
-    Diagonals    => [qw [$DEFAULT], map {"\$$_"} @tokens],
+    Diagonals    => [map {"\$$_"} @tokens, @aliases, @sets],
 );
 our @EXPORT_OK   = map {@$_} values %EXPORT_TAGS;
 
@@ -27,8 +31,16 @@ foreach my $i (keys @tokens) {
     vec (${$tokens [$i]} = "", $i, 1) = 1;
 }
 
+our $MAIN        = our $SUPER0;
+our $MINOR       = our $MINOR_SUPER0;
+our $SUB0        =     $SUPER0;
+our $MINOR_SUB0  =     $MINOR_SUPER0;
+our $SUPER       = our $SUPER1;
+our $SUB         = our $SUB1;
+our $MINOR_SUPER = our $MINOR_SUPER1;
+our $MINOR_SUB   = our $MINOR_SUB1;
 
-our $DEFAULT = our $MAIN |. our $MINOR;
+our $DEFAULT     =     $MAIN |. $MINOR;
 
 1;
 
