@@ -11,6 +11,14 @@ use experimental 'lexical_subs';
 
 our $VERSION     = '202202015';
 
+################################################################################
+#
+# Diagonals
+#
+# TESTS: Constants/100-diagonals.t
+#
+################################################################################
+
 my   @tokens  =  qw [SUPER0 MINOR_SUPER0];
 push @tokens  => map {($_, "MINOR_$_")} map {("SUB$_", "SUPER$_")} "", 1 .. 34;
 
@@ -18,13 +26,6 @@ my   @aliases =  qw [MAIN MINOR SUB0 MINOR_SUB0
                      SUB SUPER MINOR_SUP MINOR_SUPER];
 my   @sets    =  qw [CROSS DOUBLE TRIPLE ARGYLE];
 push @sets    => map {"CROSS$_"} 0 .. 34;
-
-use Exporter ();
-our @ISA         = qw [Exporter];
-our %EXPORT_TAGS = (
-    Diagonals    => [map {"\$$_"} @tokens, @aliases, @sets],
-);
-our @EXPORT_OK   = map {@$_} values %EXPORT_TAGS;
 
 foreach my $i (keys @tokens) {
     no strict 'refs';
@@ -52,6 +53,36 @@ our $CROSS       = our $CROSS0;
 our $DOUBLE      = our $CROSS1;
 our $TRIPLE      = $CROSS  |.     $CROSS1;
 our $ARGYLE      = $CROSS1 |. our $CROSS4;
+
+
+################################################################################
+#
+# Houses
+#
+# TESTS: Constants/110-diagonals.t
+#
+################################################################################
+
+our $NRC         = 1 << 0;
+our $ASTERISK    = 1 << 1;
+our $GIRANDOLA   = 1 << 2;
+our $CENTER_DOT  = 1 << 3;
+
+
+################################################################################
+#
+# Exporting the symbols
+#
+################################################################################
+
+use Exporter ();
+our @ISA         = qw [Exporter];
+our %EXPORT_TAGS = (
+    Diagonals    => [map {"\$$_"} @tokens, @aliases, @sets],
+    Houses       => [qw [$NRC $ASTERISK $GIRANDOLA $CENTER_DOT]],
+);
+our @EXPORT_OK   = map {@$_} values %EXPORT_TAGS;
+
 
 1;
 
