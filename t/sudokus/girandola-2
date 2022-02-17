@@ -24,7 +24,8 @@ Solution
 1 7 5  4 6 2  9 8 3
 ==
 Args
-{girandola => 1}
+use Regexp::Sudoku::Constants qw [:Houses];
+{houses => $GIRANDOLA}
 ==
 Name: Girandola-2
 URL: http://www.tectonicpuzzel.eu/girandola-sudoku.html

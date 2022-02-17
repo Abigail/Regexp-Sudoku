@@ -13,10 +13,11 @@ use Test::More 0.88;
 our $r = eval "require Test::NoWarnings; 1";
 
 use Regexp::Sudoku;
+use Regexp::Sudoku::Constants qw [:Houses];
 
 my $size = 9;
 
-my $sudoku = Regexp::Sudoku:: -> new -> init (girandola => 1);
+my $sudoku = Regexp::Sudoku:: -> new -> init (houses => $GIRANDOLA);
 
 my @exp_cells = sort map {"R" . $$_ [0] . "C" . $$_ [1]} [1, 1], [2, 5], [1, 9],
                                                          [5, 2], [5, 5], [5, 8],

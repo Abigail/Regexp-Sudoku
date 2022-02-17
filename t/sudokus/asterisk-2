@@ -24,7 +24,8 @@ Solution
 4 8 7  5 6 2  3 1 9
 ==
 Args
-{asterisk => 1}
+use Regexp::Sudoku::Constants qw [:Houses];
+{houses => $ASTERISK}
 ==
 Name: Asterisk
 URL: https://www.sudopedia.org/wiki/Asterisk

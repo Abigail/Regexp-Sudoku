@@ -24,7 +24,8 @@ Solution
 2 4 3  9 5 1  8 6 7
 ==
 Args
-{girandola => 1}
+use Regexp::Sudoku::Constants qw [:Houses];
+{houses => $GIRANDOLA}
 ==
 Name: Girandola
 URL: http://www.cross-plus-a.com/sudoku.htm#Girandola

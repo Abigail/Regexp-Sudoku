@@ -13,7 +13,7 @@ our $VERSION = '2021060901';
 use Hash::Util::FieldHash qw [fieldhash];
 use List::Util            qw [min];
 use Math::Sequence::DeBruijn;
-use Regexp::Sudoku::Constants qw [:Diagonals];
+use Regexp::Sudoku::Constants qw [:Diagonals :Houses];
 
 use Exporter ();
 our @ISA       = qw [Exporter];
@@ -371,13 +371,15 @@ sub init_houses ($self, %args) {
     $self -> init_columns;
     $self -> init_boxes;
 
+    my $houses = $args {houses} || 0;
+
     if ($self -> size == 9) {
-        $self -> init_nrc_houses        if $args {nrc};
-        $self -> init_asterisk_house    if $args {asterisk};
-        $self -> init_girandola_house   if $args {girandola};
+        $self -> init_nrc_houses        if $houses & $NRC;
+        $self -> init_asterisk_house    if $houses & $ASTERISK;
+        $self -> init_girandola_house   if $houses & $GIRANDOLA;
     }
 
-    $self -> init_center_dot_house      if $args {center_dot};
+    $self -> init_center_dot_house      if $houses & $CENTER_DOT;
     $self -> init_diagonals (%args)     if $args {diagonals};
 
     $self;
@@ -815,12 +817,10 @@ sub init ($self, %args) {
     #
     # Init parameters we want to pass on to init_house
     #
-    my @house_params = qw [nrc asterisk girandola center_dot diagonals];
-
-    $self -> init_sizes              ($args {size});
+    $self -> init_sizes   ($args {size});
     $self -> init_values;
-    $self -> init_houses             (%args {@house_params});
-    $self -> init_clues              ($args {clues});
+    $self -> init_houses  (%args);
+    $self -> init_clues   ($args {clues});
 
     $self -> init_subject_and_pattern ();
 

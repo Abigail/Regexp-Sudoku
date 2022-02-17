@@ -13,6 +13,7 @@ use Test::More 0.88;
 our $r = eval "require Test::NoWarnings; 1";
 
 use Regexp::Sudoku;
+use Regexp::Sudoku::Constants qw [:Houses];
 
 my %box_sizes = (
      9 => [3, 3],
@@ -20,8 +21,8 @@ my %box_sizes = (
 );
 
 foreach my $size (sort {$a <=> $b} keys %box_sizes) {
-    my $sudoku = Regexp::Sudoku:: -> new -> init (size       => $size,
-                                                  center_dot =>     1);
+    my $sudoku = Regexp::Sudoku:: -> new -> init (size   => $size,
+                                                  houses => $CENTER_DOT);
 
     my ($bw, $bh) = @{$box_sizes {$size}};
     my @exp_cells;
