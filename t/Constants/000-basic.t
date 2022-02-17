@@ -8,6 +8,8 @@ no  warnings 'syntax';
 
 use Test::More 0.88;
 
+use lib qw [lib ../../lib];
+
 my $r;
 
 BEGIN {
