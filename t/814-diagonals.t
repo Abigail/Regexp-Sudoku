@@ -16,6 +16,7 @@ use Test;
 
 run_sudoku "sudokus/diagonal_25374";
 run_sudoku "sudokus/diagonal_25434";
+run_sudoku "sudokus/diagonal_double-1";
 
 
 Test::NoWarnings::had_no_warnings () if $r;
