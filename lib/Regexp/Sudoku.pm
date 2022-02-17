@@ -206,7 +206,7 @@ sub values_range ($self) {
 # the width larger than the height). The width and height are stored as
 # attributes. If they are already set, the function immediately returns.
 #
-# TESTS: 030_values.t
+# TESTS: 030-box.t
 #
 ################################################################################
 
@@ -634,7 +634,7 @@ sub init_diagonals ($self, %args) {
 # Give the name of a cell, return the names of all the houses this cell
 # is part off.
 #
-# TESTS: 040_houses.t
+# TESTS: 040-houses.t
 #
 ################################################################################
 
@@ -649,7 +649,7 @@ sub cell2houses ($self, $cell) {
 #
 # Give the name of a house, return the names of all the cells in this house.
 #
-# TESTS: 040_houses.t
+# TESTS: 040-houses.t
 #
 ################################################################################
 
@@ -664,7 +664,7 @@ sub house2cells ($self, $house) {
 #
 # Return the names of all the cells in the sudoku.
 #
-# TESTS: 040_houses.t
+# TESTS: 040-houses.t
 #
 ################################################################################
 
@@ -710,7 +710,7 @@ sub cells  ($self, $sorted = 0) {
 #
 # Return the names of all the houses in the sudoku.
 #
-# TESTS: 040_houses.t
+# TESTS: 040-houses.t
 #
 ################################################################################
 
@@ -768,7 +768,7 @@ sub init_clues ($self, $in_clues) {
 #
 # Return an hashref mapping cell names to clues.
 #
-# TESTS: 050_houses.t
+# TESTS: 080-clues.t
 #
 ################################################################################
 
@@ -784,7 +784,7 @@ sub clues ($self) {
 # Returns the clue in the given cell. If the cell does not have a clue,
 # return false.
 #
-# TESTS: 050_houses.t
+# TESTS: 080-clues.t
 #
 ################################################################################
 
@@ -798,6 +798,8 @@ sub clue ($self, $cell) {
 # init ($self, %args)
 #
 # Configure the Regexp::Sudoku object. 
+#
+# TESTS: *.t
 #
 ################################################################################
 
@@ -833,8 +835,8 @@ sub init ($self, %args) {
 # Given a cell name, and a value, return a sub subject, and sub pattern
 # which sets the capture '$cell' to '$value'
 #
-# TESTS: 110_make_clue.t
-#        120_make_cell.t
+# TESTS: 110-make_clue.t
+#        120-make_cell.t
 #
 ################################################################################
 
@@ -853,8 +855,8 @@ sub make_clue ($self, $cell, $value) {
 # Given a cell name, return a sub subject and a sub pattern allowing the
 # cell to pick up one of the values in the sudoku.
 #
-# TESTS: 100_make_empty.t
-#        120_make_cell.t
+# TESTS: 100-make_empty.t
+#        120-make_cell.t
 #
 ################################################################################
 
@@ -875,7 +877,7 @@ sub make_empty ($self, $cell) {
 # this cell. Either the cell has a clue (and we dispatch to make_clue),
 # or not (and we dispatch to make_empty).
 #
-# TESTS: 120_make_cell.t
+# TESTS: 120-make_cell.t
 #
 ################################################################################
 
@@ -896,7 +898,7 @@ sub make_cell ($self, $cell) {
 #  1) Duplicates removed and
 #  2) The first character copied to the end
 #
-# TESTS: TODO
+# TESTS: 130-semi_debruijn_seq.t
 #
 ################################################################################
 
@@ -919,7 +921,7 @@ sub semi_debruijn_seq ($self, $values = $values {$self}) {
 # Given two cell names, return a sub subject and a sub pattern which matches
 # iff the values in the cell differ.
 #
-# TESTS: 140_make_diff_clause.t
+# TESTS: 140-make_diff_clause.t
 #
 ################################################################################
 
@@ -941,7 +943,7 @@ sub make_diff_clause ($self, $cell1, $cell2) {
 #
 # Returns a true value if the two given cells must have different values.
 #
-# TESTS: 150_must_differ.t
+# TESTS: 150-must_differ.t
 #
 ################################################################################
 
@@ -960,6 +962,8 @@ sub must_differ ($self, $cell1, $cell2) {
 #
 # Create the subject we're going to match against, and the pattern
 # we use to match.
+#
+# TESTS: TODO
 #
 ################################################################################
 
@@ -1011,6 +1015,8 @@ sub init_subject_and_pattern ($self) {
 #
 # Return the subject we're matching against.
 #
+# TESTS: Test.pm
+#
 ################################################################################
 
 sub subject ($self) {
@@ -1023,6 +1029,8 @@ sub subject ($self) {
 # pattern ($self)
 #
 # Return the pattern we're matching with.
+#
+# TESTS: Test.pm
 #
 ################################################################################
 
