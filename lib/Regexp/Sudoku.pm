@@ -39,6 +39,7 @@ fieldhash my %house2cells;
 fieldhash my %clues;
 fieldhash my %subject;
 fieldhash my %pattern;
+fieldhash my %constraints;
 
 ################################################################################
 #
@@ -57,12 +58,27 @@ sub new ($class) {bless \do {my $v} => $class}
 #
 # Given a row number and a cell number, return the name of the cell.
 #
-# TESTS: 090-cell_name.t
+# TESTS: 090-cell_name_row_column.t
 #
 ################################################################################
 
 sub cell_name ($row, $column) {
     "R" . $row . "C" . $column
+}
+
+
+################################################################################
+#
+# sub cell_row_column ($cell_name)
+#
+# Given the name of a cell, return its row and column.
+#
+# TESTS: 090-cell_name_row_column.t
+#
+################################################################################
+
+sub cell_row_column ($name) {
+    $name =~ /R([0-9]+)C([0-9]+)/ ? ($1, $2) : (0, 0)
 }
 
 
@@ -840,6 +856,9 @@ sub init ($self, %args) {
           -> init_clues               (%args)
           -> init_subject_and_pattern ();
 
+    $constraints {$self} = $args {constraints} || 0;
+
+    $self;
 }
 
 

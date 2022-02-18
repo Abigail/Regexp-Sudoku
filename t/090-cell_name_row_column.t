@@ -18,7 +18,10 @@ foreach my $r (1 .. 9) {
     foreach my $c (1 .. 9) {
         my $got = Regexp::Sudoku::cell_name ($r, $c);
         my $exp = "R${r}C${c}";
-        is $got, $exp, "Cell [$r, $c]";
+        is $got, $exp, "[$r, $c] -> $exp";
+
+        my ($got_r, $got_c) = Regexp::Sudoku::cell_row_column ($exp);
+        ok $got_r == $r && $got_c == $c, "$exp -> [$r, $c]";
     }
 }
 
