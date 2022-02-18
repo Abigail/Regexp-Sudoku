@@ -389,6 +389,21 @@ sub init_houses ($self, %args) {
 #
 # For NRC style puzzles, handle creating the houses.
 #
+# There are four NRC houses (9 x 9 Sudokus only):
+#
+#     . . .  . . .  . . .
+#     . * *  * . *  * * .
+#     . * *  * . *  * * .
+#
+#     . * *  * . *  * * .
+#     . . .  . . .  . . .
+#     . * *  * . *  * * .
+#
+#     . * *  * . *  * * .
+#     . * *  * . *  * * .
+#     . . .  . . .  . . .
+#
+#
 # TESTS: 046-init_nrc_houses.t
 #
 ################################################################################
