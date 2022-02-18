@@ -13,7 +13,7 @@ our $VERSION = '2021060901';
 use Hash::Util::FieldHash qw [fieldhash];
 use List::Util            qw [min];
 use Math::Sequence::DeBruijn;
-use Regexp::Sudoku::Constants qw [:Diagonals :Houses];
+use Regexp::Sudoku::Constants qw [:Diagonals :Houses :Constraints];
 
 use Exporter ();
 our @ISA       = qw [Exporter];
@@ -850,11 +850,10 @@ sub init ($self, %args) {
         $args {size} = $NR_OF_SYMBOLS;
     }
 
-    $self -> init_sizes               (%args)
-          -> init_values              (%args)
-          -> init_houses              (%args)
-          -> init_clues               (%args)
-          -> init_subject_and_pattern ();
+    $self -> init_sizes  (%args)
+          -> init_values (%args)
+          -> init_houses (%args)
+          -> init_clues  (%args);
 
     $constraints {$self} = $args {constraints} || 0;
 
@@ -978,6 +977,7 @@ sub make_diff_clause ($self, $cell1, $cell2) {
 # Returns a true value if the two given cells must have different values.
 #
 # TESTS: 150-must_differ.t
+#        151-must_differ.t
 #
 ################################################################################
 
@@ -986,7 +986,20 @@ sub must_differ ($self, $cell1, $cell2) {
     $seen {$_} ++ for $self -> cell2houses ($cell1),
                       $self -> cell2houses ($cell2);
 
-   (grep {$_ > 1} values %seen) ? 1 : 0;
+    my $same_house = grep {$_ > 1} values %seen;
+
+    my ($r1, $c1)    = cell_row_column ($cell1);
+    my ($r2, $c2)    = cell_row_column ($cell2);
+    my  $constraints = $constraints {$self};
+
+    my $d_rows    = abs ($r1 - $r2);
+    my $d_cols    = abs ($c1 - $c2);
+
+    return $same_house
+        || ($constraints & $ANTI_KNIGHT) && (($d_rows == 1 && $d_cols == 2)  ||
+                                             ($d_rows == 2 && $d_cols == 1))
+        || ($constraints & $ANTI_KING)   &&   $d_rows == 1 && $d_cols == 1
+        ? 1 : 0;
 }
 
 
@@ -1002,7 +1015,9 @@ sub must_differ ($self, $cell1, $cell2) {
 ################################################################################
 
 sub init_subject_and_pattern ($self) {
-    my $subject  = "";
+    return $self if $subject {$self} && $pattern {$self};
+
+    my $subject = "";
     my $pattern = "";
 
     my @cells   = $self -> cells (1);
@@ -1056,6 +1071,7 @@ sub init_subject_and_pattern ($self) {
 ################################################################################
 
 sub subject ($self) {
+    $self -> init_subject_and_pattern;
     $subject {$self}
 }
 
@@ -1071,6 +1087,7 @@ sub subject ($self) {
 ################################################################################
 
 sub pattern ($self) {
+    $self -> init_subject_and_pattern;
     $pattern {$self}
 }
 

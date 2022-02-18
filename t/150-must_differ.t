@@ -42,12 +42,14 @@ for my $size (sort {$a <=> $b} keys %$box) {
                         my $got = $sudoku -> must_differ ($cell1, $cell2);
                         my $exp = $r1 == $r2 || $c1 == $c2 ||
                                   $box1 eq $box2 ? 1 : 0;
-                        is $got, $exp, "Cell $cell1 and $cell2";
+                        is $got, $exp,
+                                 $exp ? "Cells $cell1 and $cell2 must differ"
+                                      : "Cells $cell1 and $cell2 can be same";
                     }
                 }
             }
         }
-    }
+    };
 }
 
 Test::NoWarnings::had_no_warnings () if $r;
