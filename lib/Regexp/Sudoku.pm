@@ -814,9 +814,6 @@ sub init ($self, %args) {
         $args {size} = $NR_OF_SYMBOLS;
     }
 
-    #
-    # Init parameters we want to pass on to init_house
-    #
     $self -> init_sizes   ($args {size});
     $self -> init_values;
     $self -> init_houses  (%args);
