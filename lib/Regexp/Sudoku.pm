@@ -78,9 +78,9 @@ sub cell_name ($row, $column) {
 #
 ################################################################################
 
-sub init_sizes ($self, $size) {
-    $self -> init_size ($size);
-    $self -> init_box  ();
+sub init_sizes ($self, %args) {
+    $self -> init_size (%args)
+          -> init_box  (%args);
 }
 
 
@@ -94,8 +94,9 @@ sub init_sizes ($self, $size) {
 #
 ################################################################################
 
-sub init_size ($self, $size) {
-    $size {$self} = $size || $DEFAULT_SIZE;
+sub init_size ($self, %args) {
+    $size {$self} = $args {size} || $DEFAULT_SIZE;
+    $self;
 }
 
 
@@ -126,7 +127,7 @@ sub size ($self) {
 #
 ################################################################################
 
-sub init_values ($self) {
+sub init_values ($self, %args) {
     my $size   = $self -> size;
     my $values = join "" => 1 .. min $size, $NR_OF_DIGITS;
     if ($size > $NR_OF_DIGITS) {
@@ -137,7 +138,7 @@ sub init_values ($self) {
 
     $values {$self} = $values;
 
-    $self -> init_values_range ();
+    $self -> init_values_range (%args);
 }
 
 
@@ -151,7 +152,7 @@ sub init_values ($self) {
 #
 ################################################################################
 
-sub init_values_range ($self) {
+sub init_values_range ($self, %args) {
     my @values = sort {$a cmp $b} $self -> values;
     my $size   = $self -> size;
     my $range  = "1-";
@@ -161,6 +162,8 @@ sub init_values_range ($self) {
     else                {$range .= "9A-" . $values [-1];}
 
     $values_range {$self} = $range;
+
+    $self;
 }
 
 
@@ -210,7 +213,7 @@ sub values_range ($self) {
 #
 ################################################################################
 
-sub init_box ($self) {
+sub init_box ($self, %args) {
     return if $box_height {$self} && $box_width {$self};
     my $size = $self -> size;
     my $box_height = int sqrt $size;
@@ -219,6 +222,8 @@ sub init_box ($self) {
 
     $box_height {$self} = $box_height;
     $box_width  {$self} = $box_width;
+
+    $self;
 }
 
 
@@ -264,7 +269,7 @@ sub create_house ($self, $name, @cells) {
 
 ################################################################################
 #
-# init_rows ($self)
+# init_rows ($self, %args)
 #
 # Initialize the rows in the sudoku. Calculates which cells belong to which
 # rows, and calls create_house for each row. Called from init_houses.
@@ -274,7 +279,7 @@ sub create_house ($self, $name, @cells) {
 #
 ################################################################################
 
-sub init_rows ($self) {
+sub init_rows ($self, %args) {
     my $size = $self -> size;
     for my $r (1 .. $size) {
         my $row_name = "R$r";
@@ -287,7 +292,7 @@ sub init_rows ($self) {
 
 ################################################################################
 #
-# init_columns ($self)
+# init_columns ($self, %args)
 #
 # Initialize the columns in the sudoku. Calculates which cells belong to which
 # columns, and calls create_house for each column. Called from init_houses.
@@ -297,7 +302,7 @@ sub init_rows ($self) {
 #
 ################################################################################
 
-sub init_columns ($self) {
+sub init_columns ($self, %args) {
     my $size = $self -> size;
     for my $c (1 .. $size) {
         my $col_name = "C$c";
@@ -310,7 +315,7 @@ sub init_columns ($self) {
 
 ################################################################################
 #
-# init_boxes ($self)
+# init_boxes ($self, %args)
 #
 # Initialize the boxes in the sudoku. Calculates which cells belong to which
 # boxes, and calls create_house for each box. Called from init_houses.
@@ -320,7 +325,7 @@ sub init_columns ($self) {
 #
 ################################################################################
 
-sub init_boxes ($self) {
+sub init_boxes ($self, %args) {
     my $size       = $self -> size;
     my $box_width  = $self -> box_width;
     my $box_height = $self -> box_height;
@@ -348,7 +353,7 @@ sub init_boxes ($self) {
 
 ################################################################################
 #
-# init_houses ($self)
+# init_houses ($self, %args)
 #      init_rows    ($self)
 #      init_columns ($self)
 #      init_boxes   ($self)
@@ -367,28 +372,20 @@ sub init_boxes ($self) {
 ################################################################################
 
 sub init_houses ($self, %args) {
-    $self -> init_rows;
-    $self -> init_columns;
-    $self -> init_boxes;
-
-    my $houses = $args {houses} || 0;
-
-    if ($self -> size == 9) {
-        $self -> init_nrc_houses        if $houses & $NRC;
-        $self -> init_asterisk_house    if $houses & $ASTERISK;
-        $self -> init_girandola_house   if $houses & $GIRANDOLA;
-    }
-
-    $self -> init_center_dot_house      if $houses & $CENTER_DOT;
-    $self -> init_diagonals (%args)     if $args {diagonals};
-
-    $self;
+    $self -> init_rows             (%args)
+          -> init_columns          (%args)
+          -> init_boxes            (%args)
+          -> init_nrc_houses       (%args)
+          -> init_asterisk_house   (%args)
+          -> init_girandola_house  (%args)
+          -> init_center_dot_house (%args)
+          -> init_diagonals        (%args);
 }
 
 
 ################################################################################
 #
-# init_nrc_houses ($self)
+# init_nrc_houses ($self, %args)
 #
 # For NRC style puzzles, handle creating the houses.
 #
@@ -396,7 +393,10 @@ sub init_houses ($self, %args) {
 #
 ################################################################################
 
-sub init_nrc_houses ($self) {
+sub init_nrc_houses ($self, %args) {
+    return $self unless $self -> size == $DEFAULT_SIZE &&
+                        $args {houses} && $args {houses} & $NRC;
+
     my @top_left = ([2, 2], [2, 6], [6, 2], [6, 6]);
     foreach my $i (keys @top_left) {
         my $top_left = $top_left [$i];
@@ -411,6 +411,8 @@ sub init_nrc_houses ($self) {
         }
         $self -> create_house ($house, @cells);
     }
+
+    $self;
 }
 
 
@@ -439,18 +441,20 @@ sub init_nrc_houses ($self) {
 #
 ################################################################################
 
-sub init_asterisk_house ($self) {
+sub init_asterisk_house ($self, %args) {
+    return $self unless $self -> size == $DEFAULT_SIZE &&
+                        $args {houses} && $args {houses} & $ASTERISK;
+
     $self -> create_house ("AS" => map {cell_name @$_}
                                        [3, 3], [2, 5], [3, 7],
                                        [5, 2], [5, 5], [5, 8],
                                        [7, 3], [8, 5], [7, 7]);
-    $self;
 }
 
 
 ################################################################################
 #
-# sub init_girandola_house ($self)
+# sub init_girandola_house ($self, %args)
 #
 # An asterisk sudoku has an additional house: one cell from each box.
 # This method initializes that house.
@@ -473,12 +477,14 @@ sub init_asterisk_house ($self) {
 #
 ################################################################################
 
-sub init_girandola_house ($self) {
+sub init_girandola_house ($self, %args) {
+    return $self unless $self -> size == $DEFAULT_SIZE &&
+                        $args {houses} && $args {houses} & $GIRANDOLA;
+
     $self -> create_house ("GR" => map {cell_name @$_}
                                        [1, 1], [2, 5], [1, 9],
                                        [5, 2], [5, 5], [5, 8],
                                        [9, 1], [8, 5], [9, 9]);
-    $self;
 }
 
 ################################################################################
@@ -506,7 +512,7 @@ sub init_girandola_house ($self) {
 #
 ################################################################################
 
-sub init_center_dot_house ($self) {
+sub init_center_dot_house ($self, %args) {
     my $width  = $self -> box_width;
     my $height = $self -> box_height;
     my $size   = $self -> size;
@@ -514,7 +520,8 @@ sub init_center_dot_house ($self) {
     #
     # We can only do center dots if boxes are odd sized width and heigth.
     #
-    return $self unless $width % 2 && $height % 2;
+    return $self unless $width % 2 && $height % 2 &&
+                        $args {houses} && $args {houses} & $CENTER_DOT;
 
     my $width_start  = ($width  + 1) / 2;
     my $height_start = ($height + 1) / 2;
@@ -571,9 +578,6 @@ sub init_center_dot_house ($self) {
 
 
 sub init_diagonals ($self, %args) {
-    #
-    # For now, just do the main and minor diagonals
-    #
     my $diagonals = $args {diagonals} or return $self;
 
     my $size = $self -> size;
@@ -623,7 +627,6 @@ sub init_diagonals ($self, %args) {
                      map {cell_name $size - $_ + 1, $_ + $s} 1 .. $size - $s);
         }
     }
-
 
     $self
 }
@@ -723,7 +726,7 @@ sub houses ($self) {
 
 ################################################################################
 #
-# init_clues ($self, $clues)
+# init_clues ($self, %args)
 #
 # Take the supplied clues (if any!), and return a structure which maps cell
 # names to clue values.
@@ -741,26 +744,28 @@ sub houses ($self) {
 #
 ################################################################################
 
-sub init_clues ($self, $in_clues) {
+sub init_clues ($self, %args) {
+    my $in_clues = $args {clues} or return $self;
+
     my $clues = {};
-    if ($in_clues) {
-        #
-        # Turn a string into an array
-        #
-        if (!ref $in_clues) {
-            my @rows  = grep {/\S/} split /\n/ => $in_clues;
-            $in_clues = [map {[split]} @rows];
-        }
-        foreach my $r (keys @$in_clues) {
-            foreach my $c (keys @{$$in_clues [$r]}) {
-                my $val  = $$in_clues [$r] [$c];
-                next if !$val || $val eq ".";
-                my $cell = cell_name $r + 1, $c + 1;
-                $$clues {$cell} = $val;
-            }
+    #
+    # Turn a string into an array
+    #
+    if (!ref $in_clues) {
+        my @rows  = grep {/\S/} split /\n/ => $in_clues;
+        $in_clues = [map {[split]} @rows];
+    }
+    foreach my $r (keys @$in_clues) {
+        foreach my $c (keys @{$$in_clues [$r]}) {
+            my $val  = $$in_clues [$r] [$c];
+            next if !$val || $val eq ".";
+            my $cell = cell_name $r + 1, $c + 1;
+            $$clues {$cell} = $val;
         }
     }
     $clues {$self} = $clues;
+
+    $self;
 }
 
 
@@ -814,14 +819,12 @@ sub init ($self, %args) {
         $args {size} = $NR_OF_SYMBOLS;
     }
 
-    $self -> init_sizes   ($args {size});
-    $self -> init_values;
-    $self -> init_houses  (%args);
-    $self -> init_clues   ($args {clues});
+    $self -> init_sizes               (%args)
+          -> init_values              (%args)
+          -> init_houses              (%args)
+          -> init_clues               (%args)
+          -> init_subject_and_pattern ();
 
-    $self -> init_subject_and_pattern ();
-
-    $self;
 }
 
 
@@ -1001,8 +1004,10 @@ sub init_subject_and_pattern ($self) {
         }
     }
 
-    $subjec  {$self} =       $subject;
+    $subject {$self} =       $subject;
     $pattern {$self} = "^" . $pattern . '$';
+
+    $self;
 }
 
 

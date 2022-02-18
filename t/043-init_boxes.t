@@ -19,7 +19,7 @@ foreach my $size (4, 6, 9, 12, 16) {
     my $sudoku = Regexp::Sudoku:: -> new;  # Don't call init(), as that
                                            # will create houses.
 
-    $sudoku -> init_sizes ($size);
+    $sudoku -> init_sizes (size => $size);
     $sudoku -> init_boxes;
 
     my $box_width    = $sudoku -> box_width;
