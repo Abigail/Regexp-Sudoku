@@ -319,7 +319,7 @@ sub init_columns ($self, %args) {
 #
 # Initialize the boxes in the sudoku. Calculates which cells belong to which
 # boxes, and calls create_house for each box. Called from init_houses.
-# Columns are named "B1-1" .. "Bh-w" where we have h rows of w boxes.
+# Boxes are named "B1-1" .. "Bh-w" where we have h rows of w boxes.
 #
 # TESTS: 043-init_boxes
 #
