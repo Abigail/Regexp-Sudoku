@@ -71,6 +71,17 @@ our $CENTER_DOT  = 1 << 3;
 
 ################################################################################
 #
+# Constraints
+#
+# TESTS: Constants/120-constraints.t
+#
+################################################################################
+
+our $ANTI_KNIGHT = 1 << 0;
+our $ANTI_KING   = 1 << 1;
+
+################################################################################
+#
 # Exporting the symbols
 #
 ################################################################################
@@ -80,6 +91,7 @@ our @ISA         = qw [Exporter];
 our %EXPORT_TAGS = (
     Diagonals    => [map {"\$$_"} @tokens, @aliases, @sets],
     Houses       => [qw [$NRC $ASTERISK $GIRANDOLA $CENTER_DOT]],
+    Constraints  => [qw [$ANTI_KNIGHT $ANTI_KING]],
 );
 our @EXPORT_OK   = map {@$_} values %EXPORT_TAGS;
 
