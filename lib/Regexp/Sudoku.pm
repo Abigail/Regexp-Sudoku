@@ -1004,7 +1004,7 @@ sub init_subject_and_pattern ($self) {
         }
     }
 
-    $subject  {$self} =       $subject;
+    $subjec  {$self} =       $subject;
     $pattern {$self} = "^" . $pattern . '$';
 }
 
