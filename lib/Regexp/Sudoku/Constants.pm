@@ -27,9 +27,12 @@ my   @aliases =  qw [MAIN MINOR SUB0 MINOR_SUB0
 my   @sets    =  qw [CROSS DOUBLE TRIPLE ARGYLE];
 push @sets    => map {"CROSS$_"} 0 .. 34;
 
+our  $ALL_DIAGONALS;
+
 foreach my $i (keys @tokens) {
     no strict 'refs';
     no warnings 'once';
+    vec ($ALL_DIAGONALS, $i, 1) = 1;
     vec (${$tokens [$i]} = "", $i, 1) = 1;
 }
 
@@ -54,6 +57,8 @@ our $DOUBLE      = our $CROSS1;
 our $TRIPLE      = $CROSS  |.     $CROSS1;
 our $ARGYLE      = $CROSS1 |. our $CROSS4;
 
+# our $ALL_DIAGONALS   = "";
+#     $ALL_DIAGONALS |.= $_ foreach @tokens;
 
 ################################################################################
 #
@@ -67,6 +72,7 @@ our $NRC         = 1 << 0;
 our $ASTERISK    = 1 << 1;
 our $GIRANDOLA   = 1 << 2;
 our $CENTER_DOT  = 1 << 3;
+our $ALL_HOUSES  = $NRC | $ASTERISK | $GIRANDOLA | $CENTER_DOT;
 
 
 ################################################################################
@@ -77,8 +83,10 @@ our $CENTER_DOT  = 1 << 3;
 #
 ################################################################################
 
-our $ANTI_KNIGHT = 1 << 0;
-our $ANTI_KING   = 1 << 1;
+our $ANTI_KNIGHT     = 1 << 0;
+our $ANTI_KING       = 1 << 1;
+our $ALL_CONSTRAINTS = $ANTI_KNIGHT | $ANTI_KING;
+
 
 ################################################################################
 #
@@ -89,11 +97,12 @@ our $ANTI_KING   = 1 << 1;
 use Exporter ();
 our @ISA         = qw [Exporter];
 our %EXPORT_TAGS = (
-    Diagonals    => [map {"\$$_"} @tokens, @aliases, @sets],
-    Houses       => [qw [$NRC $ASTERISK $GIRANDOLA $CENTER_DOT]],
-    Constraints  => [qw [$ANTI_KNIGHT $ANTI_KING]],
+    Diagonals    => [map {"\$$_"} @tokens, @aliases, @sets, "ALL_DIAGONALS"],
+    Houses       => [qw [$NRC $ASTERISK $GIRANDOLA $CENTER_DOT $ALL_HOUSES]],
+    Constraints  => [qw [$ANTI_KNIGHT $ANTI_KING $ALL_CONSTRAINTS]],
 );
 our @EXPORT_OK   = map {@$_} values %EXPORT_TAGS;
+    $EXPORT_TAGS {All} = \@EXPORT_OK;
 
 
 1;

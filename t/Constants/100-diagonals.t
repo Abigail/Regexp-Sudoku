@@ -7,6 +7,7 @@ use warnings;
 no  warnings 'syntax';
 
 use lib qw [lib ../../lib];
+use experimental 'signatures';
 
 use Test::More 0.88;
 
@@ -25,6 +26,8 @@ my %aliases = qw [
     MINOR_SUB     MINOR_SUB1
     CROSS         CROSS0
     DOUBLE        CROSS1
+    SUB0          SUPER0
+    MINOR_SUB0    MINOR_SUPER0
 ];
 
 my %sets = (
@@ -36,21 +39,43 @@ foreach my $i (1 .. 34) {
     $sets {"CROSS$i"} = ["SUB$i", "SUPER$i", "MINOR_SUB$i", "MINOR_SUPER$i"];
 }
 
-my      @tokens =  map {("SUB$_", "SUPER$_")} "", 0 .. 34;
-push    @tokens => map {"MINOR_$_"} @tokens;
+my      @base   =  map {("SUB$_", "SUPER$_")} 0 .. 34;
+push    @base   => map {"MINOR_$_"} @base;
+
+        @base   =  grep {!$aliases {$_}} @base;
+
+my      @tokens =  @base;
 #
 # Aliases
 #
-push    @tokens => qw [MAIN MINOR SUPER SUB MINOR_SUPER MINOR_SUB];
+push    @tokens => keys %aliases;
 #
 # Sets
 #
-push    @tokens => qw [CROSS DOUBLE TRIPLE ARGYLE];
+push    @tokens => keys %sets;
 
-foreach my $token (@tokens) {
+foreach my $token (@tokens, "ALL_DIAGONALS") {
     no strict 'refs';
     ok defined $$token, "\$$token set";
 }
+
+
+for (my $i = 0; $i < @base; $i ++) {
+    for (my $j = $i + 1; $j < @base; $j ++) {
+        no strict 'refs';
+        ok +(${$tokens [$i]} &. ${$tokens [$j]}) =~ /^\0*$/,
+             sprintf '$%s and $%s share no bits', $tokens [$i], $tokens [$j];
+    }
+}
+
+
+foreach my $token (@tokens) {
+    no strict 'refs';
+    is $$token, $$token &. $::ALL_DIAGONALS,
+     "\$$token is contained in \$ALL_DIAGONALS";
+}
+
+
 
 print <<"--";
 #

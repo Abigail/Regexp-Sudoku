@@ -16,17 +16,23 @@ use Regexp::Sudoku::Constants qw [:Constraints];
 
 my @tokens = qw [ANTI_KNIGHT ANTI_KING];
 
-foreach my $token (@tokens) {
+foreach my $token (@tokens, "ALL_CONSTRAINTS") {
     no strict 'refs';
     ok defined $$token, "\$$token set";
 }
 
-foreach my $token_1 (@tokens) {
-    foreach my $token_2 (@tokens) {
-        next if $token_1 eq $token_2;
+for (my $i = 0; $i < @tokens; $i ++) {
+    for (my $j = $i + 1; $j < @tokens; $j ++) {
         no strict 'refs';
-        isnt $$token_1, $$token_2, "\$$token_1 != \$$token_2";
+        ok !(${$tokens [$i]} & ${$tokens [$j]}),
+             sprintf '$%s and $%s share no bits', $tokens [$i], $tokens [$j];
     }
+}
+
+foreach my $token (@tokens) {
+    no strict 'refs';
+    is $$token, $$token & $::ALL_CONSTRAINTS,
+      "\$$token is contained in \$ALL_CONSTRAINTS";
 }
 
 
