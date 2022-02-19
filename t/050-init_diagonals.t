@@ -11,6 +11,7 @@ use experimental 'signatures';
 use lib qw [lib ../lib];
 
 use Test::More 0.88;
+use Test::Exception;
 
 our $r = eval "require Test::NoWarnings; 1";
 
@@ -99,6 +100,13 @@ test "Super minor diagonal 2",  $MINOR_SUPER2;
 test "Sub minor diagonal 2",    $MINOR_SUB2;
 test "Argyle",                  $ARGYLE;
 test "Argyle (12x12)",          $ARGYLE,          12;
+
+
+vec (my $diag = "", 200, 1) = 1;
+throws_ok {
+    Regexp::Sudoku:: -> new -> init (diagonals => $diag)
+} qr /^Unknown diagonal\(s\)/, "Do not allow unknown diagonals";
+
 
 Test::NoWarnings::had_no_warnings () if $r;
 

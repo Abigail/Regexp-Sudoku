@@ -618,9 +618,20 @@ sub init_center_dot_house ($self, $args = {}) {
 sub init_diagonals ($self, $args = {}) {
     my $diagonals = delete $$args {diagonals} or return $self;
 
+    my sub has_bit ($vec) {$vec =~ /[^\x{00}]/}
+
+    if (has_bit ($diagonals &. ~. $ALL_DIAGONALS) ||
+        length ($diagonals =~ s/\x{00}*$//r) > length ($ALL_DIAGONALS)) {
+        my $out = "";
+        my $r = $diagonals &. ~. $ALL_DIAGONALS;
+        for (my $i = 0; $i < 8 * length ($r); $i ++) {
+            $out .= vec ($r, $i, 1) ? 1 : 0;
+        }
+        die sprintf "Unknown diagonal(s): %s\n", $out;
+    }
+
     my $size = $self -> size;
 
-    my sub has_bit ($vec) {$vec =~ /[^\x{00}]/};
     #
     # Top left to bottom right
     #
