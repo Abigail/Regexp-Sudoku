@@ -392,6 +392,10 @@ sub init_boxes ($self, $args = {}) {
 
 sub init_houses ($self, $args = {}) {
     $houses {$self} = delete $$args {houses} || 0;
+    if ($houses {$self} & ~$ALL_HOUSES) {
+        die sprintf "Unknown house(s) '%d'\n", $houses {$self};
+    }
+
     $self -> init_rows             ($args)
           -> init_columns          ($args)
           -> init_boxes            ($args)
