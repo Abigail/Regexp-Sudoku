@@ -113,6 +113,8 @@ sub init_sizes ($self, $args) {
 
 sub init_size ($self, $args = {}) {
     $size {$self} = delete $$args {size} || $DEFAULT_SIZE;
+    die "Size should not exceed $NR_OF_SYMBOLS\n"
+               if $size {$self} > $NR_OF_SYMBOLS;
     $self;
 }
 
@@ -845,12 +847,6 @@ sub clue ($self, $cell) {
 
 sub init ($self, %args) {
     my $args = {%args};
-    #
-    # Copy some values into attributes. If they're undefined, that's fine.
-    #
-    if ($$args {size} && $$args {size} > $NR_OF_SYMBOLS) {
-        $$args {size} = $NR_OF_SYMBOLS;
-    }
 
     $self -> init_sizes     ($args)
           -> init_values    ($args)
