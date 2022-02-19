@@ -396,8 +396,7 @@ sub init_houses ($self, $args = {}) {
           -> init_nrc_houses       ($args)
           -> init_asterisk_house   ($args)
           -> init_girandola_house  ($args)
-          -> init_center_dot_house ($args)
-          -> init_diagonals        ($args);
+          -> init_center_dot_house ($args);
 }
 
 
@@ -853,10 +852,11 @@ sub init ($self, %args) {
         $$args {size} = $NR_OF_SYMBOLS;
     }
 
-    $self -> init_sizes  ($args)
-          -> init_values ($args)
-          -> init_houses ($args)
-          -> init_clues  ($args);
+    $self -> init_sizes     ($args)
+          -> init_values    ($args)
+          -> init_houses    ($args)
+          -> init_diagonals ($args)
+          -> init_clues     ($args);
 
     $constraints {$self} = delete $$args {constraints} || 0;
 
