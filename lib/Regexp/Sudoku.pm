@@ -31,6 +31,8 @@ my $NR_OF_SYMBOLS  = $NR_OF_DIGITS + $NR_OF_LETTERS;
 
 fieldhash my %size;
 fieldhash my %values;
+fieldhash my %evens;
+fieldhash my %odds;
 fieldhash my %box_width;
 fieldhash my %box_height;
 fieldhash my %values_range;
@@ -155,7 +157,12 @@ sub init_values ($self, $args = {}) {
                 ($NR_OF_DIGITS + 1) .. min $size, $NR_OF_SYMBOLS;
     }
 
+    my $evens = do {my $i = 1; join "" => grep {$i = !$i} split // => $values};
+    my $odds  = do {my $i = 0; join "" => grep {$i = !$i} split // => $values};
+
     $values {$self} = $values;
+    $evens  {$self} = $evens;
+    $odds   {$self} = $odds;
 
     $self -> init_values_range ($args);
 }
@@ -199,6 +206,38 @@ sub init_values_range ($self, $args = {}) {
 
 sub values ($self) {
     wantarray ? split // => $values {$self} : $values {$self};
+}
+
+
+################################################################################
+#
+# evens ($self)
+#
+# Return the set of even values used in the sudoku. In list context, this will
+# be an array of characters; in scalar context, a string.
+#
+# TESTS: 020_values.t
+#
+################################################################################
+
+sub evens ($self) {
+    wantarray ? split // => $evens  {$self} : $evens  {$self};
+}
+
+
+################################################################################
+#
+# odds ($self)
+#
+# Return the set of odd values used in the sudoku. In list context, this will
+# be an array of characters; in scalar context, a string.
+#
+# TESTS: 020_values.t
+#
+################################################################################
+
+sub odds  ($self) {
+    wantarray ? split // => $odds   {$self} : $odds   {$self};
 }
 
 
@@ -946,13 +985,17 @@ sub make_clue ($self, $cell, $value) {
 #
 ################################################################################
 
-sub make_empty ($self, $cell) {
-    my $subsub = $self -> values;
+sub make_empty ($self, $cell, $method = "values") {
+    my $subsub = $self -> $method;
     my $range  = $self -> values_range;
     my $subpat = "[$range]*(?<$cell>[$range])[$range]*";
 
     map {$_ . $SENTINEL} $subsub, $subpat;
 }
+
+sub make_any  ($self, $cell) {$self -> make_empty ($cell, "values")}
+sub make_even ($self, $cell) {$self -> make_empty ($cell, "evens")}
+sub make_odd  ($self, $cell) {$self -> make_empty ($cell, "odds")}
 
 
 ################################################################################
@@ -970,8 +1013,10 @@ sub make_empty ($self, $cell) {
 sub make_cell ($self, $cell) {
     my $clue = $self -> clue ($cell);
 
-    $clue ? $self -> make_clue  ($cell, $clue)
-          : $self -> make_empty ($cell);
+    ! $clue        ? $self -> make_any   ($cell)
+    : $clue eq 'e' ? $self -> make_even  ($cell)
+    : $clue eq 'o' ? $self -> make_odd   ($cell)
+    :                $self -> make_clue  ($cell, $clue)
 }
 
 
