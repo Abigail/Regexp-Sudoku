@@ -833,6 +833,41 @@ sub clue ($self, $cell) {
     $clues {$self} {$cell}
 }
 
+################################################################################
+#
+# init_constraints ($self, $args)
+#
+# Set the constraints for the sudoku. Die if the constrainst do not validate.
+#
+# TESTS: 060-constraints.t
+#
+################################################################################
+
+sub init_constraints ($self, $args = {}) {
+    $constraints {$self} = delete $$args {constraints} || 0;
+    if ($constraints {$self} & ~$ALL_CONSTRAINTS) {
+        die sprintf "Unknown constraint(s) '%d'\n", $constraints {$self};
+    }
+
+    $self;
+}
+
+
+################################################################################
+#
+# constraints ($self)
+#
+# Return the constraints set for this sudoku.
+#
+# TESTS: 060-constraints.t
+#
+################################################################################
+
+sub constraints ($self) {
+    $constraints {$self} || 0;
+}
+
+
 
 ################################################################################
 #
@@ -848,13 +883,12 @@ sub clue ($self, $cell) {
 sub init ($self, %args) {
     my $args = {%args};
 
-    $self -> init_sizes     ($args)
-          -> init_values    ($args)
-          -> init_houses    ($args)
-          -> init_diagonals ($args)
-          -> init_clues     ($args);
-
-    $constraints {$self} = delete $$args {constraints} || 0;
+    $self -> init_sizes       ($args)
+          -> init_values      ($args)
+          -> init_houses      ($args)
+          -> init_diagonals   ($args)
+          -> init_constraints ($args)
+          -> init_clues       ($args);
 
     if (keys %$args) {
         die "Unknown parameter(s) to init: " . join (", " => keys %$args)
@@ -994,7 +1028,7 @@ sub must_differ ($self, $cell1, $cell2) {
 
     my ($r1, $c1)    = cell_row_column ($cell1);
     my ($r2, $c2)    = cell_row_column ($cell2);
-    my  $constraints = $constraints {$self};
+    my  $constraints = $self -> constraints;
 
     my $d_rows    = abs ($r1 - $r2);
     my $d_cols    = abs ($c1 - $c2);
