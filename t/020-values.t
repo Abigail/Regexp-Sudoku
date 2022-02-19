@@ -25,8 +25,6 @@ my @tests = (
                    "Large size"],
     [{size => 35}, "123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ",  "1-9A-Z",
                    "Max size"],
-    [{size => 42}, "123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ",  "1-9A-Z",
-                   "Over sized"],
 );
 
 
