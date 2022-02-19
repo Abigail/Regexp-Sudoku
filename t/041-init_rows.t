@@ -19,7 +19,7 @@ foreach my $size (4, 6, 9, 12, 16) {
     my $sudoku = Regexp::Sudoku:: -> new;  # Don't call init(), as that
                                            # will create houses.
     subtest "Rows for a ${size} x ${size} Sudoku" => sub {
-        $sudoku -> init_sizes (size => $size);
+        $sudoku -> init_sizes ({size => $size});
         $sudoku -> init_rows;
         foreach my $r (1 .. $size) {
             my $row = "R$r";

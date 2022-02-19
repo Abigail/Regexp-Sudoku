@@ -24,7 +24,8 @@ Solution
 3 4 7  5 8 9  1 6 2
 ==
 Args
-{center_dot => 1}
+use Regexp::Sudoku::Constants qw [:Houses];
+{houses => $CENTER_DOT}
 ==
 Name: Center Dot
 URL: http://www.cross-plus-a.com/sudoku.htm#CenterDot
