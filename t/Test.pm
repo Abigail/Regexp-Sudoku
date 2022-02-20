@@ -24,6 +24,20 @@ our @EXPORT = qw [run_sudoku];
 use Regexp::Sudoku;
 use Test::More;
 
+sub show ($size, $matches) {
+    say "    # ";
+    say "    # Got solution: ";
+    say "    # ";
+    for (my $r = 1; $r <= $size; $r ++) {
+        print "    # ";
+        for (my $c = 1; $c <= $size; $c ++) {
+            my $cell = "R${r}C${c}";
+            print $$matches {$cell}, " ";
+        }
+        print "\n";
+    }
+    say "    # ";
+}
 
 sub run_sudoku ($file) {
     #
@@ -100,13 +114,16 @@ sub run_sudoku ($file) {
 
         if ($solution) {
             $solution =~ s/^.*\n//;
-            my @exp = map {[/\S+/g]} grep {/\S/} split /\n/ => $solution;
+            my @exp  = map {[/\S+/g]} grep {/\S/} split /\n/ => $solution;
+            my $pass = 1;
             foreach my $r (1 .. $size) {
                 foreach my $c (1 .. $size) {
                     my $cell = "R${r}C${c}";
-                    is $plus {$cell}, $exp [$r - 1] [$c - 1], "Cell $cell";
+                    $pass &&=
+                       is $plus {$cell}, $exp [$r - 1] [$c - 1], "Cell $cell";
                 }
             }
+            show $size, \%plus unless $pass;
         }
     }
 }
