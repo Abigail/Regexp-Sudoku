@@ -9,7 +9,7 @@ no  warnings 'syntax';
 use experimental 'signatures';
 use experimental 'lexical_subs';
 
-our $VERSION     = '202202015';
+our $VERSION = '2022022001';
 
 ################################################################################
 #
