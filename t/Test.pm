@@ -119,8 +119,8 @@ sub run_sudoku ($file) {
             foreach my $r (1 .. $size) {
                 foreach my $c (1 .. $size) {
                     my $cell = "R${r}C${c}";
-                    $pass &&=
-                       is $plus {$cell}, $exp [$r - 1] [$c - 1], "Cell $cell";
+                    is $plus {$cell}, $exp [$r - 1] [$c - 1], "Cell $cell";
+                    $pass &&= $plus {$cell} eq $exp [$r - 1] [$c - 1];
                 }
             }
             show $size, \%plus unless $pass;

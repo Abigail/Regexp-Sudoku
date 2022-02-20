@@ -39,6 +39,8 @@ fieldhash my %values_range;
 fieldhash my %cell2houses;
 fieldhash my %house2cells;
 fieldhash my %clues;
+fieldhash my %is_even;
+fieldhash my %is_odd;
 fieldhash my %subject;
 fieldhash my %pattern;
 fieldhash my %houses;
@@ -835,7 +837,9 @@ sub houses ($self) {
 sub init_clues ($self, $args) {
     my $in_clues = delete $$args {clues} or return $self;
 
-    my $clues = {};
+    my $clues   = {};
+    my $is_even = {};
+    my $is_odd  = {};
     #
     # Turn a string into an array
     #
@@ -848,10 +852,14 @@ sub init_clues ($self, $args) {
             my $val  = $$in_clues [$r] [$c];
             next if !$val || $val eq ".";
             my $cell = cell_name $r + 1, $c + 1;
-            $$clues {$cell} = $val;
+            if    ($val eq 'e') {$$is_even {$cell} = 1}
+            elsif ($val eq 'o') {$$is_odd  {$cell} = 1}
+            else                {$$clues   {$cell} = $val}
         }
     }
-    $clues {$self} = $clues;
+    $clues   {$self} = $clues;
+    $is_even {$self} = $is_even;
+    $is_odd  {$self} = $is_odd;
 
     $self;
 }
@@ -883,9 +891,29 @@ sub clues ($self) {
 #
 ################################################################################
 
-sub clue ($self, $cell) {
-    $clues {$self} {$cell}
+sub clue     ($self , $cell) {
+    $clues   {$self} {$cell}
 }
+
+
+################################################################################
+#
+# is_even ($self, $cell)
+# is_odd  ($self, $cell)
+#
+# Returns wether the cell is given to be even/odd. 
+#
+# TESTS: 081-is_even_odd.t
+#
+################################################################################
+
+sub is_even  ($self,  $cell) {
+    $is_even {$self} {$cell}
+}
+sub is_odd   ($self,  $cell) {
+    $is_odd  {$self} {$cell}
+}
+
 
 ################################################################################
 #
@@ -965,7 +993,8 @@ sub init ($self, %args) {
 #
 ################################################################################
 
-sub make_clue ($self, $cell, $value) {
+sub make_clue ($self, $cell) {
+    my $value  = $self -> clue ($cell);
     my $subsub = $value;
     my $subpat = "(?<$cell>$value)";
 
@@ -1013,10 +1042,10 @@ sub make_odd  ($self, $cell) {$self -> make_empty ($cell, "odds")}
 sub make_cell ($self, $cell) {
     my $clue = $self -> clue ($cell);
 
-    ! $clue        ? $self -> make_any   ($cell)
-    : $clue eq 'e' ? $self -> make_even  ($cell)
-    : $clue eq 'o' ? $self -> make_odd   ($cell)
-    :                $self -> make_clue  ($cell, $clue)
+      $self -> clue    ($cell) ? $self -> make_clue ($cell)
+    : $self -> is_even ($cell) ? $self -> make_even ($cell)
+    : $self -> is_odd  ($cell) ? $self -> make_odd  ($cell)
+    :                            $self -> make_any  ($cell)
 }
 
 
