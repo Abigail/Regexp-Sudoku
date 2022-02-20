@@ -16,9 +16,6 @@ use Math::Sequence::DeBruijn;
 use Regexp::Sudoku::Constants qw [:Diagonals :Houses :Constraints];
 
 use Exporter ();
-our @ISA       = qw [Exporter];
-our @EXPORT    = qw [sudoku];
-our @EXPORT_OK = qw [run_sudoku];
 
 my $DEFAULT_SIZE   = 9;
 my $SENTINEL       = "\n";
