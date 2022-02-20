@@ -1219,15 +1219,182 @@ __END__
 
 =head1 NAME
 
-Regexp::Sudoku - Abstract
+Regexp::Sudoku - Solve Sudokus with regular expressions.
 
 =head1 SYNOPSIS
+
+ use Regexp::Sudoku;
+ my $sudoku = Regexp::Sudoku:: -> new -> init (clues <<~ '--')
+     5 3 .  . 7 .  . . .
+     6 . .  1 9 5  . . .
+     . 9 8  . . .  . 6 .
+
+     8 . .  . 6 .  . . 3
+     4 . .  8 . 3  . . 1
+     7 . .  . 2 .  . . 6
+
+     . 6 .  . . .  2 8 .
+     . . .  4 1 9  . . 5
+     . . .  . 8 .  . 7 9
+     --
+
+ my $subject = $sudoku -> subject;
+ my $pattern = $sudoku -> pattern;
+
+ if ($subject =~ $pattern) {
+    for my $row (1 .. 9) {
+        for my $col (1 .. 9) {
+            print $+ {"R${r}C${c}"}, " ";
+        }
+        print "\n";
+    }
+ }
 
 =head1 DESCRIPTION
 
 =head1 BUGS
 
 =head1 TODO
+
+=over 2
+
+=item *
+
+Disjoint Groups
+
+=item *
+
+Jigsaw
+
+=item *
+
+Battenburg
+
+=item *
+
+Greater Than
+
+=over 2
+
+=item *
+
+Thermo
+
+=item *
+
+Slow Thermo
+
+=item *
+
+Rossini
+
+=back
+
+=item *
+
+Consecutive Sudoku
+
+=over 2
+
+=item *
+
+Non-consecutive Sudoku
+
+=back
+
+=item *
+
+Kropki
+
+=over 2
+
+=item *
+
+Absolute difference = 1
+
+=item *
+
+Other differences
+
+=item *
+
+Ratio 1:2
+
+=item *
+
+Other ratios
+
+=back
+
+=item *
+
+XV Sudoku
+
+=item *
+
+CL Sudoku
+
+=item *
+
+Outsize Sudoku
+
+=item *
+
+Young Tableaux
+
+=item *
+
+Palindromes
+
+=item *
+
+Renban lines
+
+=over 2
+
+=item *
+
+Nabner
+
+=back
+
+=item *
+
+German Whisper
+
+=item *
+
+Clones
+
+=item *
+
+Quadruple
+
+=item *
+
+Killer Sudoku
+
+=item *
+
+Little Killer Sudoku
+
+=item *
+
+Frame Sudoku
+
+=item *
+
+Arrow Sudoku
+
+=item *
+
+Sandwich
+
+=item *
+
+Clock Sudoku
+
+=back
 
 =head1 SEE ALSO
 
@@ -1242,7 +1409,7 @@ Abigail, L<< mailto:cpan@abigail.freedom.nl >>.
 
 =head1 COPYRIGHT and LICENSE
 
-Copyright (C) 2021 by Abigail.
+Copyright (C) 2021-2022 by Abigail.
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),   
