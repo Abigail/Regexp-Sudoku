@@ -1252,6 +1252,12 @@ Regexp::Sudoku - Solve Sudokus with regular expressions.
 
 =head1 DESCRIPTION
 
+This module takes a sudoku (or variant) as input, calculates a subject
+and pattern, such that, if the pattern is matched agains the subject,
+the match succeeds if, and only if, the sudoku has a solution. And if
+it has a solution C<%+> is populated with the values of the cells of
+the solved sudoku.
+
 =head1 BUGS
 
 =head1 TODO
