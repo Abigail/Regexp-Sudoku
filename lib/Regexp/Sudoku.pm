@@ -779,12 +779,15 @@ sub cells  ($self, $sorted = 0) {
 
         @cells = map  {$$_ [0]}
                  sort {$$b [1] <=> $$a [1]  ||           # Clues first
-                       $$b [2] <=> $$a [2]  ||           # Favour nr clues seen
-                       $$b [3] <=> $$a [3]  ||           # More houses is better
+                       $$b [2] <=> $$a [2]  ||           # Even/Odd
+                       $$b [3] <=> $$a [3]  ||           # Favour nr clues seen
+                       $$b [4] <=> $$a [4]  ||           # More houses is better
                        $$a [0] cmp $$b [0]}
                  map  {
                      [$_,                                # Cell name
                       $self -> clue ($_) ? 1 : 0,        # Is a clue
+                      $self -> is_even ($_) ||
+                            $self -> is_odd ($_) || 0,   # Is odd/even
                       scalar keys (%{$sees {$_} || {}}), # Nr of clues cell sees
                       scalar $self -> cell2houses ($_),  # Nr of houses
                                                          #       cell is in
