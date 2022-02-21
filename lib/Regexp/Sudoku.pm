@@ -1255,8 +1255,195 @@ Regexp::Sudoku - Solve Sudokus with regular expressions.
 This module takes a sudoku (or variant) as input, calculates a subject
 and pattern, such that, if the pattern is matched agains the subject,
 the match succeeds if, and only if, the sudoku has a solution. And if
-it has a solution C<%+> is populated with the values of the cells of
+it has a solution C<< %+ >> is populated with the values of the cells of
 the solved sudoku.
+
+After constructing and initializing a sudoku object using
+C<< new >> and C<< init >> (see below), the object can be queried
+with C<< subject >> and C<< pattern >>. C<< subject >> returns 
+a string, while C<< pattern >> returns a pattern (as a string).
+
+Once the subject has been matched against the pattern, 81 (or rather
+C<< N ** 2 >> for an C<< N x N >> sudoku) named captures will be set:
+C<< R1C1 >> .. C<< R1C9 >> .. C<< R9C1 >> .. C<< R9C9 >>. These correspond
+to the values of the cells of a solved sudoku, where the cell in the
+top left is named C<< R1C1 >>, the cell in the top right C<< R1C9 >>,
+the cell in the bottom left C<< R9C1 >> and the cell in the bottom right
+C<< R9C9 >>. In general, the cell on row C<< r >> and column C<< c >>
+is named C<< RrCc >>. Named captures are available in C<< %+ >>
+(see L<< perlvar/%{^CAPTURE} >>).
+
+The C<< init >> method takes the following named parameters:
+
+=head2 C<< clues => STRING | ARRAYREF >>
+
+The C<< clues >> parameter is used to pass in the clue (aka givens)
+of a suduko. The clues are either given as a string, or a two
+dimensional arrayref. 
+
+In the case of a string, rows are separated by newlines, and values
+in a row by whitespace. The first line of the string corresponds
+with the first row of the sudoku, the second line with the second 
+row, etc. In each line, the first value corresponds with the first
+cell of that row, the second value with the second cell, etc.
+In case of an arrayref, the array consists of arrays of values. Each
+array corresponds with a row, and each element of the inner arrays
+corresponds with a cell.
+
+The values have the following meaning:
+
+=over 2
+
+=item C<< '1' .. '9', 'A' .. 'Z' >>
+
+This corresponds to a clue/given in the corresponding cell. For standard
+sudokus, we use C<< '1' .. '9' >>. Smaller sudokus use less digits.
+For sudokus greater than C<< 9 x 9 >>, capital letters are used, up to 
+C<< 'Z' >> for a C<< 35 x 35 >> sudoku.
+
+=item C<< '.' >>, C<< 0 >>, C<< "" >>, C << undef >>
+
+These values indicate the sudoku does not have a clue for the corresponding
+cell: the cell is blank. C<< "" >> and C<< undef >> can only be used
+if the array form is being used.
+
+=item C<< 'e' >>
+
+This indicates the cell should have an I<< even >> number in its solution.
+(Note that C<< 'E' >> indicates a clue (if the size is at least C<< 15 x 15 >>),
+and is different from C<< 'e' >>).
+
+=item C<< 'o' >>
+
+This indicates the cell should have an I<< odd >> number in its solution.
+(Note that C<< 'O' >> indicates a clue (if the size is at least C<< 25 x 25 >>),
+and is different from C<< 'o' >>).
+
+=head2 C<< size => INTEGER >>
+
+This is used to indicate the size of a sudoku. The default size is a
+C<< 9 x 9 >> sudoku. A size which exceeds C<< 35 >> is a fatal error.
+
+The size directly influences the size of the boxes (the rectangles where
+each of the numbers appears exactly once). For a size C<< N >>, the size
+of a box will be those integers C<< p >> and C<< q >> where C<< N = p * q >>,
+and which minimizes C<< abs (p - q) >>. Common sizes lead to the following
+box sizes:
+
+    size (N x N) | box size (width x height)
+    =============+==========================
+          4 *    |      2 x 2
+          6      |      3 x 2
+          8      |      4 x 2
+          9 *    |      3 x 3  (Default)
+         10      |      5 x 2
+         12      |      4 x 3
+         15      |      5 x 3
+         16 *    |      4 x 4
+         24      |      6 x 4
+         25 *    |      5 x 5
+         30      |      6 x 5
+         35      |      7 x 5
+
+Sizes which are perfect squares (marked with C<< * >> in the table above)
+lead to square boxes.
+
+=head2 C<< houses => MASK >>
+
+For sudoku variants with extra houses, this parameter is used to indicate
+which extra I<< houses >> are used. A I<< house >> is a region which 
+contains each of the numbers C<< 1 .. 9 >> (or C<< 1 .. N >> for an
+C<< N x N >> sized sudoku) exactly once. With a standard sudoku, each
+row, each column, and each C<< 3 x 3 >> box is a house.
+
+We recognize the following values (imported from
+C<< Regexp::Sudoku::Constants >>):
+
+=over 2
+
+=item C<< $NRC >>
+
+An I<< NRC >> sudoku has four additional houses, indicated below with
+the numbers C<< 1 .. 4 >>. This variant is only defined for C<< 9 x 9 >>
+sudokus:
+
+    . . .  . . .  . . .
+    . 1 1  1 . 2  2 2 .
+    . 1 1  1 . 2  2 2 .
+
+    . 1 1  1 . 2  2 2 .
+    . . .  . . .  . . .
+    . 3 3  3 . 4  4 4 .
+
+    . 3 3  3 . 4  4 4 .
+    . 3 3  3 . 4  4 4 .
+    . . .  . . .  . . .
+
+=item C<< $ASTERISK >>
+
+An I<< asterisk >> sudoku has an additional house, roughly in the
+shape of an asterisk, as indicated below. This variant is only defined
+for C<< 9 x 9 >> sudokus:
+
+    . . .  . . .  . . .
+    . . .  . * .  . . .
+    . . *  . . .  * . .
+
+    . . .  . . .  . . .
+    . * .  . * .  . * .
+    . . .  . . .  . . .
+
+    . . *  . . .  * . .
+    . . .  . * .  . . .
+    . . .  . . .  . . .
+
+=item C<< $GIRANDOLA >>
+
+An I<< girandola >> sudoku has an additional house, roughly in the
+shape of a I<< windmill pinwheel >> (a childs toy), as indicated below.
+This variant is only defined for C<< 9 x 9 >> sudokus:
+
+    * . .  . . .  . . *
+    . . .  . * .  . . .
+    . . .  . . .  . . .
+
+    . . .  . . .  . . .
+    . * .  . * .  . * .
+    . . .  . . .  . . .
+
+    . . .  . . .  . . .
+    . . .  . * .  . . .
+    * . .  . . .  . . *
+
+=item C<< $CENTER_DOT >>
+
+A I<< center dot >> house is an additional house which consists of
+all the center cell of all the boxes. This is only defined for sudokus
+where the boxes have odd sizes. (Sizes C<< 9 >>, C<< 15 >>, C<< 25 >>,
+and C<< 35 >>; see the table with sizes above). For a C<< 9 x 9 >>
+sudoku, this looks like:
+
+    . . .  . . .  . . .
+    . * .  . * .  . * .
+    . . .  . . .  . . .
+
+    . . .  . . .  . . .
+    . * .  . * .  . * .
+    . . .  . . .  . . .
+
+    . . .  . . .  . . .
+    . * .  . * .  . * .
+    . . .  . . .  . . .
+
+=back
+
+=head2 C<< diagonals => MASK >>
+
+TODO
+
+=head2 C<< constraints => MASK >>
+
+TODO
 
 =head1 BUGS
 
