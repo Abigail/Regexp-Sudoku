@@ -16,6 +16,7 @@ use Test;
 
 run_sudoku "sudokus/odd-even-1";
 run_sudoku "sudokus/even-1";
+run_sudoku "sudokus/odd-even-2";
 
 
 Test::NoWarnings::had_no_warnings () if $r;
