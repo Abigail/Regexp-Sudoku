@@ -1362,7 +1362,7 @@ C<< N x N >> sized sudoku) exactly once. With a standard sudoku, each
 row, each column, and each C<< 3 x 3 >> box is a house.
 
 We recognize the following values (imported from
-C<< Regexp::Sudoku::Constants >>):
+L<< Regexp::Sudoku::Constants >>):
 
 =over 2
 
@@ -1450,13 +1450,118 @@ sudoku, this looks like:
 
 =head2 C<< diagonals => MASK >>
 
-TODO
+The C<< diagonals >> parameter is used to indicate the sudoku has
+one or more constraints on diagonals: all values on the given
+diagonal(s) should be unique. There are many possible diagonals
+(34 for a C<< 9 x 9 >> sudoku, in general, C<< 4 * N - 2 >> for
+an C<< N x N >> sudoku. For a full explanation of all diagonals,
+see L<< Regexp::Sudoku::Constants >>.
+
+Here, we will list a couple of the most common ones:
+
+=over 2
+
+=item C<< $MAIN >>
+
+The main diagonal is the diagonal which runs from the top left to
+the bottom right. All values on this diagonal should be unique.
+
+    * . .  . . .  . . .
+    . * .  . . .  . . .
+    . . *  . . .  . . .
+
+    . . .  * . .  . . .
+    . . .  . * .  . . .
+    . . .  . . *  . . .
+
+    . . .  . . .  * . .
+    . . .  . . .  . * .
+    . . .  . . .  . . *
+
+=item C<< $MINOR >>
+
+The minor diagonal is the diagonal which runs from the bottom left to
+the top right. All values on this diagonal should be unique.
+
+    . . .  . . .  . . *
+    . . .  . . .  . * .
+    . . .  . . .  * . .
+
+    . . .  . . *  . . .
+    . . .  . * .  . . .
+    . . .  * . .  . . .
+
+    . . *  . . .  . . .
+    . * .  . . .  . . .
+    * . .  . . .  . . .
+
+
+=item C<< $CROSS >>
+
+This is a combination of main and minor diagonal constaints. The values
+on each of diagonals should be unique. 
+
+    * . .  . . .  . . *
+    . * .  . . .  . * .
+    . . *  . . .  * . .
+
+    . . .  * . *  . . .
+    . . .  . * .  . . .
+    . . .  * . *  . . .
+
+    . . *  . . .  * . .
+    . * .  . . .  . * .
+    * . .  . . .  . . *
+
+
+=item C<< $DOUBLE >>
+
+C<< $DOUBLE >> is used for a sudoku variant with four diagonals
+having unique values: the diagonals just above/below the main and
+minor diagonals:
+
+    . * .  . . .  . * .
+    * . *  . . .  * . *
+    . * .  * . *  . * .
+
+    . . *  . * .  * . .
+    . . .  * . *  . . .
+    . . *  . * .  * . .
+
+    . * .  * . *  . * .
+    * . *  . . .  * . *
+    . * .  . . .  . * .
+
+
+=item C<< $ARGYLE >>
+
+I<< Argyle >> sudokus have eight diagonals on which the values
+should be unique. This is named after a L<< pattern consisting of
+lozenges|https://en.wikipedia.org/wiki/Argyle_(pattern) >>, which
+itself was named after the tartans of the 
+L<< Clan Cambell |https://en.wikipedia.org/wiki/Clan_Campbell >>
+in Argyll in the Scottish highlands.
+
+
+    . 1 .  . 5 .  . 3 .
+    2 . 1  6 . 5  3 . 4
+    . 2 6  1 . 3  5 4 .
+
+    . 6 2  . 1 .  4 5 .
+    6 . .  2 . 1  . . 5
+    . 7 3  . 2 .  1 8 .
+
+    . 3 7  4 . 2  8 1 .
+    3 . 4  7 . 8  2 . 1
+    . 4 .  . 7 .  . 2 .
+
+=back
 
 =head2 C<< constraints => MASK >>
 
 Some variants have additional constraints, which apply to all cells
 in the sudoku. We recognize the following values (imported from
-C<< Regexp::Sudoku::Constants >>):
+L<< Regexp::Sudoku::Constants >>):
 
 =over 2
 
@@ -1514,6 +1619,8 @@ the cells which are a kings move away from the cell marked C<< O >>.
 =back
 
 =head1 BUGS
+
+There are no known bugs.
 
 =head1 TODO
 
