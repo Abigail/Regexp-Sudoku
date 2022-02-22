@@ -43,6 +43,10 @@ fieldhash my %pattern;
 fieldhash my %houses;
 fieldhash my %constraints;
 
+
+my sub has_bit ($vec) {$vec =~ /[^\x{00}]/}
+
+
 ################################################################################
 #
 # new ($class)
@@ -429,9 +433,15 @@ sub init_boxes ($self, $args = {}) {
 ################################################################################
 
 sub init_houses ($self, $args = {}) {
-    $houses {$self} = delete $$args {houses} || 0;
-    if ($houses {$self} & ~$ALL_HOUSES) {
-        die sprintf "Unknown house(s) '%d'\n", $houses {$self};
+    my $houses = $houses {$self} = delete $$args {houses} || "";
+    if (has_bit ($houses &. ~. $ALL_HOUSES) ||
+         length ($houses =~ s/\x{00}*$//r) > length ($ALL_HOUSES)) {
+        my $out = "";
+        my $r = $houses &. ~. $ALL_HOUSES;
+        for (my $i = 0; $i < 8 * length ($r); $i ++) {
+            $out .= vec ($r, $i, 1) ? 1 : 0;
+        }
+        die sprintf "Unknown house(s): %s\n", $out;
     }
 
     $self -> init_rows             ($args)
@@ -471,7 +481,7 @@ sub init_houses ($self, $args = {}) {
 
 sub init_nrc_houses ($self, $args = {}) {
     return $self unless $self -> size == $DEFAULT_SIZE &&
-               $houses {$self} & $NRC;
+                 has_bit ($houses {$self} &. $NRC);
 
     my @top_left = ([2, 2], [2, 6], [6, 2], [6, 6]);
     foreach my $i (keys @top_left) {
@@ -519,7 +529,7 @@ sub init_nrc_houses ($self, $args = {}) {
 
 sub init_asterisk_house ($self, $args = {}) {
     return $self unless $self -> size == $DEFAULT_SIZE &&
-               $houses {$self} & $ASTERISK;
+                 has_bit ($houses {$self} &. $ASTERISK);
 
     $self -> create_house ("AS" => map {cell_name @$_}
                                        [3, 3], [2, 5], [3, 7],
@@ -555,7 +565,7 @@ sub init_asterisk_house ($self, $args = {}) {
 
 sub init_girandola_house ($self, $args = {}) {
     return $self unless $self -> size == $DEFAULT_SIZE &&
-               $houses {$self} & $GIRANDOLA;
+                 has_bit ($houses {$self} &. $GIRANDOLA);
 
     $self -> create_house ("GR" => map {cell_name @$_}
                                        [1, 1], [2, 5], [1, 9],
@@ -597,7 +607,7 @@ sub init_center_dot_house ($self, $args = {}) {
     # We can only do center dots if boxes are odd sized width and heigth.
     #
     return $self unless $width % 2 && $height % 2 &&
-               $houses {$self} & $CENTER_DOT;
+                 has_bit ($houses {$self} &. $CENTER_DOT);
 
     my $width_start  = ($width  + 1) / 2;
     my $height_start = ($height + 1) / 2;
@@ -655,8 +665,6 @@ sub init_center_dot_house ($self, $args = {}) {
 
 sub init_diagonals ($self, $args = {}) {
     my $diagonals = delete $$args {diagonals} or return $self;
-
-    my sub has_bit ($vec) {$vec =~ /[^\x{00}]/}
 
     if (has_bit ($diagonals &. ~. $ALL_DIAGONALS) ||
         length ($diagonals =~ s/\x{00}*$//r) > length ($ALL_DIAGONALS)) {
@@ -930,9 +938,15 @@ sub is_odd   ($self,  $cell) {
 ################################################################################
 
 sub init_constraints ($self, $args = {}) {
-    $constraints {$self} = delete $$args {constraints} || 0;
-    if ($constraints {$self} & ~$ALL_CONSTRAINTS) {
-        die sprintf "Unknown constraint(s) '%d'\n", $constraints {$self};
+    my $constraints = $constraints {$self} = delete $$args {constraints} || "";
+    if (has_bit ($constraints &. ~. $ALL_CONSTRAINTS) ||
+         length ($constraints =~ s/\x{00}*$//r) > length ($ALL_CONSTRAINTS)) {
+        my $out = "";
+        my $r = $constraints &. ~. $ALL_CONSTRAINTS;
+        for (my $i = 0; $i < 8 * length ($r); $i ++) {
+            $out .= vec ($r, $i, 1) ? 1 : 0;
+        }
+        die sprintf "Unknown constraint(s) %s\n", $out;
     }
 
     $self;
@@ -1127,9 +1141,11 @@ sub must_differ ($self, $cell1, $cell2) {
     my $d_cols    = abs ($c1 - $c2);
 
     return $same_house
-        || ($constraints & $ANTI_KNIGHT) && (($d_rows == 1 && $d_cols == 2)  ||
-                                             ($d_rows == 2 && $d_cols == 1))
-        || ($constraints & $ANTI_KING)   &&   $d_rows == 1 && $d_cols == 1
+        || has_bit ($constraints &. $ANTI_KNIGHT) &&
+                                             (($d_rows == 1 && $d_cols == 2)  ||
+                                              ($d_rows == 2 && $d_cols == 1))
+        || has_bit ($constraints &. $ANTI_KING)   &&
+                                               $d_rows == 1 && $d_cols == 1
         ? 1 : 0;
 }
 
@@ -1769,6 +1785,8 @@ Clock Sudoku
 =back
 
 =head1 SEE ALSO
+
+L<< Regexp::Sudoku::Constants >>.
 
 =head1 DEVELOPMENT
 

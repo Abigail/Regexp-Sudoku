@@ -68,11 +68,11 @@ our $ARGYLE      = $CROSS1 |. our $CROSS4;
 #
 ################################################################################
 
-our $NRC         = 1 << 0;
-our $ASTERISK    = 1 << 1;
-our $GIRANDOLA   = 1 << 2;
-our $CENTER_DOT  = 1 << 3;
-our $ALL_HOUSES  = $NRC | $ASTERISK | $GIRANDOLA | $CENTER_DOT;
+vec (our $NRC        = "", 0, 1) = 1;
+vec (our $ASTERISK   = "", 1, 1) = 1;
+vec (our $GIRANDOLA  = "", 2, 1) = 1;
+vec (our $CENTER_DOT = "", 3, 1) = 1;
+     our $ALL_HOUSES = $NRC |. $ASTERISK |. $GIRANDOLA |. $CENTER_DOT;
 
 
 ################################################################################
@@ -83,9 +83,9 @@ our $ALL_HOUSES  = $NRC | $ASTERISK | $GIRANDOLA | $CENTER_DOT;
 #
 ################################################################################
 
-our $ANTI_KNIGHT     = 1 << 0;
-our $ANTI_KING       = 1 << 1;
-our $ALL_CONSTRAINTS = $ANTI_KNIGHT | $ANTI_KING;
+vec (our $ANTI_KNIGHT     = "", 0, 1) = 1;
+vec (our $ANTI_KING       = "", 1, 1) = 1;
+     our $ALL_CONSTRAINTS = $ANTI_KNIGHT |. $ANTI_KING;
 
 
 ################################################################################

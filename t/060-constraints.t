@@ -17,9 +17,9 @@ use Regexp::Sudoku;
 use Regexp::Sudoku::Constants qw [:Constraints];
 
 my @tests = (
-    $ANTI_KING                 =>  "Anti King constraint",
-    $ANTI_KNIGHT               =>  "Anti Knight constraint",
-    $ANTI_KING | $ANTI_KNIGHT  =>  "Set two constraints",
+    $ANTI_KING                  =>  "Anti King constraint",
+    $ANTI_KNIGHT                =>  "Anti Knight constraint",
+    $ANTI_KING |. $ANTI_KNIGHT  =>  "Set two constraints",
 );
 
 

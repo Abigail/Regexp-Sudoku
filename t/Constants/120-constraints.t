@@ -24,14 +24,14 @@ foreach my $token (@tokens, "ALL_CONSTRAINTS") {
 for (my $i = 0; $i < @tokens; $i ++) {
     for (my $j = $i + 1; $j < @tokens; $j ++) {
         no strict 'refs';
-        ok !(${$tokens [$i]} & ${$tokens [$j]}),
+        ok +(${$tokens [$i]} &. ${$tokens [$j]}) =~ /^\0*$/,
              sprintf '$%s and $%s share no bits', $tokens [$i], $tokens [$j];
     }
 }
 
 foreach my $token (@tokens) {
     no strict 'refs';
-    is $$token, $$token & $::ALL_CONSTRAINTS,
+    is $$token, $$token &. $::ALL_CONSTRAINTS,
       "\$$token is contained in \$ALL_CONSTRAINTS";
 }
 
