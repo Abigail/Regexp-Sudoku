@@ -109,3 +109,22 @@ our @EXPORT_OK   = map {@$_} values %EXPORT_TAGS;
 
 
 __END__
+
+
+=head1 NAME
+
+Regexp::Sudoku::Constants - Constants related to Regexp::Sudoku
+
+=head1 SYNOPSIS
+
+ use Regexp::Sudoku;
+ use Regexp::Sudoku::Constants qw [:Houses :Constraints :Diagonals];
+
+ my $sudoku = Regexp::Sudoku:: -> new -> init (
+    clues      => "...",
+    diagonals  => $MAIN |. $MINOR,
+    houses     => $NRC,
+    constaints => $ANTI_KING;
+
+=head1 DESCRIPTION
+
