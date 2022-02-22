@@ -1382,6 +1382,12 @@ sudokus:
     . 3 3  3 . 4  4 4 .
     . . .  . . .  . . .
 
+The NRC sudoku is named after the Dutch newspaper
+L<< NRC|https://www.nrc.nl/ >>, which first publishes such a sudoku
+and still publishes one L<< daily|https://www.nrc.nl/sudoku/ >>.
+It is also known under
+the names I<< Windoku >> and I<< Hyper Sudoku >>.
+
 =item C<< $ASTERISK >>
 
 An I<< asterisk >> sudoku has an additional house, roughly in the
