@@ -763,6 +763,12 @@ sub house2cells ($self, $house) {
 sub cells  ($self, $sorted = 0) {
     my @cells = sort keys %{$cell2houses  {$self}};
     if ($sorted) {
+        state $CELL_NAME    = 0;
+        state $IS_CLUE      = $CELL_NAME  + 1;
+        state $EVEN_ODD     = $IS_CLUE    + 1;
+        state $CLUES_SEEN   = $EVEN_ODD   + 1;
+        state $NR_OF_HOUSES = $CLUES_SEEN + 1;
+
         #
         # For each cell, determine how many different clues it sees.
         #
@@ -777,22 +783,20 @@ sub cells  ($self, $sorted = 0) {
             }
         }
 
-        @cells = map  {$$_ [0]}
-                 sort {$$b [1] <=> $$a [1]  ||           # Clues first
-                       $$b [2] <=> $$a [2]  ||           # Even/Odd
-                       $$b [3] <=> $$a [3]  ||           # Favour nr clues seen
-                       $$b [4] <=> $$a [4]  ||           # More houses is better
-                       $$a [0] cmp $$b [0]}
-                 map  {
-                     [$_,                                # Cell name
-                      $self -> clue ($_) ? 1 : 0,        # Is a clue
-                      $self -> is_even ($_) ||
-                            $self -> is_odd ($_) || 0,   # Is odd/even
-                      scalar keys (%{$sees {$_} || {}}), # Nr of clues cell sees
-                      scalar $self -> cell2houses ($_),  # Nr of houses
-                                                         #       cell is in
-                     ]
-                 }
+        @cells = map  {$$_ [$CELL_NAME]}
+                 sort {$$b [$IS_CLUE]      <=> $$a [$IS_CLUE]        ||       
+                       $$b [$EVEN_ODD]     <=> $$a [$EVEN_ODD]       ||      
+                       $$b [$CLUES_SEEN]   <=> $$a [$CLUES_SEEN]     ||   
+                       $$b [$NR_OF_HOUSES] <=> $$a [$NR_OF_HOUSES]   ||
+                       $$a [$CELL_NAME]    cmp $$b [$CELL_NAME]}
+                 map  {my $r = [];
+                       $$r [$CELL_NAME]     =  $_;
+                       $$r [$IS_CLUE]       =  $self -> clue ($_)    ? 1 : 0;
+                       $$r [$EVEN_ODD]      =  $self -> is_even ($_) ||
+                                               $self -> is_odd  ($_) ? 1 : 0;
+                       $$r [$CLUES_SEEN]    =  keys (%{$sees {$_}    || {}});
+                       $$r [$NR_OF_HOUSES]  =  $self -> cell2houses ($_);
+                       $r}
                  @cells;
     }
     @cells;
