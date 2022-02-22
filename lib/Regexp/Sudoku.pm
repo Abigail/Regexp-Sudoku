@@ -1322,6 +1322,8 @@ This indicates the cell should have an I<< odd >> number in its solution.
 (Note that C<< 'O' >> indicates a clue (if the size is at least C<< 25 x 25 >>),
 and is different from C<< 'o' >>).
 
+=back
+
 =head2 C<< size => INTEGER >>
 
 This is used to indicate the size of a sudoku. The default size is a
@@ -1452,7 +1454,64 @@ TODO
 
 =head2 C<< constraints => MASK >>
 
-TODO
+Some variants have additional constraints, which apply to all cells
+in the sudoku. We recognize the following values (imported from
+C<< Regexp::Sudoku::Constants >>):
+
+=over 2
+
+=item C<< $ANTI_KNIGHT >>
+
+An I<< anti knight >> constraint implies that two cells which are
+a knights move apart must have different values. (A knights move
+is first two cells in an orthognal direction, then one cell
+perpendicular). For each cell, this puts a restriction to up to
+eight different cells. In the diagram below, C<< * >> marks all
+the cells which are a knights move away from the cell marked C<< O >>.
+
+    . . .  . . .  . . .
+    . . .  . . .  . . .
+    . . *  . * .  . . .
+
+    . * .  . . *  . . .
+    . . .  O . .  . . .
+    . * .  . . *  . . .
+
+    . . *  . * .  . . .
+    . . .  . . .  . . .
+    . . .  . . .  . . .
+
+
+=item C<< $ANTI_KING >>
+
+Also known as the I<< no touch constraint >>.
+
+An I<< anti king >> constraint implies that two cells which are
+a king move apart must have different values. (A kings move
+is one step in any of the eight directions).
+
+For each cell, this puts a restriction to up to
+eight different cells. Four of them are already restricted
+because they are one the same row or columns. And at least
+one kings move will end in the same box. So, this restriction
+is far restrictive than the anti knights move restriction.
+
+In the diagram below, C<< * >> marks all
+the cells which are a kings move away from the cell marked C<< O >>.
+
+    . . .  . . .  . . .
+    . . .  . . .  . . .
+    . . .  . . .  . . .
+
+    . . *  * * .  . . .
+    . . *  O * .  . . .
+    . . *  * * .  . . .
+
+    . . .  . . .  . . .
+    . . .  . . .  . . .
+    . . .  . . .  . . .
+
+=back
 
 =head1 BUGS
 
