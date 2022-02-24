@@ -71,6 +71,7 @@ t/sudokus/girandola-2
 t/sudokus/nrc
 t/sudokus/nrc-2018-12-31
 t/sudokus/odd-even-1
+t/sudokus/odd-even-2
 t/sudokus/sudoku_4_25764
 t/sudokus/sudoku_6_fun
 t/sudokus/sudoku_6_griddlers
