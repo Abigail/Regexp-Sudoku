@@ -197,6 +197,118 @@ known as a I<< No Touch Sudoku >>.
 
 =head2 C<< :Diagonals >>
 
+Sudokus with constraints on I<< diagonals >> (the constraint being that
+the cells on one or more diagonals should be different) are configured
+with the C<< diagonals >> parameter, which takes one or more of the following
+constants as argument. 
+
+Note that there are many possible diagonals. For an C<< N x N >> Sudoku,
+there are C<< 4 * N - 2 >> possible diagonals; for a standard C<< 9 x 9 >>
+Sudoku, this means 34 possible diagonals. 
+
+=over 2
+
+=item C<< $MAIN >>
+
+This is used if the cells on the main diagonal, running from the
+top left to the bottom right, are all different. Aliases for 
+C<< $MAIN >> and C<< $SUB0 >> and C<< $SUPER0 >>.
+
+=item C<< $MINOR >>
+
+This is used if the cells on the minor diagonal, running from the
+bottom left to the top right, are all different. Aliases for 
+C<< $MINOR >> and C<< $MINOR_SUB0 >> and C<< $MINOR_SUPER0 >>.
+
+=item C<< $SUPER >>
+
+The super diagonal is the diagonal which runs one cell above (or to the
+right) of the main diagonal. This is an alias for C<< $SUPER1 >>.
+
+=item C<< $SUB >>
+
+The sub diagonal is the diagonal which runs one cell below (or to the
+left) of the main diagonal. This is an alias for C<< $SUB1 >>.
+
+=item C<< $MINOR_SUPER >>
+
+The minor super diagonal is the diagonal which runs one cell above (or to the
+left) of the minor diagonal. This is an alias for C<< $MINOR_SUPER1 >>.
+
+=item C<< $MINOR_SUB >>
+
+The minor sub diagonal is the diagonal which runs one cell below (or to the
+right) of the main diagonal. This is an alias for C<< $MINOR_SUB1 >>.
+
+=item C<< $SUPER1 .. $SUPER34 >>
+
+C<< $SUPERM >> is the diagonal which runs parallel to the main diagonal,
+C<< M >> cells above it (or to its right).
+
+Note: If we have an C<< N x N >> Sudoku, then if C<< M >= N >>, 
+this diagonal lies completely outside the Sudoku, and won't make any sense.
+If C<< M == N - 1 >> the diagonal only contains a single cell (the one in
+the top right corner), and will not contain any other cells to differ from.
+For a standard C<< 9 x 9 >> Sudoku, the diagonals C<< $SUPER7 >>
+and C<< $SUPER6 >> lie completely in the top right box, and hence, 
+don't impose any additional constraints.
+
+=item C<< $SUB1 .. $SUB34 >>
+
+C<< $SUBM >> is the diagonal which runs parallel to the main diagonal,
+C<< M >> cells below it (or to its left).
+
+The Note above applies here as well.
+
+=item C<< $MINOR_SUPER1 .. $MINOR_SUPER34 >>
+
+C<< $MINOR_SUPERM >> is the diagonal which runs parallel to the minor diagonal,
+C<< M >> cells above it (or to its left).
+
+The Note above applies here as well.
+
+=item C<< $MINOR_SUB1 .. $MINOR_SUB34 >>
+
+C<< $MINOR_SUBM >> is the diagonal which runs parallel to the minor diagonal,
+C<< M >> cells below it (or to its right).
+
+The Note above applies here as well.
+
+=item C<< $CROSS >>
+
+This is a mask oring C<< $MAIN >> and C<< $MINOR >> together
+(C<< $CROSS = $MAIN |. $MINOR >>). This is used to indicate cells
+on both the main and minor diagonals should differ. This is a common
+Sudoku variant, the I<< X-Sudoku >>. 
+
+=item C<< $CROSS1 .. $CROSS34 >>
+
+Each of those masks ors together the super, sub, minor super and minor sub
+diagonals C<< M >> steps (for C<< $CROSSM >>) above/below the main and
+minor diagonals. So, each C<< $CROSSM >> mask implies uniqueness 
+constraints on four diagonals.
+
+=item C<< $DOUBLE >>
+
+This is an alias for C<< $CROSS1 >>, and is used for a Sudoku variant
+where all the cells on the diagonals just next to the main and minor
+diagonals should be unique.
+
+=item C<< $TRIPLE >>
+
+This mask combines C<< $CROSS >> and C<< $CROSS1 >> 
+(C<< $TRIPLE = $CROSS |. $CROSS1 >>). This is used for the variant
+where the cells on the six largest diagonals (the main and minor
+diagonals, and the four right next to them) should be unique.
+
+=item C<< $ARGYLE >>
+
+This mask combines C<< $CROSS1 >> and C<< $CROSS4 >> and is used
+for the I<< Argyle Sudoku >> variant. The eight diagonals of this
+mask form a pattern known as an I<< argyle >> pattern.
+
+=back
+
 =head1 BUGS
 
 There are no known bugs.
