@@ -193,7 +193,7 @@ which only touch by their corners) must be different. These cells
 corresponds with a Kings move in Chess. This type of Sudoku is also
 known as a I<< No Touch Sudoku >>.
 
-=back 2
+=back
 
 =head2 C<< :Diagonals >>
 
