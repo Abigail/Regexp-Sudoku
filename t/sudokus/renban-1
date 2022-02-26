@@ -1,0 +1,33 @@
+6 9 4  . 2 .  . 7 8
+2 . 3  . . .  . . 5
+. . .  . . .  . 4 3
+
+. . .  . . .  . . .
+4 . .  . 3 .  . . 6
+. . .  . . .  . . .
+
+7 6 .  . . .  . . .
+9 . .  . . .  8 . 1
+3 1 .  . 5 .  7 6 4
+==
+Solution
+. . .  . . .  . . .
+. . .  . . .  . . .
+. . .  . . .  . . .
+
+. . .  . . .  . . .
+. . .  . . .  . . .
+. . .  . . .  . . .
+
+. . .  . . .  . . .
+. . .  . . .  . . .
+. . .  . . .  . . .
+==
+Args
+{renban => [[qw [R2C2 R3C2 R4C2 R4C3 R4C4]],
+            [qw [R2C8 R2C7 R2C6 R3C6 R4C6]],
+            [qw [R6C4 R7C4 R8C4 R8C3 R8C2]],
+            [qw [R6C6 R6C7 R6C8 R7C8 R8C8]]]}
+==
+Name: Renban Sudoku
+URL: https://logic-masters.de/Raetselportal/Raetsel/zeigen.php?id=0000YB
