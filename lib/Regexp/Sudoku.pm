@@ -11,7 +11,7 @@ use experimental 'lexical_subs';
 our $VERSION = '2022022401';
 
 use Hash::Util::FieldHash qw [fieldhash];
-use List::Util            qw [min];
+use List::Util            qw [min max];
 use Math::Sequence::DeBruijn;
 use Regexp::Sudoku::Constants qw [:Diagonals :Houses :Constraints];
 
@@ -42,6 +42,8 @@ fieldhash my %subject;
 fieldhash my %pattern;
 fieldhash my %houses;
 fieldhash my %constraints;
+fieldhash my %renban2cells;
+fieldhash my %cell2renbans;
 
 
 my sub has_bit ($vec) {$vec =~ /[^\x{00}]/}
@@ -968,6 +970,79 @@ sub constraints ($self) {
 }
 
 
+################################################################################
+#
+# init_renbans ($self)
+#
+# Initialize any renban lines/areas
+#
+# TESTS: 170-init_renban.t
+#
+################################################################################
+
+sub init_renbans ($self, $args) {
+    my $renbans = delete $$args {renban} or return $self;
+
+    $renbans = [$renbans] unless ref $$renbans [0];
+
+    my $count = 0;
+    foreach my $renban (@$renbans) {
+        my $name = "REN-" . ++ $count;
+        foreach my $cell (@$renban) {
+            $cell2renbans {$self} {$cell} {$name} = 1;
+            $renban2cells {$self} {$name} {$cell} = 1;
+        }
+    }
+
+    $self;
+}
+
+################################################################################
+#
+# cell2renbans ($self, $cell)
+#
+# Return a list of renbans a cell belongs to.
+#
+# TESTS: 170-init_renban.t
+#
+################################################################################
+
+sub cell2renbans ($self, $cell) {
+    keys %{$cell2renbans {$self} {$cell} || {}}
+}
+
+################################################################################
+#
+# renban2cells ($self, $cell)
+#
+# Return a list of cells in a renban.
+#
+# TESTS: 170-init_renban.t
+#
+################################################################################
+
+sub renban2cells ($self, $renban) {
+    keys %{$renban2cells {$self} {$renban} || {}}
+}
+
+################################################################################
+#
+# same_renban ($self, $cell1, $cell2)
+#
+# Return a list of renbans to which both $cell1 and $cell2 belong.
+# In scalar context, returns the number of renbans the cells both belong.
+#
+# TESTS: 171-same_renban.t
+#
+################################################################################
+
+sub same_renban ($self, $cell1, $cell2) {
+    my %seen;
+       $seen {$_} ++ for $self -> cell2renbans ($cell1),
+                         $self -> cell2renbans ($cell2);
+    grep {$seen {$_} > 1} keys %seen;
+}
+
 
 ################################################################################
 #
@@ -988,6 +1063,7 @@ sub init ($self, %args) {
           -> init_houses      ($args)
           -> init_diagonals   ($args)
           -> init_constraints ($args)
+          -> init_renbans     ($args)
           -> init_clues       ($args);
 
     if (keys %$args) {
@@ -1094,6 +1170,47 @@ sub semi_debruijn_seq ($self, $values = $values {$self}) {
 
 ################################################################################
 #
+# make_renban_clause ($self, $cell1, $cell2)
+#
+# Given two cell names, which are assumed to be in the same renban,
+# return a sub subject and a sub pattern, which makes iff the difference
+# between the cells is less than the size of the renban.
+#
+# For now, we assume no pair of different size renbans intersect more
+# than once.
+#
+# TESTS: 140-make_renban_clause.t
+#
+################################################################################
+
+sub make_renban_clause ($self, $cell1, $cell2) {
+    my ($name)  = $self -> same_renban ($cell1, $cell2);
+    my  $size   = $self -> renban2cells ($name);
+    my  @values = $self -> values;
+    my  $subsub = "";
+    my  $subpat = "";
+
+    for (my $i = 0; $i < @values; $i ++) {
+        my $d1 = $values [$i];
+        for (my $j = max (0, $i - $size + 1);
+                $j < min ($i + $size, scalar @values); $j ++) {
+            next if $i == $j;
+            my $d2 = $values [$j];
+            $subsub .= "$d1$d2";
+       }
+    }
+
+    my $range = $self -> values_range ();
+    my $pair  = "(?:[$range][$range])";
+
+    $subpat   = "$pair*\\g{$cell1}\\g{$cell2}$pair*";
+
+    map {$_ . $SENTINEL} $subsub, $subpat;
+}
+
+
+################################################################################
+#
 # make_diff_clause ($self, $cell1, $cell2)
 #
 # Given two cell names, return a sub subject and a sub pattern which matches
@@ -1180,8 +1297,8 @@ sub init_subject_and_pattern ($self) {
         $pattern .= $subpat;
 
         #
-        # Now, for all the previous cells, if they must differ,
-        # add a clause for that.
+        # Now, for all the previous cells, if there is a constraint
+        # between them, add a clause for them.
         #
         for my $j (0 .. $i - 1) {
             my $cell2 = $cells [$j];
@@ -1191,9 +1308,18 @@ sub init_subject_and_pattern ($self) {
             #
             next if $self -> clue ($cell1) && $self -> clue ($cell2);
 
-            if ($self -> must_differ ($cell1, $cell2)) {
-                my ($subsub, $subpat) =
-                             $self -> make_diff_clause ($cell1, $cell2);
+            my ($subsub, $subpat);
+
+            if (my @renbans = $self -> same_renban ($cell1, $cell2)) {
+                ($subsub, $subpat) = $self -> make_renban_clause
+                                                 ($cell1, $cell2);
+            }
+            elsif ($self -> must_differ ($cell1, $cell2)) {
+                ($subsub, $subpat) = $self -> make_diff_clause
+                                                 ($cell1, $cell2);
+            }
+
+            if ($subsub && $subpat) {
                 $subject .= $subsub;
                 $pattern .= $subpat;
             }

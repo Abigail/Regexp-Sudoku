@@ -30,6 +30,9 @@ t/140-make_diff_clause.t
 t/150-must_differ.t
 t/151-must_differ.t
 t/160-diff_clause.t
+t/170-init_renban.t
+t/171-same_renban.t
+t/172-make_renban_statement.t
 t/804-sudoku-4.t
 t/806-sudoku-6.t
 t/809-sudoku-9.t
