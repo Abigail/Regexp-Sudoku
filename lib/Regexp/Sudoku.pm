@@ -1077,17 +1077,17 @@ sub init ($self, %args) {
 
 ################################################################################
 #
-# make_clue ($self, $cell, $value)
+# make_clue_statement ($self, $cell, $value)
 #
 # Given a cell name, and a value, return a sub subject, and sub pattern
 # which sets the capture '$cell' to '$value'
 #
-# TESTS: 110-make_clue.t
-#        120-make_cell.t
+# TESTS: 110-make_clue_statement.t
+#        120-make_cell_statement.t
 #
 ################################################################################
 
-sub make_clue ($self, $cell) {
+sub make_clue_statement ($self, $cell) {
     my $value  = $self -> clue ($cell);
     my $subsub = $value;
     my $subpat = "(?<$cell>$value)";
@@ -1098,17 +1098,17 @@ sub make_clue ($self, $cell) {
 
 ################################################################################
 #
-# make_empty ($cell)
+# make_empty_statement ($cell)
 #
 # Given a cell name, return a sub subject and a sub pattern allowing the
 # cell to pick up one of the values in the sudoku.
 #
-# TESTS: 100-make_empty.t
-#        120-make_cell.t
+# TESTS: 100-make_empty_statement.t
+#        120-make_cell_statement.t
 #
 ################################################################################
 
-sub make_empty ($self, $cell, $method = "values") {
+sub make_empty_statement ($self, $cell, $method = "values") {
     my $subsub = $self -> $method;
     my $range  = $self -> values_range;
     my $subpat = "[$range]*(?<$cell>[$range])[$range]*";
@@ -1116,30 +1116,36 @@ sub make_empty ($self, $cell, $method = "values") {
     map {$_ . $SENTINEL} $subsub, $subpat;
 }
 
-sub make_any  ($self, $cell) {$self -> make_empty ($cell, "values")}
-sub make_even ($self, $cell) {$self -> make_empty ($cell, "evens")}
-sub make_odd  ($self, $cell) {$self -> make_empty ($cell, "odds")}
+sub make_any_statement  ($self, $cell) {
+    $self -> make_empty_statement ($cell, "values")
+}
+sub make_even_statement ($self, $cell) {
+    $self -> make_empty_statement ($cell, "evens")
+}
+sub make_odd_statement  ($self, $cell) {
+    $self -> make_empty_statement ($cell, "odds")
+}
 
 
 ################################################################################
 #
-# make_cell ($cell)
+# make_cell_statement ($cell)
 #
 # Given a cell name, return a subsubject and subpattern to set a value for
 # this cell. Either the cell has a clue (and we dispatch to make_clue),
 # or not (and we dispatch to make_empty).
 #
-# TESTS: 120-make_cell.t
+# TESTS: 120-make_cell_statement.t
 #
 ################################################################################
 
-sub make_cell ($self, $cell) {
+sub make_cell_statement ($self, $cell) {
     my $clue = $self -> clue ($cell);
 
-      $self -> clue    ($cell) ? $self -> make_clue ($cell)
-    : $self -> is_even ($cell) ? $self -> make_even ($cell)
-    : $self -> is_odd  ($cell) ? $self -> make_odd  ($cell)
-    :                            $self -> make_any  ($cell)
+      $self -> clue    ($cell) ? $self -> make_clue_statement ($cell)
+    : $self -> is_even ($cell) ? $self -> make_even_statement ($cell)
+    : $self -> is_odd  ($cell) ? $self -> make_odd_statement  ($cell)
+    :                            $self -> make_any_statement  ($cell)
 }
 
 
@@ -1170,7 +1176,7 @@ sub semi_debruijn_seq ($self, $values = $values {$self}) {
 
 ################################################################################
 #
-# make_renban_clause ($self, $cell1, $cell2)
+# make_renban_statement ($self, $cell1, $cell2)
 #
 # Given two cell names, which are assumed to be in the same renban,
 # return a sub subject and a sub pattern, which makes iff the difference
@@ -1179,11 +1185,11 @@ sub semi_debruijn_seq ($self, $values = $values {$self}) {
 # For now, we assume no pair of different size renbans intersect more
 # than once.
 #
-# TESTS: 140-make_renban_clause.t
+# TESTS: 140-make_renban_statement.t
 #
 ################################################################################
 
-sub make_renban_clause ($self, $cell1, $cell2) {
+sub make_renban_statement ($self, $cell1, $cell2) {
     my ($name)  = $self -> same_renban ($cell1, $cell2);
     my  $size   = $self -> renban2cells ($name);
     my  @values = $self -> values;
@@ -1211,16 +1217,16 @@ sub make_renban_clause ($self, $cell1, $cell2) {
 
 ################################################################################
 #
-# make_diff_clause ($self, $cell1, $cell2)
+# make_diff_statement ($self, $cell1, $cell2)
 #
 # Given two cell names, return a sub subject and a sub pattern which matches
 # iff the values in the cell differ.
 #
-# TESTS: 140-make_diff_clause.t
+# TESTS: 140-make_diff_statement.t
 #
 ################################################################################
 
-sub make_diff_clause ($self, $cell1, $cell2) {
+sub make_diff_statement ($self, $cell1, $cell2) {
     my $subsub = "";
     my @values = $self -> values;
     my $range  = $self -> values_range;
@@ -1292,7 +1298,7 @@ sub init_subject_and_pattern ($self) {
         #
         my $cell1 = $cells [$i];
 
-        my ($subsub, $subpat) = $self -> make_cell ($cell1);
+        my ($subsub, $subpat) = $self -> make_cell_statement ($cell1);
         $subject .= $subsub;
         $pattern .= $subpat;
 
@@ -1311,11 +1317,11 @@ sub init_subject_and_pattern ($self) {
             my ($subsub, $subpat);
 
             if (my @renbans = $self -> same_renban ($cell1, $cell2)) {
-                ($subsub, $subpat) = $self -> make_renban_clause
+                ($subsub, $subpat) = $self -> make_renban_statement
                                                  ($cell1, $cell2);
             }
             elsif ($self -> must_differ ($cell1, $cell2)) {
-                ($subsub, $subpat) = $self -> make_diff_clause
+                ($subsub, $subpat) = $self -> make_diff_statement
                                                  ($cell1, $cell2);
             }
 

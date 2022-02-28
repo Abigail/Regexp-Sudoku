@@ -39,7 +39,7 @@ for my $size (sort {$a <=> $b} keys %range) {
 
     my $exp_pat = "[$range]*\\g{$cell1}\\g{$cell2}[$range]*" . $SENTINEL;
 
-    my ($got_str, $got_pat) = $sudoku -> make_diff_clause ($cell1, $cell2);
+    my ($got_str, $got_pat) = $sudoku -> make_diff_statement ($cell1, $cell2);
 
     subtest "Size: $size", sub {
         subtest "Allowed pairs in string" => sub {

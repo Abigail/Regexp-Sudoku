@@ -25,7 +25,7 @@ my $sudoku = Regexp::Sudoku:: -> new -> init (clues => $clues);
 
 for my $clue (1 .. 9) {
     my $cell = "R${clue}C${clue}";
-    my ($got_str, $got_pat) = $sudoku -> make_clue ($cell);
+    my ($got_str, $got_pat) = $sudoku -> make_clue_statement ($cell);
     subtest "Clue $clue" => sub {
         is $got_str, "$clue$SENTINEL",           "String";
         is $got_pat, "(?<$cell>$clue)$SENTINEL", "Pattern";

@@ -39,9 +39,9 @@ foreach my $test (@tests) {
 
     my $sudoku = Regexp::Sudoku:: -> new -> init (%args);
 
-    my ($got_sub_a, $got_pat_a) = $sudoku -> make_any  ($cell);
-    my ($got_sub_e, $got_pat_e) = $sudoku -> make_even ($cell);
-    my ($got_sub_o, $got_pat_o) = $sudoku -> make_odd  ($cell);
+    my ($got_sub_a, $got_pat_a) = $sudoku -> make_any_statement  ($cell);
+    my ($got_sub_e, $got_pat_e) = $sudoku -> make_even_statement ($cell);
+    my ($got_sub_o, $got_pat_o) = $sudoku -> make_odd_statement  ($cell);
 
     subtest $name => sub {
         is $got_sub_a, $exp_sub_a, "Subject/any";

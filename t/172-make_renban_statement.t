@@ -24,7 +24,7 @@ for (my $size = 2; $size <= 9; $size ++) {
         my $sudoku = Regexp::Sudoku:: -> new -> init (renban => [\@cells]);
         my $cell1  = "R1C1";
         my $cell2  = "R${size}C${size}";
-        my ($subject, $pattern) = $sudoku -> make_renban_clause
+        my ($subject, $pattern) = $sudoku -> make_renban_statement
                                                 ($cell1, $cell2);
         SKIP: {
             ok $subject, "Got subject $subject";

@@ -23,7 +23,8 @@ foreach my $size (4, 6, 9, 12, 16) {
     subtest "Size = $size" => sub {
         my $sudoku  = Regexp::Sudoku:: -> new -> init (size => $size);
 
-        my ($subject, $pattern) = $sudoku -> make_diff_clause ($cell1, $cell2);
+        my ($subject, $pattern) =
+                      $sudoku -> make_diff_statement ($cell1, $cell2);
 
         my @values = map {$_ >= 10 ? chr (ord ('A') + $_ - 10) : $_} 1 .. $size;
 

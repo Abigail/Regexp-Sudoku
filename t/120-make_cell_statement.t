@@ -37,7 +37,7 @@ for my $r (keys @rows) {
     for my $c (keys @row) {
         my $value   = $row [$c];
         my $cell    = "R" . ($r + 1) . "C" . ($c + 1);
-        my ($got_str, $got_pat) = $sudoku -> make_cell ($cell);
+        my ($got_str, $got_pat) = $sudoku -> make_cell_statement ($cell);
         my ($exp_str, $exp_pat, $name);
 
         if (!$value) {
