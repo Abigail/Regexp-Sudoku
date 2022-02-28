@@ -8,7 +8,7 @@ no  warnings 'syntax';
 use experimental 'signatures';
 use experimental 'lexical_subs';
 
-our $VERSION = '2022022401';
+our $VERSION = '2022022801';
 
 use Hash::Util::FieldHash qw [fieldhash];
 use List::Util            qw [min max];
@@ -1769,6 +1769,25 @@ the cells which are a kings move away from the cell marked C<< O >>.
     . . .  . . .  . . .
 
 =back
+
+=head2 C<< renban => ARRAY OF ARRAY OF CELLNAME >>
+
+The C<< renban >> parameter is used to set one or more I<< renban >>
+lines or areas. Each renban area consists of consequtive values, in
+any order. For instance, a renban area consisting of five cells
+may contain the values C<< 3-7-5-4-6 >>, but not C<< 3-8-5-4-6 >> as
+those values are not consequtive.
+
+Each renban area is given as an array of cell names (of the form
+C<< RxCy >>, indicating the cell on row C<< Rx >> and column C<< Cy >>).
+The entire parameter value is an array of arrays, since we can have
+more than one renban area per Sudoku.
+
+=head3 Example
+
+ my $sudoku = Regexp::Sudoku:: -> new -> init
+               (renban => [[qw [R1C1 R1C2 R1C3]],   # Area in top left
+                           [qw [R7C9 R8C9 R9C9]]])  # Area in bottom right
 
 =head1 BUGS
 
