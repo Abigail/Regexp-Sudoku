@@ -14,7 +14,7 @@ my $r = eval "require Test::NoWarnings; 1";
 
 use Regexp::Sudoku::Constants qw [:Houses];
 
-my @tokens = qw [NRC ASTERISK GIRANDOLA CENTER_DOT];
+my @tokens = qw [NRC ASTERISK GIRANDOLA CENTER_DOT DISJOINT_GROUPS];
 
 foreach my $token (@tokens, "ALL_HOUSES") {
     no strict 'refs';

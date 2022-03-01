@@ -64,15 +64,18 @@ our $ARGYLE      = $CROSS1 |. our $CROSS4;
 #
 # Houses
 #
-# TESTS: Constants/110-diagonals.t
+# TESTS: Constants/110-houses.t
 #
 ################################################################################
 
-vec (our $NRC        = "", 0, 1) = 1;
-vec (our $ASTERISK   = "", 1, 1) = 1;
-vec (our $GIRANDOLA  = "", 2, 1) = 1;
-vec (our $CENTER_DOT = "", 3, 1) = 1;
-     our $ALL_HOUSES = $NRC |. $ASTERISK |. $GIRANDOLA |. $CENTER_DOT;
+my $hc = 0;
+vec (our $NRC             = "", $hc ++, 1) = 1;
+vec (our $ASTERISK        = "", $hc ++, 1) = 1;
+vec (our $GIRANDOLA       = "", $hc ++, 1) = 1;
+vec (our $CENTER_DOT      = "", $hc ++, 1) = 1;
+vec (our $DISJOINT_GROUPS = "", $hc ++, 1) = 1;
+     our $ALL_HOUSES = $NRC |. $ASTERISK |. $GIRANDOLA |. $CENTER_DOT |.
+                       $DISJOINT_GROUPS;
 
 
 ################################################################################
@@ -98,7 +101,8 @@ use Exporter ();
 our @ISA         = qw [Exporter];
 our %EXPORT_TAGS = (
     Diagonals    => [map {"\$$_"} @tokens, @aliases, @sets, "ALL_DIAGONALS"],
-    Houses       => [qw [$NRC $ASTERISK $GIRANDOLA $CENTER_DOT $ALL_HOUSES]],
+    Houses       => [qw [$NRC $ASTERISK $GIRANDOLA $CENTER_DOT $DISJOINT_GROUPS
+                         $ALL_HOUSES]],
     Constraints  => [qw [$ANTI_KNIGHT $ANTI_KING $ALL_CONSTRAINTS]],
 );
 our @EXPORT_OK   = map {@$_} values %EXPORT_TAGS;
@@ -171,6 +175,10 @@ This is for I<< Girandola Sudokus >>.
 =item C<< $CENTER_DOT >>
 
 This is for I<< center dot Sudokus >>.
+
+=item C<< $DISJOINT_GROUPS >>
+
+This is for I<< disjoint groups Sudokus >>.
 
 =back
 
