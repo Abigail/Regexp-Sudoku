@@ -176,6 +176,10 @@ This is for I<< Girandola Sudokus >>.
 
 This is for I<< center dot Sudokus >>.
 
+=item C<< $DISJOINT_GROUPS >>
+
+This is for I<< disjoint groups Sudokus >>.
+
 =back
 
 =head2 C<< :Constraints >>
