@@ -64,7 +64,7 @@ our $ARGYLE      = $CROSS1 |. our $CROSS4;
 #
 # Houses
 #
-# TESTS: Constants/110-diagonals.t
+# TESTS: Constants/110-houses.t
 #
 ################################################################################
 
