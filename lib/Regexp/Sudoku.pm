@@ -647,10 +647,6 @@ sub set_center_dot_house ($self) {
 ################################################################################
 
 my sub init_diagonal ($self, $type, $offset = 0) {
-    #
-    # $offset > 0: shift to the right
-    # $offset < 0: shift to the left
-    #
     my $size = $self -> size;
 
     return $self if $offset >= $size;
@@ -1052,10 +1048,10 @@ sub same_renban ($self, $cell1, $cell2) {
 sub init ($self, %args) {
     my $args = {%args};
 
-    $self -> init_sizes       ($args)
-          -> init_values      ($args)
-          -> init_houses      ($args)
-          -> init_clues       ($args);
+    $self -> init_sizes  ($args)
+          -> init_values ($args)
+          -> init_houses ($args)
+          -> init_clues  ($args);
 
     if (keys %$args) {
         die "Unknown parameter(s) to init: " . join (", " => keys %$args)

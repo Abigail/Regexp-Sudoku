@@ -23,8 +23,8 @@ Solution
 . . .  . . .  . . .
 . . .  . . .  . . .
 ==
-Args
-{ }
+Create
+Regexp::Sudoku:: -> new -> init
 ==
 Name: XXX
 URL: http://...

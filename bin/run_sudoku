@@ -27,17 +27,6 @@ else {
 my @sections = split /\n==\n/ => $input;
 my $clues = shift @sections;
 
-my ($arg_section) = grep {/^Args/} @sections;
-my $args = {};
-if ($arg_section) {
-    $arg_section =~ s/^.*\n//;  # Remove header
-    $args = eval $arg_section;
-    die "Cannot parse $arg_section" if $@;
-}
-
-my ($create_section) = grep {/^Create/} @sections;
-    $create_section =~ s/^.*\n// if $create_section;
-
 #
 # Figure out the size
 #
@@ -45,16 +34,18 @@ my @lines = split /\n/ => $input;
 my @first = $lines [0] =~ /\S+/g;
 my $size  = @first;
 
-my $sudoku;
+
+my ($create_section) = grep {/^Create/} @sections;
 if ($create_section) {
-    $sudoku = eval $create_section or die $@;
-    $sudoku -> set_clues ($clues)
+    $create_section =~ s/^.*\n//;
 }
 else {
-    $sudoku = Regexp::Sudoku:: -> new -> init (size  => $size,
-                                               clues => $clues,
-                                               %$args);
+    $create_section = "Regexp::Sudoku:: -> new -> init (size => $size)";
 }
+
+
+my $sudoku = eval $create_section or die $@;
+   $sudoku -> set_clues ($clues);
 
 my $subject  = $sudoku -> subject;
 my $pattern  = $sudoku -> pattern;
