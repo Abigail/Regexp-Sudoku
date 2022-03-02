@@ -19,7 +19,7 @@ t/049-set_center_dot_house.t
 t/050-set_diagonals.t
 t/051-set_diagonals.t
 t/052-set_diagonals.t
-t/080-clues.t
+t/080-set_clues.t
 t/081-is_even_odd.t
 t/090-cell_name_row_column.t
 t/100-make_empty_statement.t

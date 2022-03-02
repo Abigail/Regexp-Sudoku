@@ -26,8 +26,8 @@ my $test = << '--';  # Does not have to have a solution
 0  .  .  0  8  .  0  7  9
 --
 
-my $sudoku = Regexp::Sudoku:: -> new -> init (size  => 9,
-                                              clues => $test);
+my $sudoku = Regexp::Sudoku:: -> new -> init      (size  => 9)
+                                     -> set_clues ($test);
 
 my $exp_clues = {};
 my @rows = split /\n/ => $test;

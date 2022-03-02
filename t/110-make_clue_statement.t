@@ -21,7 +21,7 @@ foreach my $clue (1 .. 9) {
     $$clues [$clue - 1] [$clue - 1] = $clue;
 }
 
-my $sudoku = Regexp::Sudoku:: -> new -> init (clues => $clues);
+my $sudoku = Regexp::Sudoku:: -> new -> init -> set_clues ($clues);
 
 for my $clue (1 .. 9) {
     my $cell = "R${clue}C${clue}";

@@ -834,7 +834,7 @@ sub houses ($self) {
 
 ################################################################################
 #
-# init_clues ($self, $args)
+# set_clues ($self, $args)
 #
 # Take the supplied clues (if any!), and return a structure which maps cell
 # names to clue values.
@@ -848,13 +848,11 @@ sub houses ($self) {
 # We wil populate the clues attribute, mapping cell names to clue values.
 # Cells without clues won't be set.
 #
-# TESTS: 080-clues.t
+# TESTS: 080-set_clues.t
 #
 ################################################################################
 
-sub init_clues ($self, $args) {
-    my $in_clues = delete $$args {clues} or return $self;
-
+sub set_clues ($self, $in_clues) {
     my $clues   = {};
     my $is_even = {};
     my $is_odd  = {};
@@ -880,13 +878,6 @@ sub init_clues ($self, $args) {
     $is_odd  {$self} = $is_odd;
 
     $self;
-}
-
-#
-# FIXME: Once we're fully ported
-#
-sub set_clues ($self, $clues) {
-    $self -> init_clues ({clues => $clues});
 }
 
 
@@ -1050,8 +1041,7 @@ sub init ($self, %args) {
 
     $self -> init_sizes  ($args)
           -> init_values ($args)
-          -> init_houses ($args)
-          -> init_clues  ($args);
+          -> init_houses ($args);
 
     if (keys %$args) {
         die "Unknown parameter(s) to init: " . join (", " => keys %$args)
