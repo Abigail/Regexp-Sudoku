@@ -21,8 +21,8 @@ my %box_sizes = (
 );
 
 foreach my $size (sort {$a <=> $b} keys %box_sizes) {
-    my $sudoku = Regexp::Sudoku:: -> new -> init (size   => $size,
-                                                  houses => $CENTER_DOT);
+    my $sudoku = Regexp::Sudoku:: -> new -> init (size   => $size)
+                                         -> has_center_dot_house;
 
     my ($bw, $bh) = @{$box_sizes {$size}};
     my @exp_cells;

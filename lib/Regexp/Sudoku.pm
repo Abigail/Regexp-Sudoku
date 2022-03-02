@@ -431,21 +431,9 @@ sub init_boxes ($self, $args = {}) {
 ################################################################################
 
 sub init_houses ($self, $args = {}) {
-    my $houses = $houses {$self} = delete $$args {houses} || "";
-    if (has_bit ($houses &. ~. $ALL_HOUSES) ||
-         length ($houses =~ s/\x{00}*$//r) > length ($ALL_HOUSES)) {
-        my $out = "";
-        my $r = $houses &. ~. $ALL_HOUSES;
-        for (my $i = 0; $i < 8 * length ($r); $i ++) {
-            $out .= vec ($r, $i, 1) ? 1 : 0;
-        }
-        die sprintf "Unknown house(s): %s\n", $out;
-    }
-
-    $self -> init_rows             ($args)
-          -> init_columns          ($args)
-          -> init_boxes            ($args)
-          -> init_center_dot_house ($args);
+    $self -> init_rows     ($args)
+          -> init_columns  ($args)
+          -> init_boxes    ($args)
 }
 
 
@@ -567,7 +555,7 @@ sub has_girandola_house ($self) {
 
 ################################################################################
 #
-# sub init_center_dot_house ($self, $args)
+# sub has_center_dot_house ($self, $args)
 #
 # An center dot sudoku has an additional house: one cell from each box.
 # This method initializes that house.
@@ -586,11 +574,11 @@ sub has_girandola_house ($self) {
 #     . * .  . * .  . * .
 #     . . .  . . .  . . .
 #
-# TESTS: 049-init_center_dot_house.t
+# TESTS: 049-has_center_dot_house.t
 #
 ################################################################################
 
-sub init_center_dot_house ($self, $args = {}) {
+sub has_center_dot_house ($self) {
     my $width  = $self -> box_width;
     my $height = $self -> box_height;
     my $size   = $self -> size;
@@ -598,8 +586,7 @@ sub init_center_dot_house ($self, $args = {}) {
     #
     # We can only do center dots if boxes are odd sized width and heigth.
     #
-    return $self unless $width % 2 && $height % 2 &&
-                 has_bit ($houses {$self} &. $CENTER_DOT);
+    return $self unless $width % 2 && $height % 2;
 
     my $width_start  = ($width  + 1) / 2;
     my $height_start = ($height + 1) / 2;
