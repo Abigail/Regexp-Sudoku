@@ -13,7 +13,7 @@ our $VERSION = '2022022801';
 use Hash::Util::FieldHash qw [fieldhash];
 use List::Util            qw [min max];
 use Math::Sequence::DeBruijn;
-use Regexp::Sudoku::Constants qw [:Diagonals :Constraints];
+use Regexp::Sudoku::Constants qw [:Diagonals];
 
 use Exporter ();
 
@@ -24,6 +24,9 @@ my $CLAUSE_LIST    = ",";
 my $NR_OF_DIGITS   =  9;
 my $NR_OF_LETTERS  = 26;
 my $NR_OF_SYMBOLS  = $NR_OF_DIGITS + $NR_OF_LETTERS;
+
+my $ANTI_KNIGHT    = 1;
+my $ANTI_KING      = 2;
 
 
 fieldhash my %size;
@@ -914,42 +917,23 @@ sub is_odd   ($self,  $cell) {
 
 ################################################################################
 #
-# init_constraints ($self, $args)
+# has_anti_knight_constraint ($self)
+# has_anti_king_constraint ($self)
 #
-# Set the constraints for the sudoku. Die if the constrainst do not validate.
+# Set the anti knigt/anti king constraints for the sudoku.
 #
-# TESTS: 060-constraints.t
+# TESTS: 151-must-differ.t
 #
 ################################################################################
 
-sub init_constraints ($self, $args = {}) {
-    my $constraints = $constraints {$self} = delete $$args {constraints} || "";
-    if (has_bit ($constraints &. ~. $ALL_CONSTRAINTS) ||
-         length ($constraints =~ s/\x{00}*$//r) > length ($ALL_CONSTRAINTS)) {
-        my $out = "";
-        my $r = $constraints &. ~. $ALL_CONSTRAINTS;
-        for (my $i = 0; $i < 8 * length ($r); $i ++) {
-            $out .= vec ($r, $i, 1) ? 1 : 0;
-        }
-        die sprintf "Unknown constraint(s) %s\n", $out;
-    }
-
+sub has_anti_knight_constraint ($self) {
+    $constraints {$self} {$ANTI_KNIGHT} = 1;
     $self;
 }
 
-
-################################################################################
-#
-# constraints ($self)
-#
-# Return the constraints set for this sudoku.
-#
-# TESTS: 060-constraints.t
-#
-################################################################################
-
-sub constraints ($self) {
-    $constraints {$self} || 0;
+sub has_anti_king_constraint ($self) {
+    $constraints {$self} {$ANTI_KING} = 1;
+    $self;
 }
 
 
@@ -1045,7 +1029,6 @@ sub init ($self, %args) {
           -> init_values      ($args)
           -> init_houses      ($args)
           -> init_diagonals   ($args)
-          -> init_constraints ($args)
           -> init_renbans     ($args)
           -> init_clues       ($args);
 
@@ -1237,21 +1220,19 @@ sub must_differ ($self, $cell1, $cell2) {
     $seen {$_} ++ for $self -> cell2houses ($cell1),
                       $self -> cell2houses ($cell2);
 
-    my $same_house = grep {$_ > 1} values %seen;
+    my $same_house   = grep {$_ > 1} values %seen;
 
     my ($r1, $c1)    = cell_row_column ($cell1);
     my ($r2, $c2)    = cell_row_column ($cell2);
-    my  $constraints = $self -> constraints;
 
-    my $d_rows    = abs ($r1 - $r2);
-    my $d_cols    = abs ($c1 - $c2);
+    my $d_rows       = abs ($r1 - $r2);
+    my $d_cols       = abs ($c1 - $c2);
 
+    my $constraints = $constraints {$self};
     return $same_house
-        || has_bit ($constraints &. $ANTI_KNIGHT) &&
-                                             (($d_rows == 1 && $d_cols == 2)  ||
-                                              ($d_rows == 2 && $d_cols == 1))
-        || has_bit ($constraints &. $ANTI_KING)   &&
-                                               $d_rows == 1 && $d_cols == 1
+        || $$constraints {$ANTI_KNIGHT} && (($d_rows == 1 && $d_cols == 2) ||
+                                            ($d_rows == 2 && $d_cols == 1))
+        || $$constraints {$ANTI_KING}   &&   $d_rows == 1 && $d_cols == 1
         ? 1 : 0;
 }
 

@@ -63,19 +63,6 @@ our $ARGYLE      = $CROSS1 |. our $CROSS4;
 
 ################################################################################
 #
-# Constraints
-#
-# TESTS: Constants/120-constraints.t
-#
-################################################################################
-
-vec (our $ANTI_KNIGHT     = "", 0, 1) = 1;
-vec (our $ANTI_KING       = "", 1, 1) = 1;
-     our $ALL_CONSTRAINTS = $ANTI_KNIGHT |. $ANTI_KING;
-
-
-################################################################################
-#
 # Exporting the symbols
 #
 ################################################################################
@@ -84,7 +71,6 @@ use Exporter ();
 our @ISA         = qw [Exporter];
 our %EXPORT_TAGS = (
     Diagonals    => [map {"\$$_"} @tokens, @aliases, @sets, "ALL_DIAGONALS"],
-    Constraints  => [qw [$ANTI_KNIGHT $ANTI_KING $ALL_CONSTRAINTS]],
 );
 our @EXPORT_OK   = map {@$_} values %EXPORT_TAGS;
     $EXPORT_TAGS {All} = \@EXPORT_OK;
@@ -128,27 +114,6 @@ be used to import all the constants.
 We'll discuss the constants below, grouped by the tag which imports
 them. (You can still import each constant individually if you wish
 to do so).
-
-=head2 C<< :Constraints >>
-
-These constants are used for the C<< constraints >> parameter, and
-indicate which additionally constraints apply to the Sudoku variant.
-
-=over 2
-
-=item C<< $ANTI_KNIGHT >>
-
-In an I<< Anti-Knight Sudoku >>, cells which are a Knights move away
-(as in Chess) must be different.
-
-=item C<< $ANTI_KING >>
-
-In an I<< Anti-King Sudoku >>, cells which touch each other (including cells 
-which only touch by their corners) must be different. These cells
-corresponds with a Kings move in Chess. This type of Sudoku is also
-known as a I<< No Touch Sudoku >>.
-
-=back
 
 =head2 C<< :Diagonals >>
 
