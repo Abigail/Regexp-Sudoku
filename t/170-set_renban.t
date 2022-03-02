@@ -20,7 +20,10 @@ use Regexp::Sudoku;
 sub run_test ($name, @renbans) {
     subtest $name => sub {
         my %exp;
-        my $sudoku = Regexp::Sudoku:: -> new -> init (renban => \@renbans);
+        my $sudoku = Regexp::Sudoku:: -> new -> init;
+        foreach my $renban (@renbans) {
+            $sudoku -> set_renban (@$renban)
+        }
         foreach my $i (keys @renbans) {
             my $name = "REN-" . ($i + 1);
             my $set  = $renbans [$i];
