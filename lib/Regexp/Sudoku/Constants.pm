@@ -60,23 +60,6 @@ our $ARGYLE      = $CROSS1 |. our $CROSS4;
 # our $ALL_DIAGONALS   = "";
 #     $ALL_DIAGONALS |.= $_ foreach @tokens;
 
-################################################################################
-#
-# Houses
-#
-# TESTS: Constants/110-houses.t
-#
-################################################################################
-
-my $hc = 0;
-vec (our $NRC             = "", $hc ++, 1) = 1;
-vec (our $ASTERISK        = "", $hc ++, 1) = 1;
-vec (our $GIRANDOLA       = "", $hc ++, 1) = 1;
-vec (our $CENTER_DOT      = "", $hc ++, 1) = 1;
-vec (our $DISJOINT_GROUPS = "", $hc ++, 1) = 1;
-     our $ALL_HOUSES = $NRC |. $ASTERISK |. $GIRANDOLA |. $CENTER_DOT |.
-                       $DISJOINT_GROUPS;
-
 
 ################################################################################
 #
@@ -101,8 +84,6 @@ use Exporter ();
 our @ISA         = qw [Exporter];
 our %EXPORT_TAGS = (
     Diagonals    => [map {"\$$_"} @tokens, @aliases, @sets, "ALL_DIAGONALS"],
-    Houses       => [qw [$NRC $ASTERISK $GIRANDOLA $CENTER_DOT $DISJOINT_GROUPS
-                         $ALL_HOUSES]],
     Constraints  => [qw [$ANTI_KNIGHT $ANTI_KING $ALL_CONSTRAINTS]],
 );
 our @EXPORT_OK   = map {@$_} values %EXPORT_TAGS;
@@ -140,47 +121,13 @@ based on L<< Exporter >> tags; constants exported by the same tag
 can be mixed using the bitwise operators: C<< |. >>, C<< &. >>
 and C<< ~. >>.
 
-There are three tags C<< :Houses >>, C<< :Constraints >> and
+There are two tags C<< :Constraints >> and
 C<< :Diagonals >>. There is also the tag C<< :All >>, which can
 be used to import all the constants.
 
 We'll discuss the constants below, grouped by the tag which imports
 them. (You can still import each constant individually if you wish
 to do so).
-
-=head2 C<< :Houses >>
-
-These are used to signal the Sudoku variant uses additional houses.
-For a description of each additional house, see
-L<< Regexp::Sudoku >>.
-
-The constants are used for the C<< houses >> parameter of the
-C<< init >> function of C<< Regexp::Sudoku >>.
-
-=over 2
-
-=item C<< $NRC >>
-
-This is for I<< NRC Sudokus >>; also called I<< Windokus >> or
-I<< Hyper Sudokus >>.
-
-=item C<< $ASTERISK >>
-
-This is for I<< Asterisk Sudokus >>. 
-
-=item C<< $GIRANDOLA >>
-
-This is for I<< Girandola Sudokus >>. 
-
-=item C<< $CENTER_DOT >>
-
-This is for I<< center dot Sudokus >>.
-
-=item C<< $DISJOINT_GROUPS >>
-
-This is for I<< disjoint groups Sudokus >>.
-
-=back
 
 =head2 C<< :Constraints >>
 

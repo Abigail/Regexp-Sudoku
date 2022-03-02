@@ -13,7 +13,6 @@ use Test::More 0.88;
 our $r = eval "require Test::NoWarnings; 1";
 
 use Regexp::Sudoku;
-use Regexp::Sudoku::Constants qw [:Houses];
 
 my $size = 9;
 

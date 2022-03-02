@@ -13,7 +13,7 @@ our $VERSION = '2022022801';
 use Hash::Util::FieldHash qw [fieldhash];
 use List::Util            qw [min max];
 use Math::Sequence::DeBruijn;
-use Regexp::Sudoku::Constants qw [:Diagonals :Houses :Constraints];
+use Regexp::Sudoku::Constants qw [:Diagonals :Constraints];
 
 use Exporter ();
 
