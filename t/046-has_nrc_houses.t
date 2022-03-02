@@ -13,11 +13,12 @@ use Test::More 0.88;
 our $r = eval "require Test::NoWarnings; 1";
 
 use Regexp::Sudoku;
-use Regexp::Sudoku::Constants qw [:Houses];
 
 my $size = 9;
 
-my $sudoku = Regexp::Sudoku:: -> new -> init (houses => $NRC);
+my $sudoku = Regexp::Sudoku:: -> new
+                              -> init
+                              -> has_nrc_houses;
 
 my @tl = (undef, [2, 2], [2, 6], [6, 2], [6, 6]);
 my @EXP_CELLS;

@@ -449,7 +449,6 @@ sub init_houses ($self, $args = {}) {
     $self -> init_rows             ($args)
           -> init_columns          ($args)
           -> init_boxes            ($args)
-          -> init_nrc_houses       ($args)
           -> init_asterisk_house   ($args)
           -> init_girandola_house  ($args)
           -> init_center_dot_house ($args);
@@ -458,7 +457,7 @@ sub init_houses ($self, $args = {}) {
 
 ################################################################################
 #
-# init_nrc_houses ($self, $args)
+# has_nrc_houses ($self, $args)
 #
 # For NRC style puzzles, handle creating the houses.
 #
@@ -477,13 +476,12 @@ sub init_houses ($self, $args = {}) {
 #     . . .  . . .  . . .
 #
 #
-# TESTS: 046-init_nrc_houses.t
+# TESTS: 046-has_nrc_houses.t
 #
 ################################################################################
 
-sub init_nrc_houses ($self, $args = {}) {
-    return $self unless $self -> size == $DEFAULT_SIZE &&
-                 has_bit ($houses {$self} &. $NRC);
+sub has_nrc_houses ($self, $args = {}) {
+    return $self unless $self -> size == $DEFAULT_SIZE;
 
     my @top_left = ([2, 2], [2, 6], [6, 2], [6, 6]);
     foreach my $i (keys @top_left) {
@@ -544,10 +542,10 @@ sub init_asterisk_house ($self, $args = {}) {
 #
 # sub init_girandola_house ($self, $args)
 #
-# An asterisk sudoku has an additional house: one cell from each box.
+# An girandola sudoku has an additional house: one cell from each box.
 # This method initializes that house.
 #
-# An asterisk is defined for a 9 x 9 sudoku as follows:
+# An girandola is defined for a 9 x 9 sudoku as follows:
 #
 #     * . .  . . .  . . *
 #     . . .  . * .  . . .
@@ -579,10 +577,10 @@ sub init_girandola_house ($self, $args = {}) {
 #
 # sub init_center_dot_house ($self, $args)
 #
-# An asterisk sudoku has an additional house: one cell from each box.
+# An center dot sudoku has an additional house: one cell from each box.
 # This method initializes that house.
 #
-# An asterisk is defined for a 9 x 9 sudoku as follows:
+# A center dot is defined for a 9 x 9 sudoku as follows:
 #
 #     . . .  . . .  . . .
 #     . * .  . * .  . * .
@@ -876,6 +874,13 @@ sub init_clues ($self, $args) {
     $is_odd  {$self} = $is_odd;
 
     $self;
+}
+
+#
+# FIXME: Once we're fully ported
+#
+sub set_clues ($self, $clues) {
+    $self -> init_clues ({clues => $clues});
 }
 
 

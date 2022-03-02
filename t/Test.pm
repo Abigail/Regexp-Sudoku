@@ -68,6 +68,14 @@ sub run_sudoku ($file) {
     }
 
     #
+    # Find create, if any
+    #
+    my ($create_section) = grep {/^Create/} @chunks;
+    if ($create_section) {
+        $create_section =~ s/^.*\n//;
+    }
+
+    #
     # Find the size
     #
     my ($first) = split /\n/ => $clues;
@@ -86,9 +94,16 @@ sub run_sudoku ($file) {
         #
         # Sudoku object
         #
-        my $sudoku = Regexp::Sudoku:: -> new -> init (size  => $size,
-                                                      clues => $clues,
-                                                      %$args);
+        my $sudoku;
+        if ($create_section) {
+            $sudoku = eval $create_section;
+            $sudoku -> set_clues ($clues) if $sudoku;
+        }
+        else {
+            $sudoku = Regexp::Sudoku:: -> new -> init (size  => $size,
+                                                       clues => $clues,
+                                                       %$args);
+        }
 
         ok $sudoku, "Regexp::Sudoku object";
         return unless $sudoku;
