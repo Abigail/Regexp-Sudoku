@@ -450,7 +450,6 @@ sub init_houses ($self, $args = {}) {
           -> init_columns          ($args)
           -> init_boxes            ($args)
           -> init_asterisk_house   ($args)
-          -> init_girandola_house  ($args)
           -> init_center_dot_house ($args);
 }
 
@@ -540,7 +539,7 @@ sub init_asterisk_house ($self, $args = {}) {
 
 ################################################################################
 #
-# sub init_girandola_house ($self, $args)
+# sub has_girandola_house ($self, $args)
 #
 # An girandola sudoku has an additional house: one cell from each box.
 # This method initializes that house.
@@ -559,13 +558,12 @@ sub init_asterisk_house ($self, $args = {}) {
 #     . . .  . * .  . . .
 #     * . .  . . .  . . *
 #
-# TESTS: 048-init_girandola_house.t
+# TESTS: 048-has_girandola_house.t
 #
 ################################################################################
 
-sub init_girandola_house ($self, $args = {}) {
-    return $self unless $self -> size == $DEFAULT_SIZE &&
-                 has_bit ($houses {$self} &. $GIRANDOLA);
+sub has_girandola_house ($self) {
+    return $self unless $self -> size == $DEFAULT_SIZE;
 
     $self -> create_house ("GR" => map {cell_name @$_}
                                        [1, 1], [2, 5], [1, 9],
