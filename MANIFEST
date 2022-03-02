@@ -1,5 +1,4 @@
 lib/Regexp/Sudoku.pm
-lib/Regexp/Sudoku/Constants.pm
 Makefile.PL
 MANIFEST
 Changes
@@ -13,12 +12,13 @@ t/041-init_rows.t
 t/042-init_columns.t
 t/043-init_boxes.t
 t/045-init_houses.t
-t/046-init_nrc_houses.t
-t/047-init_asterisk_house.t
-t/048-init_girandola_house.t
-t/049_init_center_dot_house.t
-t/050-init_diagonals.t
-t/060-constraints.t
+t/046-set_nrc_houses.t
+t/047-set_asterisk_house.t
+t/048-set_girandola_house.t
+t/049-set_center_dot_house.t
+t/050-set_diagonals.t
+t/051-set_diagonals.t
+t/052-set_diagonals.t
 t/080-clues.t
 t/081-is_even_odd.t
 t/090-cell_name_row_column.t
@@ -30,7 +30,7 @@ t/140-make_diff_statement.t
 t/150-must_differ.t
 t/151-must_differ.t
 t/160-diff_statement.t
-t/170-init_renban.t
+t/170-set_renban.t
 t/171-same_renban.t
 t/172-make_renban_statement.t
 t/804-sudoku-4.t
@@ -53,10 +53,6 @@ t/980-versions.t
 t/981-permissions.t
 t/982-git.t
 t/Test.pm
-t/Constants/000-basic.t
-t/Constants/100-diagonals.t
-t/Constants/110-houses.t
-t/Constants/120-constraints.t
 t/sudokus/anti-king-1
 t/sudokus/anti-king-2
 t/sudokus/anti-knight-1
