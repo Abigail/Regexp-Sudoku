@@ -17,7 +17,7 @@ use Regexp::Sudoku::Constants qw [:Houses];
 
 my $size = 9;
 
-my $sudoku = Regexp::Sudoku:: -> new -> init (houses => $ASTERISK);
+my $sudoku = Regexp::Sudoku:: -> new -> init -> has_asterisk_house;
 
 my @exp_cells = sort map {"R" . $$_ [0] . "C" . $$_ [1]} [3, 3], [2, 5], [3, 7],
                                                          [5, 2], [5, 5], [5, 8],

@@ -426,10 +426,6 @@ sub init_boxes ($self, $args = {}) {
 # Calls init_rows (), init_columns (), and init_boxes () to initialize
 # the rows, columns and boxes. 
 #
-# Depending on the parameters, it may call:
-#   - init_nrc_houses () 
-#   - init_asterisk_house ()
-#
 # TESTS: 045-init_houses.t
 #
 ################################################################################
@@ -449,7 +445,6 @@ sub init_houses ($self, $args = {}) {
     $self -> init_rows             ($args)
           -> init_columns          ($args)
           -> init_boxes            ($args)
-          -> init_asterisk_house   ($args)
           -> init_center_dot_house ($args);
 }
 
@@ -503,7 +498,7 @@ sub has_nrc_houses ($self, $args = {}) {
 
 ################################################################################
 #
-# sub init_asterisk_house ($self, $args)
+# sub has_asterisk_house ($self, $args)
 #
 # An asterisk sudoku has an additional house: one cell from each box.
 # This method initializes that house.
@@ -522,13 +517,12 @@ sub has_nrc_houses ($self, $args = {}) {
 #     . . .  . * .  . . .
 #     . . .  . . .  . . .
 #
-# TESTS: 047-init_asterisk_house.t
+# TESTS: 047-has_asterisk_house.t
 #
 ################################################################################
 
-sub init_asterisk_house ($self, $args = {}) {
-    return $self unless $self -> size == $DEFAULT_SIZE &&
-                 has_bit ($houses {$self} &. $ASTERISK);
+sub has_asterisk_house ($self, $args = {}) {
+    return $self unless $self -> size == $DEFAULT_SIZE;
 
     $self -> create_house ("AS" => map {cell_name @$_}
                                        [3, 3], [2, 5], [3, 7],
