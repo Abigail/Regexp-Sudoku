@@ -13,7 +13,6 @@ our $VERSION = '2022022401';
 use Hash::Util::FieldHash qw [fieldhash];
 use List::Util            qw [min max];
 use Math::Sequence::DeBruijn;
-use Regexp::Sudoku::Constants qw [:Diagonals];
 
 use Exporter ();
 
@@ -28,6 +27,8 @@ my $NR_OF_SYMBOLS  = $NR_OF_DIGITS + $NR_OF_LETTERS;
 my $ANTI_KNIGHT    = 1;
 my $ANTI_KING      = 2;
 
+my $MAIN_DIAGONAL  = 1;
+my $MINOR_DIAGONAL = 2;
 
 fieldhash my %size;
 fieldhash my %values;
@@ -606,7 +607,7 @@ sub set_center_dot_house ($self) {
 
 ################################################################################
 #
-# sub init_diagonals ($self, $args)
+# sub init_diagonal ($self, $args)
 #
 # If we have diagonals, it means cells on one or more diagonals 
 # should differ. This method initializes the houses for that.
@@ -639,72 +640,100 @@ sub set_center_dot_house ($self) {
 #     . * .  . . .  . . .
 #     * . .  . . .  . . .
 #
-# TESTS: 050-init_diagonals.t
+# TESTS: 050-set_diagonals.t
+#        051-set_diagonals.t
+#        052-set_diagonals.t
 #
 ################################################################################
 
-
-sub init_diagonals ($self, $args = {}) {
-    my $diagonals = delete $$args {diagonals} or return $self;
-
-    if (has_bit ($diagonals &. ~. $ALL_DIAGONALS) ||
-        length ($diagonals =~ s/\x{00}*$//r) > length ($ALL_DIAGONALS)) {
-        my $out = "";
-        my $r = $diagonals &. ~. $ALL_DIAGONALS;
-        for (my $i = 0; $i < 8 * length ($r); $i ++) {
-            $out .= vec ($r, $i, 1) ? 1 : 0;
-        }
-        die sprintf "Unknown diagonal(s): %s\n", $out;
-    }
-
+my sub init_diagonal ($self, $type, $offset = 0) {
+    #
+    # $offset > 0: shift to the right
+    # $offset < 0: shift to the left
+    #
     my $size = $self -> size;
 
-    #
-    # Top left to bottom right
-    #
-    if (has_bit ($diagonals &. $MAIN)) {
-        $self -> create_house ("DM" => map {cell_name $_, $_} 1 .. $size)
+    return $self if $offset >= $size;
+
+    my @cells;
+    for (my ($r, $c) = $type == $MAIN_DIAGONAL
+                        ? ($offset >= 0 ? (1,               1 + $offset)
+                                        : (1 - $offset,     1))
+                        : ($offset >= 0 ? ($size,           1 + $offset)
+                                        : ($size + $offset, 1));
+        0 < $r && $r <= $size && 0 < $c && $c <= $size;
+        ($r, $c) = $type == $MAIN_DIAGONAL ? ($r + 1, $c + 1)
+                                           : ($r - 1, $c + 1)) {
+        push @cells => cell_name ($r, $c);
     }
 
-    #
-    # Bottom left to top right
-    #
-    if (has_bit ($diagonals &. $MINOR)) {
-        $self -> create_house ("Dm" => map {cell_name $size - $_ + 1, $_}
-                                                              1 .. $size)
+    my $name;
+    if ($type == $MAIN_DIAGONAL) {
+        $name = "DM";
+        if ($offset) {
+            $name .= $offset > 0 ? "S" : "s";
+            $name .= "-" . abs ($offset);
+        }
     }
-
-    #
-    # Offsets
-    #
-    foreach my $s (1 .. $size - 1) {
-        my ($sub, $super, $minor_sub, $minor_super) = do {
-            no strict 'refs';
-            (${"SUB$s"}, ${"SUPER$s"}, ${"MINOR_SUB$s"}, ${"MINOR_SUPER$s"});
-        };
-        if (has_bit ($diagonals &. $super)) {
-            my $name = "DMS$s";
-            $self -> create_house ($name =>
-                            map {cell_name $_, $_ + $s} 1 .. $size - $s);
-        }
-        if (has_bit ($diagonals &. $sub)) {
-            my $name = "DMs$s";
-            $self -> create_house ($name =>
-                            map {cell_name $_, $_ - $s} 1 + $s .. $size);
-        }
-        if (has_bit ($diagonals &. $minor_super)) {
-            my $name = "DmS$s";
-            $self -> create_house ($name =>
-                     map {cell_name $size - $_ + 1, $_ - $s} 1 + $s .. $size);
-        }
-        if (has_bit ($diagonals &. $minor_sub)) {
-            my $name = "Dms$s";
-            $self -> create_house ($name =>
-                     map {cell_name $size - $_ + 1, $_ + $s} 1 .. $size - $s);
+    else {
+        $name = "Dm";
+        if ($offset) {
+            $name .= $offset < 0 ? "S" : "s";
+            $name .= "-" . abs ($offset);
         }
     }
 
-    $self
+    $self -> create_house ($name => @cells);
+}
+
+sub set_diagonal_main ($self) {
+    init_diagonal ($self, $MAIN_DIAGONAL);
+}
+sub set_diagonal_minor ($self) {
+    init_diagonal ($self, $MINOR_DIAGONAL);
+}
+sub set_diagonal_cross ($self) {
+    $self -> set_diagonal_main
+          -> set_diagonal_minor
+}
+sub set_diagonal_double ($self) {
+    $self -> set_diagonal_cross_1
+}
+sub set_diagonal_triple ($self) {
+    $self -> set_diagonal_cross_1
+          -> set_diagonal_cross
+}
+sub set_argyle ($self) {
+    $self -> set_diagonal_double
+          -> set_diagonal_cross_4
+}
+
+
+foreach my $offset (1 .. $NR_OF_SYMBOLS - 1) {
+    no strict 'refs';
+
+    *{"set_diagonal_main_super_$offset"} =  sub ($self) {
+        init_diagonal ($self, $MAIN_DIAGONAL,    $offset);
+    };
+
+    *{"set_diagonal_main_sub_$offset"} =  sub ($self) {
+        init_diagonal ($self, $MAIN_DIAGONAL,  - $offset);
+    };
+
+    *{"set_diagonal_minor_super_$offset"} =  sub ($self) {
+        init_diagonal ($self, $MINOR_DIAGONAL, - $offset);
+    };
+
+    *{"set_diagonal_minor_sub_$offset"} =  sub ($self) {
+        init_diagonal ($self, $MINOR_DIAGONAL,   $offset);
+    };
+
+    *{"set_diagonal_cross_$offset"} =  sub ($self) {
+        init_diagonal ($self, $MAIN_DIAGONAL,    $offset);
+        init_diagonal ($self, $MAIN_DIAGONAL,  - $offset);
+        init_diagonal ($self, $MINOR_DIAGONAL, - $offset);
+        init_diagonal ($self, $MINOR_DIAGONAL,   $offset);
+    };
 }
 
 
@@ -1026,7 +1055,6 @@ sub init ($self, %args) {
     $self -> init_sizes       ($args)
           -> init_values      ($args)
           -> init_houses      ($args)
-          -> init_diagonals   ($args)
           -> init_clues       ($args);
 
     if (keys %$args) {
@@ -1330,6 +1358,8 @@ sub pattern ($self) {
     $self -> init_subject_and_pattern;
     $pattern {$self}
 }
+
+1;
 
 __END__
 
