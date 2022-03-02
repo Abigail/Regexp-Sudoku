@@ -40,7 +40,6 @@ fieldhash my %is_even;
 fieldhash my %is_odd;
 fieldhash my %subject;
 fieldhash my %pattern;
-fieldhash my %houses;
 fieldhash my %constraints;
 fieldhash my %renban2cells;
 fieldhash my %cell2renbans;
