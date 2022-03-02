@@ -24,7 +24,7 @@ Solution
 4 6 8  5 7 3  9 2 1
 ==
 Create
-Regexp::Sudoku:: -> new -> init -> has_asterisk_house
+Regexp::Sudoku:: -> new -> init -> set_asterisk_house
 ==
 Name: Asterisk
 URL: http://www.sachsentext.de/en/node/431

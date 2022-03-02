@@ -24,7 +24,7 @@ Solution
 4 7 6  3 1 2  8 5 9
 ==
 Create
-Regexp::Sudoku:: -> new -> init -> has_anti_knight_constraint
+Regexp::Sudoku:: -> new -> init -> set_anti_knight_constraint
 ==
 Name: Anti Knight Sudoku (Fun With Puzzles #265)
 URL: https://www.funwithpuzzles.com/2018/02/no-knight-step-sudoku-puzzles.html

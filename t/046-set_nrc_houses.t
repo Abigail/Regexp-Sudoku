@@ -18,7 +18,7 @@ my $size = 9;
 
 my $sudoku = Regexp::Sudoku:: -> new
                               -> init
-                              -> has_nrc_houses;
+                              -> set_nrc_houses;
 
 my @tl = (undef, [2, 2], [2, 6], [6, 2], [6, 6]);
 my @EXP_CELLS;

@@ -24,7 +24,7 @@ Solution
 1 7 5  4 6 2  9 8 3
 ==
 Create
-Regexp::Sudoku:: -> new -> init -> has_girandola_house
+Regexp::Sudoku:: -> new -> init -> set_girandola_house
 ==
 Name: Girandola-2
 URL: http://www.tectonicpuzzel.eu/girandola-sudoku.html

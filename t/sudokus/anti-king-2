@@ -24,7 +24,7 @@ Solution
 6 4 8  2 5 9  3 7 1
 ==
 Create
-Regexp::Sudoku:: -> new -> init -> has_anti_king_constraint
+Regexp::Sudoku:: -> new -> init -> set_anti_king_constraint
 ==
 Name: No Touch Sudoku (Daily Sudoku League #159)
 URL: https://www.funwithpuzzles.com/2016/03/no-touch-sudoku.html

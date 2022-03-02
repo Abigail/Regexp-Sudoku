@@ -24,7 +24,7 @@ Solution
 2 4 3  9 5 1  8 6 7
 ==
 Create
-Regexp::Sudoku:: -> new -> init -> has_girandola_house
+Regexp::Sudoku:: -> new -> init -> set_girandola_house
 ==
 Name: Girandola
 URL: http://www.cross-plus-a.com/sudoku.htm#Girandola

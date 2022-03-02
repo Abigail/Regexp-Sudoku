@@ -441,7 +441,7 @@ sub init_houses ($self, $args = {}) {
 
 ################################################################################
 #
-# has_nrc_houses ($self, $args)
+# set_nrc_houses ($self, $args)
 #
 # For NRC style puzzles, handle creating the houses.
 #
@@ -460,11 +460,11 @@ sub init_houses ($self, $args = {}) {
 #     . . .  . . .  . . .
 #
 #
-# TESTS: 046-has_nrc_houses.t
+# TESTS: 046-set_nrc_houses.t
 #
 ################################################################################
 
-sub has_nrc_houses ($self, $args = {}) {
+sub set_nrc_houses ($self, $args = {}) {
     return $self unless $self -> size == $DEFAULT_SIZE;
 
     my @top_left = ([2, 2], [2, 6], [6, 2], [6, 6]);
@@ -488,7 +488,7 @@ sub has_nrc_houses ($self, $args = {}) {
 
 ################################################################################
 #
-# sub has_asterisk_house ($self, $args)
+# sub set_asterisk_house ($self, $args)
 #
 # An asterisk sudoku has an additional house: one cell from each box.
 # This method initializes that house.
@@ -507,11 +507,11 @@ sub has_nrc_houses ($self, $args = {}) {
 #     . . .  . * .  . . .
 #     . . .  . . .  . . .
 #
-# TESTS: 047-has_asterisk_house.t
+# TESTS: 047-set_asterisk_house.t
 #
 ################################################################################
 
-sub has_asterisk_house ($self, $args = {}) {
+sub set_asterisk_house ($self, $args = {}) {
     return $self unless $self -> size == $DEFAULT_SIZE;
 
     $self -> create_house ("AS" => map {cell_name @$_}
@@ -523,7 +523,7 @@ sub has_asterisk_house ($self, $args = {}) {
 
 ################################################################################
 #
-# sub has_girandola_house ($self, $args)
+# sub set_girandola_house ($self, $args)
 #
 # An girandola sudoku has an additional house: one cell from each box.
 # This method initializes that house.
@@ -542,11 +542,11 @@ sub has_asterisk_house ($self, $args = {}) {
 #     . . .  . * .  . . .
 #     * . .  . . .  . . *
 #
-# TESTS: 048-has_girandola_house.t
+# TESTS: 048-set_girandola_house.t
 #
 ################################################################################
 
-sub has_girandola_house ($self) {
+sub set_girandola_house ($self) {
     return $self unless $self -> size == $DEFAULT_SIZE;
 
     $self -> create_house ("GR" => map {cell_name @$_}
@@ -557,7 +557,7 @@ sub has_girandola_house ($self) {
 
 ################################################################################
 #
-# sub has_center_dot_house ($self, $args)
+# sub set_center_dot_house ($self, $args)
 #
 # An center dot sudoku has an additional house: one cell from each box.
 # This method initializes that house.
@@ -576,11 +576,11 @@ sub has_girandola_house ($self) {
 #     . * .  . * .  . * .
 #     . . .  . . .  . . .
 #
-# TESTS: 049-has_center_dot_house.t
+# TESTS: 049-set_center_dot_house.t
 #
 ################################################################################
 
-sub has_center_dot_house ($self) {
+sub set_center_dot_house ($self) {
     my $width  = $self -> box_width;
     my $height = $self -> box_height;
     my $size   = $self -> size;
@@ -917,8 +917,8 @@ sub is_odd   ($self,  $cell) {
 
 ################################################################################
 #
-# has_anti_knight_constraint ($self)
-# has_anti_king_constraint ($self)
+# set_anti_knight_constraint ($self)
+# set_anti_king_constraint ($self)
 #
 # Set the anti knigt/anti king constraints for the sudoku.
 #
@@ -926,12 +926,12 @@ sub is_odd   ($self,  $cell) {
 #
 ################################################################################
 
-sub has_anti_knight_constraint ($self) {
+sub set_anti_knight_constraint ($self) {
     $constraints {$self} {$ANTI_KNIGHT} = 1;
     $self;
 }
 
-sub has_anti_king_constraint ($self) {
+sub set_anti_king_constraint ($self) {
     $constraints {$self} {$ANTI_KING} = 1;
     $self;
 }

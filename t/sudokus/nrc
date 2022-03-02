@@ -24,7 +24,7 @@ Solution
 5 8 7  4 2 6  9 3 1
 ==
 Create
-Regexp::Sudoku:: -> new -> init -> has_nrc_houses
+Regexp::Sudoku:: -> new -> init -> set_nrc_houses
 ==
 URL: http://www.idmatica.nl/sudoku/NrcSudoku?voorbeeld=ja
 Name: NRC

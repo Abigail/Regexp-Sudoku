@@ -17,9 +17,9 @@ use Regexp::Sudoku;
 my $size     = 9;
 my $box_size = 3;
 my $sudoku_n = Regexp::Sudoku:: -> new -> init
-                                       -> has_anti_knight_constraint;
+                                       -> set_anti_knight_constraint;
 my $sudoku_k = Regexp::Sudoku:: -> new -> init
-                                       -> has_anti_king_constraint;
+                                       -> set_anti_king_constraint;
 foreach my $r1 (1 .. $size) {
     foreach my $c1 (1 .. $size) {
         my $cell1 = "R${r1}C${c1}";
