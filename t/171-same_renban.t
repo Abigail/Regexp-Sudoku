@@ -17,11 +17,11 @@ our $r = eval "require Test::NoWarnings; 1";
 
 use Regexp::Sudoku;
 
-my $sudoku = Regexp::Sudoku:: -> new -> init (
-             renban => [[qw [R2C1 R2C2 R2C3 R2C4 R2C5 R2C6 R2C7 R2C8 R2C9]],
-                        [qw [R8C1 R8C2 R8C3 R8C4 R8C5 R8C6 R8C7 R8C8 R8C9]],
-                        [qw [R1C2 R2C2 R3C2 R4C2 R5C2 R6C2 R7C2 R8C2 R9C2]],
-                        [qw [R1C8 R2C8 R3C8 R4C8 R5C8 R6C8 R7C8 R8C8 R9C8]]]);
+my $sudoku = Regexp::Sudoku:: -> new -> init
+             -> set_renban (qw [R2C1 R2C2 R2C3 R2C4 R2C5 R2C6 R2C7 R2C8 R2C9])
+             -> set_renban (qw [R8C1 R8C2 R8C3 R8C4 R8C5 R8C6 R8C7 R8C8 R8C9])
+             -> set_renban (qw [R1C2 R2C2 R3C2 R4C2 R5C2 R6C2 R7C2 R8C2 R9C2])
+             -> set_renban (qw [R1C8 R2C8 R3C8 R4C8 R5C8 R6C8 R7C8 R8C8 R9C8]);
 
 my @cells = map {my $r = $_; map {"R${r}C${_}"} 1 .. 9} 1 .. 9;
 

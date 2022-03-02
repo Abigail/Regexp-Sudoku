@@ -21,7 +21,9 @@ my $SENTINEL = "\n";
 for (my $size = 2; $size <= 9; $size ++) {
     subtest "Renban size $size" => sub {
         my @cells  = map {"R${_}C${_}"} 1 .. $size;
-        my $sudoku = Regexp::Sudoku:: -> new -> init (renban => [\@cells]);
+        my $sudoku = Regexp::Sudoku:: -> new
+                                      -> init 
+                                      -> set_renban (@cells);
         my $cell1  = "R1C1";
         my $cell2  = "R${size}C${size}";
         my ($subject, $pattern) = $sudoku -> make_renban_statement
