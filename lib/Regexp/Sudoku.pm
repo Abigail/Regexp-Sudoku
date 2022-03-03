@@ -1618,55 +1618,108 @@ Sudoku, this looks like:
 Calling the C<< set_center_dot_house () >> sets up those houses.
 
 
+
+=head2 Diagonals
+
+A common constraint used in variant Sudokus is uniqueness of one
+or more diagonals: all the values on each of the marked diagonals 
+should be unique.
+
+The I<< main >> diagonal of a Sudoku is the diagonal which runs
+from the top left to the bottom right. The I<< minor >> diagonal
+the diagonal which runs from the top right to the bottom left.
+
+
+    * . .  . . .  . . .            . . .  . . .  . . *
+    . * .  . . .  . . .            . . .  . . .  . * .
+    . . *  . . .  . . .            . . .  . . .  * . .
+
+    . . .  * . .  . . .            . . .  . . *  . . .
+    . . .  . * .  . . .            . . .  . * .  . . .
+    . . .  . . *  . . .            . . .  * . .  . . .
+
+    . . .  . . .  * . .            . . *  . . .  . . .
+    . . .  . . .  . * .            . * .  . . .  . . .
+    . . .  . . .  . . *            * . .  . . .  . . .
+
+      Main  Diagonal                 Minor Diagonal
+
+
+A I<< super >> diagonal is a diagonal which parallel and above
+of the main or minor diagonal. A I<< sub >> diagonal is a diagonal
+which runs parallel and below the main or minor diagonal.
+Super and sub diagonals have an I<< offset >>, indicating their
+distance from the main or minor diagonal. The super and sub diagonal
+directly next to the main and minor diagonals have an offset of 1.
+The maximum offset for an C<< N x N >> Sudoku is C<< N - 1 >>, although
+such an offset reduces the diagonal to a single cell.
+
+In the image below, on the left hand side, the super diagonal with
+offset 1 is marked with C<< + >>, and the sub diagonal with offset 2
+is marked with C<< o >>. On the right hand side, we have marked the
+super and sub diagonals with respect to the minor diagonals with the
+same marks (and same offsets).
+
+    . + .  . . .  . . .            . . .  . . .  . + .
+    . . +  . . .  . . .            . . .  . . .  + . .
+    o . .  + . .  . . .            . . .  . . +  . . o
+
+    . o .  . + .  . . .            . . .  . + .  . o .
+    . . o  . . +  . . .            . . .  + . .  o . .
+    . . .  o . .  + . .            . . +  . . o  . . .
+
+    . . .  . o .  . + .            . + .  . o .  . . .
+    . . .  . . o  . . +            + . .  o . .  . . .
+    . . .  . . .  o . .            . . o  . . .  . . .
+
+
+In total, an C<< N x N >> Sudoku can have C<< 4 * N - 2 >> diagonals
+(34 for a standard C<< 9 x 9 >> Sudoku).
+
+There will be a method to set uniqness for each possible diagonal.
+
+=head3 C<< set_diagonal_main () >>
+
+This method sets a uniqness constraint on the I<< main diagonal >>.
+
+=head3 C<< set_diagonal_minor () >>
+
+This method sets a uniqness constraint on the I<< minor diagonal >>.
+
+=head3 C<< set_diagonal_main_super_1 () .. set_diagonal_main_super_34 () >>
+
+These methods set uniqness constraints on I<< super diagonals >> 
+parallel to the main diagonal, with the given offset. If the 
+offset equals or exceeds the size of the Sudoku, the diagonal
+falls completely outside of the Sudoku, and hence, does not add
+a constraint.
+
+=head3 C<< set_diagonal_main_sub () .. set_diagonal_main_sub () >>
+
+These methods set uniqness constraints on I<< sub diagonals >> 
+parallel to the main diagonal, with the given offset. If the 
+offset equals or exceeds the size of the Sudoku, the diagonal
+falls completely outside of the Sudoku, and hence, does not add
+a constraint.
+
+=head3 C<< set_diagonal_minor_super_1 () .. set_diagonal_minor_super_34 () >>
+
+These methods set uniqness constraints on I<< super diagonals >> 
+parallel to the minor diagonal, with the given offset. If the 
+offset equals or exceeds the size of the Sudoku, the diagonal
+falls completely outside of the Sudoku, and hence, does not add
+a constraint.
+
+=head3 C<< set_diagonal_minor_sub () .. set_diagonal_minor_sub () >>
+
+These methods set uniqness constraints on I<< sub diagonals >> 
+parallel to the minor diagonal, with the given offset. If the 
+offset equals or exceeds the size of the Sudoku, the diagonal
+falls completely outside of the Sudoku, and hence, does not add
+a constraint.
+
+
 =head1 OLD DOC STARTS HERE
-
-=head2 C<< diagonals => MASK >>
-
-The C<< diagonals >> parameter is used to indicate the Sudoku has
-one or more constraints on diagonals: all values on the given
-diagonal(s) should be unique. There are many possible diagonals
-(34 for a C<< 9 x 9 >> Sudoku, in general, C<< 4 * N - 2 >> for
-an C<< N x N >> Sudoku. For a full explanation of all diagonals,
-see L<< Regexp::Sudoku::Constants >>.
-
-Here, we will list a couple of the most common ones:
-
-=over 2
-
-=item C<< $MAIN >>
-
-The main diagonal is the diagonal which runs from the top left to
-the bottom right. All values on this diagonal should be unique.
-
-    * . .  . . .  . . .
-    . * .  . . .  . . .
-    . . *  . . .  . . .
-
-    . . .  * . .  . . .
-    . . .  . * .  . . .
-    . . .  . . *  . . .
-
-    . . .  . . .  * . .
-    . . .  . . .  . * .
-    . . .  . . .  . . *
-
-=item C<< $MINOR >>
-
-The minor diagonal is the diagonal which runs from the bottom left to
-the top right. All values on this diagonal should be unique.
-
-    . . .  . . .  . . *
-    . . .  . . .  . * .
-    . . .  . . .  * . .
-
-    . . .  . . *  . . .
-    . . .  . * .  . . .
-    . . .  * . .  . . .
-
-    . . *  . . .  . . .
-    . * .  . . .  . . .
-    * . .  . . .  . . .
-
 
 =item C<< $CROSS >>
 
