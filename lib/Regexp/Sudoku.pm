@@ -1356,7 +1356,8 @@ Regexp::Sudoku - Solve Sudokus with regular expressions.
 =head1 SYNOPSIS
 
  use Regexp::Sudoku;
- my $sudoku = Regexp::Sudoku:: -> new -> init (clues <<~ '--')
+ my $sudoku = Regexp::Sudoku:: -> new -> init
+                                      -> set_clues (<<~ '--');
      5 3 .  . 7 .  . . .
      6 . .  1 9 5  . . .
      . 9 8  . . .  . 6 .
@@ -1384,79 +1385,60 @@ Regexp::Sudoku - Solve Sudokus with regular expressions.
 
 =head1 DESCRIPTION
 
-This module takes a sudoku (or variant) as input, calculates a subject
+This module takes a Sudoku (or variant) as input, calculates a subject
 and pattern, such that, if the pattern is matched agains the subject,
-the match succeeds if, and only if, the sudoku has a solution. And if
+the match succeeds if, and only if, the Sudoku has a solution. And if
 it has a solution C<< %+ >> is populated with the values of the cells of
-the solved sudoku.
+the solved Sudoku.
 
-After constructing and initializing a sudoku object using
-C<< new >> and C<< init >> (see below), the object can be queried
+After constructing, initializing and constructing a Sudoku object using
+C<< new >>, C<< init >> and various C<< set_* >> methods (see below),
+the object can be queried
 with C<< subject >> and C<< pattern >>. C<< subject >> returns 
 a string, while C<< pattern >> returns a pattern (as a string).
 
 Once the subject has been matched against the pattern, 81 (or rather
-C<< N ** 2 >> for an C<< N x N >> sudoku) named captures will be set:
+C<< N ** 2 >> for an C<< N x N >> Sudoku) named captures will be set:
 C<< R1C1 >> .. C<< R1C9 >> .. C<< R9C1 >> .. C<< R9C9 >>. These correspond
-to the values of the cells of a solved sudoku, where the cell in the
+to the values of the cells of a solved Sudoku, where the cell in the
 top left is named C<< R1C1 >>, the cell in the top right C<< R1C9 >>,
 the cell in the bottom left C<< R9C1 >> and the cell in the bottom right
 C<< R9C9 >>. In general, the cell on row C<< r >> and column C<< c >>
 is named C<< RrCc >>. Named captures are available in C<< %+ >>
 (see L<< perlvar/%{^CAPTURE} >>).
 
-The C<< init >> method takes the following named parameters:
+For regular, C<< 9 x 9 >> Sudokus, one would just call C<< new >>,
+C<< init >> and C<< set_clues >>. Various variants need to call
+different methods.
 
-=head2 C<< clues => STRING | ARRAYREF >>
+Unless specified otherwise, all the methods below return the object
+it was called with; this methods can be chained.
 
-The C<< clues >> parameter is used to pass in the clue (aka givens)
-of a suduko. The clues are either given as a string, or a two
-dimensional arrayref. 
+=head2 Main methods
 
-In the case of a string, rows are separated by newlines, and values
-in a row by whitespace. The first line of the string corresponds
-with the first row of the sudoku, the second line with the second 
-row, etc. In each line, the first value corresponds with the first
-cell of that row, the second value with the second cell, etc.
-In case of an arrayref, the array consists of arrays of values. Each
-array corresponds with a row, and each element of the inner arrays
-corresponds with a cell.
+=head3 C<< new () >>
 
-The values have the following meaning:
+This is a I<< class >> method called on the C<< Regexp::Sudoku >>
+package. It takes no arguments, and just returns an uninitialized
+object. (Basically, it just calls C<< bless >> for you).
 
-=over 2
+=head3 C<< init () >>
 
-=item C<< '1' .. '9', 'A' .. 'Z' >>
+C<< init >> initializes the Sudoku object. This method B<< must >> 
+be called on the return value of C<< new >> before calling any other
+methods.
 
-This corresponds to a clue/given in the corresponding cell. For standard
-sudokus, we use C<< '1' .. '9' >>. Smaller sudokus use less digits.
-For sudokus greater than C<< 9 x 9 >>, capital letters are used, up to 
-C<< 'Z' >> for a C<< 35 x 35 >> sudoku.
+C<< init >> takes one, optional, (named) argument.
 
-=item C<< '.' >>, C<< 0 >>, C<< "" >>, C << undef >>
+=over 4
 
-These values indicate the sudoku does not have a clue for the corresponding
-cell: the cell is blank. C<< "" >> and C<< undef >> can only be used
-if the array form is being used.
+=item C<< size => INTEGER >>
 
-=item C<< 'e' >>
-
-This indicates the cell should have an I<< even >> number in its solution.
-(Note that C<< 'E' >> indicates a clue (if the size is at least C<< 15 x 15 >>),
-and is different from C<< 'e' >>).
-
-=item C<< 'o' >>
-
-This indicates the cell should have an I<< odd >> number in its solution.
-(Note that C<< 'O' >> indicates a clue (if the size is at least C<< 25 x 25 >>),
-and is different from C<< 'o' >>).
-
-=back
-
-=head2 C<< size => INTEGER >>
-
-This is used to indicate the size of a sudoku. The default size is a
-C<< 9 x 9 >> sudoku. A size which exceeds C<< 35 >> is a fatal error.
+Usually, Sudokus are C<< 9 x 9 >>. For a Sudoku of a different size,
+we need to pass in the size. Smallest size for which Sudokus exist,
+is C<< 4 >>. Largest size we accept is C<< 35 >>. For a Sudoku with
+a size exceeding 9, we will letters as values. (So, for a C<< 12 x 12 >>
+Sudoku, we have C<< 1 .. 9, 'A', 'B' >> as values.)
 
 The size directly influences the size of the boxes (the rectangles where
 each of the numbers appears exactly once). For a size C<< N >>, the size
@@ -1482,24 +1464,76 @@ box sizes:
 Sizes which are perfect squares (marked with C<< * >> in the table above)
 lead to square boxes.
 
-=head2 C<< houses => MASK >>
+A size which is a prime number leads to boxes which are identical to
+rows -- you would need to configure different boxes.
 
-For sudoku variants with extra houses, this parameter is used to indicate
-which extra I<< houses >> are used. A I<< house >> is a region which 
+=back
+
+=head3 C<< set_clues (STRING | ARRAYREF) >>
+
+The C<< set_clues >> method is used to pass in the clues (aka givens)
+of a Suduko. Most Sudokus will have at least one clue, but there are
+a few variants which allow clueless Sudokus. For a standard C<< 9 x 9 >>
+Sudoku, the minimum amount of clues is 17.
+
+The clues are either given as a string, or a two dimensional arrayref. 
+
+In the case of a string, rows are separated by newlines, and values
+in a row by whitespace. The first line of the string corresponds
+with the first row of the Sudoku, the second line with the second 
+row, etc. In each line, the first value corresponds with the first
+cell of that row, the second value with the second cell, etc.
+In case of an arrayref, the array consists of arrays of values. Each
+array corresponds with a row, and each element of the inner arrays
+corresponds with a cell.
+
+The values have the following meaning:
+
+=over 4
+
+=item C<< '1' .. '9', 'A' .. 'Z' >>
+
+This corresponds to a clue/given in the corresponding cell. For standard
+Sudokus, we use C<< '1' .. '9' >>. Smaller Sudokus use less digits.
+For Sudokus greater than C<< 9 x 9 >>, capital letters are used, up to 
+C<< 'Z' >> for a C<< 35 x 35 >> Sudoku.
+
+=item C<< '.' >>, C<< 0 >>, C<< "" >>, C<< undef >>
+
+These values indicate the Sudoku does not have a clue for the corresponding
+cell: the cell is blank. C<< "" >> and C<< undef >> can only be used
+if the array form is being used.
+
+=item C<< 'e' >>
+
+This indicates the cell should have an I<< even >> number in its solution.
+(Note that C<< 'E' >> indicates a clue (if the size is at least C<< 15 x 15 >>),
+and is different from C<< 'e' >>).
+
+=item C<< 'o' >>
+
+This indicates the cell should have an I<< odd >> number in its solution.
+(Note that C<< 'O' >> indicates a clue (if the size is at least C<< 25 x 25 >>),
+and is different from C<< 'o' >>).
+
+=back
+
+=head2 Additional Houses
+
+A I<< house >> is a region which 
 contains each of the numbers C<< 1 .. 9 >> (or C<< 1 .. N >> for an
-C<< N x N >> sized sudoku) exactly once. With a standard sudoku, each
+C<< N x N >> sized Sudoku) exactly once. With a standard Sudoku, each
 row, each column, and each C<< 3 x 3 >> box is a house.
 
-We recognize the following values (imported from
-L<< Regexp::Sudoku::Constants >>):
+Some variants have additional houses, next to the rows, columns and boxes.
+In this section, we describe the methods which can be used to configure
+the Sukodu to have additional houses.
 
-=over 2
+=head3 C<< set_nrc_houses () >>
 
-=item C<< $NRC >>
-
-An I<< NRC >> sudoku has four additional houses, indicated below with
+An I<< NRC >> Sudoku has four additional houses, indicated below with
 the numbers C<< 1 .. 4 >>. This variant is only defined for C<< 9 x 9 >>
-sudokus:
+Sudokus:
 
     . . .  . . .  . . .
     . 1 1  1 . 2  2 2 .
@@ -1513,17 +1547,19 @@ sudokus:
     . 3 3  3 . 4  4 4 .
     . . .  . . .  . . .
 
-The NRC sudoku is named after the Dutch newspaper
-L<< NRC|https://www.nrc.nl/ >>, which first publishes such a sudoku
+Calling the C<< set_nrc_houses () >> sets up those houses.
+
+The NRC Sudoku is named after the Dutch newspaper
+L<< NRC|https://www.nrc.nl/ >>, which first publishes such a Sudoku
 and still publishes one L<< daily|https://www.nrc.nl/sudoku/ >>.
 It is also known under
 the names I<< Windoku >> and I<< Hyper Sudoku >>.
 
-=item C<< $ASTERISK >>
+=head3 C<< set_asterisk_house () >>
 
-An I<< asterisk >> sudoku has an additional house, roughly in the
+An I<< asterisk >> Sudoku has an additional house, roughly in the
 shape of an asterisk, as indicated below. This variant is only defined
-for C<< 9 x 9 >> sudokus:
+for C<< 9 x 9 >> Sudokus:
 
     . . .  . . .  . . .
     . . .  . * .  . . .
@@ -1537,11 +1573,13 @@ for C<< 9 x 9 >> sudokus:
     . . .  . * .  . . .
     . . .  . . .  . . .
 
-=item C<< $GIRANDOLA >>
+Calling the C<< set_asterisk_house () >> sets up those houses.
 
-An I<< girandola >> sudoku has an additional house, roughly in the
+=head3 C<< set_girandola_house () >>
+
+An I<< girandola >> Sudoku has an additional house, roughly in the
 shape of a I<< windmill pinwheel >> (a childs toy), as indicated below.
-This variant is only defined for C<< 9 x 9 >> sudokus:
+This variant is only defined for C<< 9 x 9 >> Sudokus:
 
     * . .  . . .  . . *
     . . .  . * .  . . .
@@ -1555,13 +1593,15 @@ This variant is only defined for C<< 9 x 9 >> sudokus:
     . . .  . * .  . . .
     * . .  . . .  . . *
 
-=item C<< $CENTER_DOT >>
+Calling the C<< set_girandola_house () >> sets up those houses.
+
+=head3 C<< set_center_dot_house () >>
 
 A I<< center dot >> house is an additional house which consists of
-all the center cell of all the boxes. This is only defined for sudokus
+all the center cell of all the boxes. This is only defined for Sudokus
 where the boxes have odd sizes. (Sizes C<< 9 >>, C<< 15 >>, C<< 25 >>,
 and C<< 35 >>; see the table with sizes above). For a C<< 9 x 9 >>
-sudoku, this looks like:
+Sudoku, this looks like:
 
     . . .  . . .  . . .
     . * .  . * .  . * .
@@ -1575,15 +1615,18 @@ sudoku, this looks like:
     . * .  . * .  . * .
     . . .  . . .  . . .
 
-=back
+Calling the C<< set_center_dot_house () >> sets up those houses.
+
+
+=head1 OLD DOC STARTS HERE
 
 =head2 C<< diagonals => MASK >>
 
-The C<< diagonals >> parameter is used to indicate the sudoku has
+The C<< diagonals >> parameter is used to indicate the Sudoku has
 one or more constraints on diagonals: all values on the given
 diagonal(s) should be unique. There are many possible diagonals
-(34 for a C<< 9 x 9 >> sudoku, in general, C<< 4 * N - 2 >> for
-an C<< N x N >> sudoku. For a full explanation of all diagonals,
+(34 for a C<< 9 x 9 >> Sudoku, in general, C<< 4 * N - 2 >> for
+an C<< N x N >> Sudoku. For a full explanation of all diagonals,
 see L<< Regexp::Sudoku::Constants >>.
 
 Here, we will list a couple of the most common ones:
@@ -1645,7 +1688,7 @@ on each of diagonals should be unique.
 
 =item C<< $DOUBLE >>
 
-C<< $DOUBLE >> is used for a sudoku variant with four diagonals
+C<< $DOUBLE >> is used for a Sudoku variant with four diagonals
 having unique values: the diagonals just above/below the main and
 minor diagonals:
 
@@ -1664,7 +1707,7 @@ minor diagonals:
 
 =item C<< $ARGYLE >>
 
-I<< Argyle >> sudokus have eight diagonals on which the values
+I<< Argyle >> Sudokus have eight diagonals on which the values
 should be unique. This is named after a L<< pattern consisting of
 lozenges|https://en.wikipedia.org/wiki/Argyle_(pattern) >>, which
 itself was named after the tartans of the 
@@ -1689,7 +1732,7 @@ in Argyll in the Scottish highlands.
 =head2 C<< constraints => MASK >>
 
 Some variants have additional constraints, which apply to all cells
-in the sudoku. We recognize the following values (imported from
+in the Sudoku. We recognize the following values (imported from
 L<< Regexp::Sudoku::Constants >>):
 
 =over 2
