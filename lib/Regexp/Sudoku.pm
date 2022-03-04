@@ -1926,6 +1926,28 @@ the cells which are a kings move away from the cell marked C<< O >>.
 
    Anti King Constraint
 
+=head2 Retricted lines and areas
+
+=head3 C<< set_renban (LIST) >>
+
+A I<< Renban >> line (or area) consist of a number of cells where all
+the values should form a consecutive sets of numbers. The numbers do
+not have to be in order. For example, a Renban area of size four may
+contain the numbers C<< 5-7-4-6 >> or C<< 2-3-4-5 >>, but not 
+C<< 2-3-5-6 >>. 
+
+This method takes a list of cell names as argument, where each name
+is of the form C<< RxCy >>, with C<< 1 <= x, y <= N >>, where C<< N >>
+is the size of the Sudoku.
+
+No validation of cell names is performed. Names which aren't of the
+form C<< RxCy >>, or which are outside of the Sudoku have no effect.
+A Renban area with more cells than the size of the Sudoku leads to
+an unsolvable Sudoku.
+
+This method can be called more than once, and should be called more
+than once if a Sudoku has more than one Renban line/area.
+
 =head1 BUGS
 
 There are no known bugs.
