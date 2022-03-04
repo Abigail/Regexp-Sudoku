@@ -8,7 +8,7 @@ no  warnings 'syntax';
 use experimental 'signatures';
 use experimental 'lexical_subs';
 
-our $VERSION = '2022022401';
+our $VERSION = '2022030401';
 
 use Hash::Util::FieldHash qw [fieldhash];
 use List::Util            qw [min max];
