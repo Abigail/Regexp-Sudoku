@@ -1446,7 +1446,7 @@ top left is named C<< R1C1 >>, the cell in the top right C<< R1C9 >>,
 the cell in the bottom left C<< R9C1 >> and the cell in the bottom right
 C<< R9C9 >>. In general, the cell on row C<< r >> and column C<< c >>
 is named C<< RrCc >>. Named captures are available in C<< %+ >>
-(see L<< perlvar/%{^CAPTURE} >>).
+(see L<< perlvar >>).
 
 For regular, C<< 9 x 9 >> Sudokus, one would just call C<< new >>,
 C<< init >> and C<< set_clues >>. Various variants need to call
