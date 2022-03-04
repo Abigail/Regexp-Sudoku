@@ -24,7 +24,7 @@ Solution
 7 2 1  9 5 3  6 4 8
 ==
 Create
-Regexp::Sudoku:: -> new -> init -> set_diagonal_cross
+Regexp::Sudoku:: -> new -> init -> set_cross
 ==
 Name: Default diagonals (Griddlers 25434)
 URL: https://www.griddlers.net/sudoku/-/sudoku/25434

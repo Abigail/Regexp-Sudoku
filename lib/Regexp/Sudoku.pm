@@ -688,20 +688,20 @@ sub set_diagonal_main ($self) {
 sub set_diagonal_minor ($self) {
     init_diagonal ($self, $MINOR_DIAGONAL);
 }
-sub set_diagonal_cross ($self) {
+sub set_cross ($self) {
     $self -> set_diagonal_main
           -> set_diagonal_minor
 }
 sub set_diagonal_double ($self) {
-    $self -> set_diagonal_cross_1
+    $self -> set_cross_1
 }
 sub set_diagonal_triple ($self) {
-    $self -> set_diagonal_cross_1
-          -> set_diagonal_cross
+    $self -> set_cross_1
+          -> set_cross
 }
 sub set_argyle ($self) {
     $self -> set_diagonal_double
-          -> set_diagonal_cross_4
+          -> set_cross_4
 }
 
 
@@ -724,7 +724,7 @@ foreach my $offset (1 .. $NR_OF_SYMBOLS - 1) {
         init_diagonal ($self, $MINOR_DIAGONAL,   $offset);
     };
 
-    *{"set_diagonal_cross_$offset"} =  sub ($self) {
+    *{"set_cross_$offset"} =  sub ($self) {
         init_diagonal ($self, $MAIN_DIAGONAL,    $offset);
         init_diagonal ($self, $MAIN_DIAGONAL,  - $offset);
         init_diagonal ($self, $MINOR_DIAGONAL, - $offset);

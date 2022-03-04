@@ -12,7 +12,7 @@ Solution
 4 2  3 1
 ==
 Create
-Regexp::Sudoku:: -> new -> init (size => 4) -> set_diagonal_cross
+Regexp::Sudoku:: -> new -> init (size => 4) -> set_cross
 ==
 Name: Default diagonals, 4 x 4 (Griddlers 25374)
 URL: https://www.griddlers.net/sudoku/-/sudoku/25374
