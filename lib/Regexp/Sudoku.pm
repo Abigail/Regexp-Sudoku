@@ -700,7 +700,7 @@ sub set_diagonal_triple ($self) {
           -> set_cross
 }
 sub set_argyle ($self) {
-    $self -> set_diagonal_double
+    $self -> set_cross_1
           -> set_cross_4
 }
 
