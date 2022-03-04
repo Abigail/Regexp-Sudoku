@@ -1671,17 +1671,17 @@ from the top left to the bottom right. The I<< minor >> diagonal
 the diagonal which runs from the top right to the bottom left.
 
 
-    * . .  . . .  . . .            . . .  . . .  . . *
-    . * .  . . .  . . .            . . .  . . .  . * .
-    . . *  . . .  . . .            . . .  . . .  * . .
+    \ . .  . . .  . . .            . . .  . . .  . . /
+    . \ .  . . .  . . .            . . .  . . .  . / .
+    . . \  . . .  . . .            . . .  . . .  / . .
 
-    . . .  * . .  . . .            . . .  . . *  . . .
-    . . .  . * .  . . .            . . .  . * .  . . .
-    . . .  . . *  . . .            . . .  * . .  . . .
+    . . .  \ . .  . . .            . . .  . . /  . . .
+    . . .  . \ .  . . .            . . .  . / .  . . .
+    . . .  . . \  . . .            . . .  / . .  . . .
 
-    . . .  . . .  * . .            . . *  . . .  . . .
-    . . .  . . .  . * .            . * .  . . .  . . .
-    . . .  . . .  . . *            * . .  . . .  . . .
+    . . .  . . .  \ . .            . . /  . . .  . . .
+    . . .  . . .  . \ .            . / .  . . .  . . .
+    . . .  . . .  . . \            / . .  . . .  . . .
 
       Main  Diagonal                 Minor Diagonal
 
@@ -1695,23 +1695,20 @@ directly next to the main and minor diagonals have an offset of 1.
 The maximum offset for an C<< N x N >> Sudoku is C<< N - 1 >>, although
 such an offset reduces the diagonal to a single cell.
 
-In the image below, on the left hand side, the super diagonal with
-offset 1 is marked with C<< + >>, and the sub diagonal with offset 2
-is marked with C<< o >>. On the right hand side, we have marked the
-super and sub diagonals with respect to the minor diagonals with the
-same marks (and same offsets).
+    . \ .  . . .  . . .            . . .  . . .  . / .
+    . . \  . . .  . . .            . . .  . . .  / . .
+    \ . .  \ . .  . . .            . . .  . . /  . . /
 
-    . + .  . . .  . . .            . . .  . . .  . + .
-    . . +  . . .  . . .            . . .  . . .  + . .
-    o . .  + . .  . . .            . . .  . . +  . . o
+    . \ .  . \ .  . . .            . . .  . / .  . / .
+    . . \  . . \  . . .            . . .  / . .  / . .
+    . . .  \ . .  \ . .            . . /  . . /  . . .
 
-    . o .  . + .  . . .            . . .  . + .  . o .
-    . . o  . . +  . . .            . . .  + . .  o . .
-    . . .  o . .  + . .            . . +  . . o  . . .
+    . . .  . \ .  . \ .            . / .  . / .  . . .
+    . . .  . . \  . . \            / . .  / . .  . . .
+    . . .  . . .  \ . .            . . /  . . .  . . .
 
-    . . .  . o .  . + .            . + .  . o .  . . .
-    . . .  . . o  . . +            + . .  o . .  . . .
-    . . .  . . .  o . .            . . o  . . .  . . .
+   Super and sub diagonals       Super and sub diagonals
+    off the main diagonal         off the minor diagonal
 
 
 In total, an C<< N x N >> Sudoku can have C<< 4 * N - 2 >> diagonals
@@ -1774,17 +1771,17 @@ diagonal -- this variant is widely known under the name I<< X-Sudoku >>.
 C<< set_cross () >> sets the uniqness constraints for both the main
 and minor diagonals:
 
-    * . .  . . .  . . *
-    . * .  . . .  . * .
-    . . *  . . .  * . .
+    \ . .  . . .  . . /
+    . \ .  . . .  . / .
+    . . \  . . .  / . .
 
-    . . .  * . *  . . .
-    . . .  . * .  . . .
-    . . .  * . *  . . .
+    . . .  \ . /  . . .
+    . . .  . X .  . . .
+    . . .  / . \  . . .
 
-    . . *  . . .  * . .
-    . * .  . . .  . * .
-    * . .  . . .  . . *
+    . . /  . . .  \ . .
+    . / .  . . .  . \ .
+    / . .  . . .  . . \
 
      Cross constraints
 
@@ -1804,17 +1801,17 @@ This method enables a uniqness constraints on the diagonals parallel,
 and directly next to the main and minor diagonals. This is method is
 equivalent to C<< set_cross_1 >>.
 
-    . + .  . . .  . + .
-    + . +  . . .  + . +
-    . + .  + . +  . + .
+    . \ .  . . .  . / .
+    \ . \  . . .  / . /
+    . \ .  \ . /  . / .
 
-    . . +  . + .  + . .
-    . . .  + . +  . . .
-    . . +  . + .  + . .
+    . . \  . X .  / . .
+    . . .  X . X  . . .
+    . . /  . X .  \ . .
 
-    . + .  + . +  . + .
-    + . +  . . .  + . +
-    . + .  . . .  . + .
+    . / .  / . \  . \ .
+    / . /  . . .  \ . \
+    . / .  . . .  . \ .
 
       Diagonal Double
 
@@ -1826,17 +1823,17 @@ and minor diagonals, and the diagonals parallel to them, and directly
 next to them. Calling this method is equivalent to calling both
 C<< set_cross () >> and C<< set_diagonal_double () >>.
 
-    * + .  . . .  . + *
-    + * +  . . .  + * +
-    . + *  + . +  * + .
+    \ \ .  . . .  . / /
+    \ \ \  . . .  / / /
+    . \ \  \ . /  / / .
 
-    . . +  * + *  + . .
-    . . .  + * +  . . .
-    . . +  * + *  + . .
+    . . \  X X X  / . .
+    . . .  X X X  . . .
+    . . /  X X X  \ . .
 
-    . + *  + . +  * + .
-    + * +  . . .  + * +
-    * + .  . . .  . + *
+    . / /  / . \  \ \ .
+    / / /  . . .  \ \ \
+    / / .  . . .  . \ \
 
       Diagonal Triple
 
@@ -1851,6 +1848,21 @@ in Argyll in the Scottish highlands.
 
 Calling C<< set_argyle () >> is equivalent to calling 
 C<< set_cross_1 () >> and C<< set_cross_4 () >>.
+
+    . \ .  . ^ .  . / .
+    \ . \  / . \  / . /
+    . \ /  \ . /  \ / .
+
+    . / \  . X .  / \ .
+    < . .  X . X  . . >
+    . \ /  . X .  \ / .
+
+    . / \  / . \  / \ .
+    / . /  \ . /  \ . \
+    . / .  . V .  . \ .
+
+       Argyle Pattern
+
 
 
 =head2 Global constraints
