@@ -1348,6 +1348,47 @@ sub pattern ($self) {
 1;
 
 __END__
+=begin html
+
+<style>
+    ul#index::before {
+        content:                  "Regexp::Sudoku";
+        font-size:                            300%;
+        font-family:                     monospace;
+        font-weight:                          bold;
+        text-align:                         center;
+        line-height:                           2em;
+        margin-left:                           30%;
+        margin-top:                           -1em;
+    }
+    ul#index li ul li ul li {
+        font-family:                     monospace;
+    }
+    html {
+        margin-left:                            5%;
+        margin-right:                          10%;
+    }
+    h1 {
+        margin-left:                           -4%;
+    }
+    h2 {
+        margin-left:                           -3%;
+    }
+    h3 {
+        margin-left:                           -2%;
+    }
+    pre {
+        background:                          black;
+        padding-top:                           1em;
+        padding-bottom:                        1em;
+        border-radius:                         1em;
+    }
+    pre code {
+        color:                          lightgreen;
+    }
+</style>
+
+=end html
 
 =head1 NAME
 
