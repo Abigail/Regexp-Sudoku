@@ -1719,12 +1719,19 @@ falls completely outside of the Sudoku, and hence, does not add
 a constraint.
 
 
-=head1 OLD DOC STARTS HERE
+=head2 Crosses and other diagonal sets
 
-=item C<< $CROSS >>
+It is quite common for variants which have constraints on diagonals
+to do so in a symmetric fashion. To avoid having to call multiple
+C<< set_diagonal_* >> methods, we provide a bunch of wrappers which
+set uniqness constraints on two or more diagonals.
 
-This is a combination of main and minor diagonal constaints. The values
-on each of diagonals should be unique. 
+=head3 C<< set_cross () >>
+
+A common variant has uniqness constraints for both the main and minor
+diagonal -- this variant is widely known under the name I<< X-Sudoku >>.
+C<< set_cross () >> sets the uniqness constraints for both the main
+and minor diagonals:
 
     * . .  . . .  . . *
     . * .  . . .  . * .
@@ -1738,62 +1745,83 @@ on each of diagonals should be unique.
     . * .  . . .  . * .
     * . .  . . .  . . *
 
-
-=item C<< $DOUBLE >>
-
-C<< $DOUBLE >> is used for a Sudoku variant with four diagonals
-having unique values: the diagonals just above/below the main and
-minor diagonals:
-
-    . * .  . . .  . * .
-    * . *  . . .  * . *
-    . * .  * . *  . * .
-
-    . . *  . * .  * . .
-    . . .  * . *  . . .
-    . . *  . * .  * . .
-
-    . * .  * . *  . * .
-    * . *  . . .  * . *
-    . * .  . . .  . * .
+     Cross constraints
 
 
-=item C<< $ARGYLE >>
+=head3 C<< set_cross_1 () .. set_cross_34 () >>
 
-I<< Argyle >> Sudokus have eight diagonals on which the values
-should be unique. This is named after a L<< pattern consisting of
+Each of the C<< set_cross_N () >> methods enable a uniqness constraint
+on B<< four >> diagonals: the I<< super >> and I<< sub >> diaganols
+(relative to both the main and minor diagonals) with offset C<< N >>.
+Note that if C<< N >> is equal, or exceeds the size of the Sudoku, 
+all the diagonals lie fully outside the Sudoku, rendering the method
+useless.
+
+=head3 C<< set_diagonal_double () >>
+
+This method enables a uniqness constraints on the diagonals parallel,
+and directly next to the main and minor diagonals. This is method is
+equivalent to C<< set_cross_1 >>.
+
+    . + .  . . .  . + .
+    + . +  . . .  + . +
+    . + .  + . +  . + .
+
+    . . +  . + .  + . .
+    . . .  + . +  . . .
+    . . +  . + .  + . .
+
+    . + .  + . +  . + .
+    + . +  . . .  + . +
+    . + .  . . .  . + .
+
+      Diagonal Double
+
+
+=head3 C<< set_diagonal_triple () >>
+
+This methods enables uniqness constraints on six diagonals: the main
+and minor diagonals, and the diagonals parallel to them, and directly
+next to them. Calling this method is equivalent to calling both
+C<< set_cross () >> and C<< set_diagonal_double () >>.
+
+    * + .  . . .  . + *
+    + * +  . . .  + * +
+    . + *  + . +  * + .
+
+    . . +  * + *  + . .
+    . . .  + * +  . . .
+    . . +  * + *  + . .
+
+    . + *  + . +  * + .
+    + * +  . . .  + * +
+    * + .  . . .  . + *
+
+      Diagonal Triple
+
+=head3 C<< set_argyle () >>
+
+The I<< Argyle Sudoku >> variant has uniqness constraints on
+B<< eight >> diagonals. This is named after a L<< pattern consisting of
 lozenges|https://en.wikipedia.org/wiki/Argyle_(pattern) >>, which
 itself was named after the tartans of the 
 L<< Clan Cambell |https://en.wikipedia.org/wiki/Clan_Campbell >>
 in Argyll in the Scottish highlands.
 
+Calling C<< set_argyle () >> is equivalent to calling 
+C<< set_cross_1 () >> and C<< set_cross_4 () >>.
 
-    . 1 .  . 5 .  . 3 .
-    2 . 1  6 . 5  3 . 4
-    . 2 6  1 . 3  5 4 .
 
-    . 6 2  . 1 .  4 5 .
-    6 . .  2 . 1  . . 5
-    . 7 3  . 2 .  1 8 .
+=head2 Global constraints
 
-    . 3 7  4 . 2  8 1 .
-    3 . 4  7 . 8  2 . 1
-    . 4 .  . 7 .  . 2 .
+There are Sudoku variants which enable specific constraints on
+all the cells in the Sudoku.
 
-=back
-
-=head2 C<< constraints => MASK >>
-
-Some variants have additional constraints, which apply to all cells
-in the Sudoku. We recognize the following values (imported from
-L<< Regexp::Sudoku::Constants >>):
-
-=over 2
-
-=item C<< $ANTI_KNIGHT >>
+=head3 C<< set_anti_knight_constraint () >>
 
 An I<< anti knight >> constraint implies that two cells which are
-a knights move apart must have different values. (A knights move
+a knights move (as in classical Chess) apart must have different values.
+(A knights move
 is first two cells in an orthognal direction, then one cell
 perpendicular). For each cell, this puts a restriction to up to
 eight different cells. In the diagram below, C<< * >> marks all
@@ -1811,20 +1839,22 @@ the cells which are a knights move away from the cell marked C<< O >>.
     . . .  . . .  . . .
     . . .  . . .  . . .
 
+   Anti Knight Constraint
 
-=item C<< $ANTI_KING >>
+
+=head3 C<< set_anti_king_constraint () >>
 
 Also known as the I<< no touch constraint >>.
 
 An I<< anti king >> constraint implies that two cells which are
-a king move apart must have different values. (A kings move
-is one step in any of the eight directions).
+a kings move (as in classical Chess) apart must have different values.
+(A kings move is one step in any of the eight directions).
 
 For each cell, this puts a restriction to up to
 eight different cells. Four of them are already restricted
 because they are one the same row or columns. And at least
 one kings move will end in the same box. So, this restriction
-is far restrictive than the anti knights move restriction.
+is far less restrictive than the anti knights move restriction.
 
 In the diagram below, C<< * >> marks all
 the cells which are a kings move away from the cell marked C<< O >>.
@@ -1841,7 +1871,7 @@ the cells which are a kings move away from the cell marked C<< O >>.
     . . .  . . .  . . .
     . . .  . . .  . . .
 
-=back
+   Anti King Constraint
 
 =head1 BUGS
 
