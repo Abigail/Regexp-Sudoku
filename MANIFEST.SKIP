@@ -8,4 +8,4 @@ bin/run_sudoku
 t/sudokus/__template__
 Regexp-Sudoku-[0-9]*.tar.gz
 pod2htmd.tmp
-*.html
+.*.html
