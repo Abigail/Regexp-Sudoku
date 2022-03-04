@@ -4,3 +4,5 @@ blib
 pm_to_blib
 MYMETA.*
 Regexp-Sudoku-2*
+pod2htmd.tmp
+*.html
