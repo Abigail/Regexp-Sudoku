@@ -47,11 +47,6 @@ t/830-anti-knight.t
 t/831-anti-king.t
 t/840-odd-even.t
 t/850-renban.t
-t/950-pod.t
-t/960-pod_coverage.t
-t/980-versions.t
-t/981-permissions.t
-t/982-git.t
 t/Test.pm
 t/sudokus/anti-king-1
 t/sudokus/anti-king-2

@@ -5,6 +5,11 @@ Releases
 references.md
 Variants
 bin/run_sudoku
+t/950-pod.t
+t/960-pod_coverage.t
+t/980-versions.t
+t/981-permissions.t
+t/982-git.t
 t/sudokus/__template__
 Regexp-Sudoku-[0-9]*.tar.gz
 pod2htmd.tmp
