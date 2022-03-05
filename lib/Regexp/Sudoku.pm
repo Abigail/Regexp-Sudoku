@@ -2094,10 +2094,6 @@ Clock Sudoku
 
 =back
 
-=head1 SEE ALSO
-
-L<< Regexp::Sudoku::Constants >>.
-
 =head1 DEVELOPMENT
 
 The current sources of this module are found on github,
