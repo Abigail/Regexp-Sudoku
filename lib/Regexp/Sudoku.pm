@@ -766,10 +766,19 @@ sub house2cells ($self, $house) {
 
 ################################################################################
 #
-# cells ($self)
+# cells ($self, $sorted = 0)
 #
 # Return the names of all the cells in the sudoku.
 #
+# If we want the cells to be sorted, then we use the following priorities:
+#    * Clues go first
+#    * Odd/Even cells go next
+#    * Then the other cells
+#    * Ties are broken in the following fashion:
+#        * The more clues seen, the better
+#        * The smallest Renban area the cell is in, the better
+#        * The more houses the cell is in, the better.
+#        
 # TESTS: 040-houses.t
 #
 ################################################################################
@@ -778,10 +787,11 @@ sub cells  ($self, $sorted = 0) {
     my @cells = sort keys %{$cell2houses  {$self}};
     if ($sorted) {
         state $CELL_NAME    = 0;
-        state $IS_CLUE      = $CELL_NAME  + 1;
-        state $EVEN_ODD     = $IS_CLUE    + 1;
-        state $CLUES_SEEN   = $EVEN_ODD   + 1;
-        state $NR_OF_HOUSES = $CLUES_SEEN + 1;
+        state $IS_CLUE      = $CELL_NAME    + 1;
+        state $EVEN_ODD     = $IS_CLUE      + 1;
+        state $CLUES_SEEN   = $EVEN_ODD     + 1;
+        state $NR_OF_HOUSES = $CLUES_SEEN   + 1;
+        state $RENBAN       = $NR_OF_HOUSES + 1;
 
         #
         # For each cell, determine how many different clues it sees.
@@ -801,6 +811,7 @@ sub cells  ($self, $sorted = 0) {
                  sort {$$b [$IS_CLUE]      <=> $$a [$IS_CLUE]        ||       
                        $$b [$EVEN_ODD]     <=> $$a [$EVEN_ODD]       ||      
                        $$b [$CLUES_SEEN]   <=> $$a [$CLUES_SEEN]     ||   
+                       $$a [$RENBAN]       <=> $$b [$RENBAN]         ||
                        $$b [$NR_OF_HOUSES] <=> $$a [$NR_OF_HOUSES]   ||
                        $$a [$CELL_NAME]    cmp $$b [$CELL_NAME]}
                  map  {my $r = [];
@@ -810,6 +821,10 @@ sub cells  ($self, $sorted = 0) {
                                                $self -> is_odd  ($_) ? 1 : 0;
                        $$r [$CLUES_SEEN]    =  keys (%{$sees {$_}    || {}});
                        $$r [$NR_OF_HOUSES]  =  $self -> cell2houses ($_);
+                       #
+                       # Find the *smallest* renban the cell is in
+                       #
+                       $$r [$RENBAN]        = (min map {scalar $self -> renban2cells ($_)} $self -> cell2renbans ($_)) // $self -> size;
                        $r}
                  @cells;
     }
