@@ -47,6 +47,8 @@ fieldhash my %pattern;
 fieldhash my %constraints;
 fieldhash my %renban2cells;
 fieldhash my %cell2renbans;
+fieldhash my %battenburg2cells;
+fieldhash my %cell2battenburgs;
 
 
 my sub has_bit ($vec) {$vec =~ /[^\x{00}]/}
@@ -1327,6 +1329,66 @@ sub init_subject_and_pattern ($self) {
 
     $self;
 }
+
+
+
+################################################################################
+#
+# set_battenburg ($self, @cells)
+#
+# Set one or more batterburg constraints. For each constraint, we give
+# the top left cell. (Multiple cells mean *different* constraints, not
+# the cells of a single constraint)
+#
+# TESTS: 180-set_battenburg.t
+#
+################################################################################
+
+sub set_battenburg ($self, @cells) {
+    foreach my $name (@cells) {
+        #
+        # Calculate all the cells of the constraint
+        #
+        my ($r, $c) = cell_row_column ($name);
+        my @cells = (cell_name ($r,     $c), cell_name ($r,     $c + 1),
+                     cell_name ($r + 1, $c), cell_name ($r + 1, $c + 1));
+        foreach my $cell (@cells) {
+            $cell2battenburgs {$self} {$cell} {$name} = 1;
+            $battenburg2cells {$self} {$name} {$cell} = 1;
+        }
+    }
+    $self;
+}
+
+
+################################################################################
+#
+# cell2battenburgs ($self, $cell)
+#
+# Return a list of battenburgs a cell belongs to.
+#
+# TESTS: 170-set_renban.t
+#
+################################################################################
+
+sub cell2battenburgs ($self, $cell) {
+    keys %{$cell2battenburgs {$self} {$cell} || {}}
+}
+
+################################################################################
+#
+# battenburg2cells ($self, $name)
+#
+# Return a list of cells in a battenburg.
+#
+# TESTS: 170-set_battenburg.t
+#
+################################################################################
+
+sub battenburg2cells ($self, $name) {
+    keys %{$battenburg2cells {$self} {$name} || {}}
+}
+
 
 
 ################################################################################
