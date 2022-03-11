@@ -28,7 +28,7 @@ use List::Util qw [min max];
 # the top left cell. (Multiple cells mean *different* constraints, not
 # the cells of a single constraint)
 #
-# TESTS: 180-set_battenburg.t
+# TESTS: Battenburg/100-set_battenburg.t
 #
 ################################################################################
             
@@ -55,7 +55,7 @@ sub set_battenburg ($self, @cells) {
 #
 # Return a list of battenburgs a cell belongs to.
 #
-# TESTS: 170-set_renban.t
+# TESTS: Battenburg/100-set_battenburg.t
 #
 ################################################################################
  
@@ -70,7 +70,7 @@ sub cell2battenburgs ($self, $cell) {
 #
 # Return a list of cells in a battenburg.
 #
-# TESTS: 170-set_battenburg.t
+# TESTS: Battenburg/100-set_battenburg.t
 #
 ################################################################################
         
@@ -89,7 +89,7 @@ sub battenburg2cells ($self, $name) {
 # the constraint is that they have a different parity. Else, the
 # cells must have the same parity.
 # 
-# TESTS: 183-make_battenburg_statement.t
+# TESTS: Battenburg/120-make_battenburg_statement.t
 # 
 ################################################################################
 
@@ -119,7 +119,7 @@ sub make_battenburg_statement ($self, $cell1, $cell2) {
 # Return a list of battenburg to which both $cell1 and $cell2 belong.
 # In scalar context, returns the number of battenburg the cells both belong.
 #
-# TESTS: 184-same_battenburg.t
+# TESTS: Battenburg/110-same_battenburg.t
 #
 ################################################################################
 

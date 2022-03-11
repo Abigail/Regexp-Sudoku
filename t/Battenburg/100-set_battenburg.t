@@ -9,7 +9,7 @@ no  warnings 'syntax';
 use experimental 'signatures';
 use experimental 'lexical_subs';
 
-use lib qw [lib ../lib];
+use lib qw [lib ../lib ../../lib];
 
 use Test::More 0.88;
 

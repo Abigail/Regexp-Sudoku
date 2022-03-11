@@ -26,7 +26,7 @@ use List::Util qw [min max];
 #
 # Initialize any renban lines/areas
 #        
-# TESTS: 170-set_renban.t
+# TESTS: Renban/100-set_renban.t
 #
 ################################################################################
 
@@ -52,7 +52,7 @@ sub set_renban ($self, @cells) {
 #
 # Return a list of renbans a cell belongs to.
 #
-# TESTS: 170-set_renban.t
+# TESTS: Renban/100-set_renban.t
 #
 ################################################################################
                        
@@ -67,7 +67,7 @@ sub cell2renbans ($self, $cell) {
 # 
 # Return a list of cells in a renban.
 #
-# TESTS: 170-set_renban.t
+# TESTS: Renban/100-set_renban.t
 #
 ################################################################################
         
@@ -83,7 +83,7 @@ sub renban2cells ($self, $renban) {
 # Return a list of renbans to which both $cell1 and $cell2 belong.
 # In scalar context, returns the number of renbans the cells both belong.
 #       
-# TESTS: 171-same_renban.t
+# TESTS: Renban/110-same_renban.t
 #
 ################################################################################
 
@@ -106,7 +106,7 @@ sub same_renban ($self, $cell1, $cell2) {
 # For now, we assume no pair of different size renbans intersect more
 # than once.
 # 
-# TESTS: 140-make_renban_statement.t
+# TESTS: Renban/120-make_renban_statement.t
 #
 ################################################################################
  

@@ -42,7 +42,7 @@ our $MINOR_DIAGONAL = 2;
 #
 # Given a row number and a cell number, return the name of the cell.
 #
-# TESTS: 090-cell_name_row_column.t
+# TESTS: Utils/100-cell_name_row_column.t
 #
 ################################################################################
 
@@ -57,7 +57,7 @@ sub cell_name ($row, $column) {
 #
 # Given the name of a cell, return its row and column.
 # 
-# TESTS: 090-cell_name_row_column.t
+# TESTS: Utils/100-cell_name_row_column.t
 #
 ################################################################################
 
@@ -78,7 +78,7 @@ sub cell_row_column ($name) {
 #
 # Note: this is *not* a method, as it's independent of any state.
 #
-# TESTS: 131-all_pairs.t
+# TESTS: Utils/150-all_pairs.t
 #           
 ################################################################################
          
