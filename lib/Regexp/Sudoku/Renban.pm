@@ -12,12 +12,13 @@ use experimental 'lexical_subs';
 our $VERSION = '2022030401';
 
 use Hash::Util::FieldHash qw [fieldhash];
+use Regexp::Sudoku::Utils;
 
 fieldhash my %renban2cells;
 fieldhash my %cell2renbans;
 
-my $SENTINEL       = "\n";
 use List::Util qw [min max];
+
 
 ################################################################################
 #
