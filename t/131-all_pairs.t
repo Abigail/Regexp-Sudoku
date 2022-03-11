@@ -15,10 +15,10 @@ use Test::More 0.88;
 
 our $r = eval "require Test::NoWarnings; 1";
 
-use Regexp::Sudoku;
+use Regexp::Sudoku::Utils;
 
 sub run_tests ($name, $set1, $set2) {
-    my $subject = Regexp::Sudoku::all_pairs ($set1, $set2);
+    my $subject = all_pairs ($set1, $set2);
     subtest $name => sub {
         foreach my $ch1 (split // => $set1) {
             foreach my $ch2 (split // => $set2) {

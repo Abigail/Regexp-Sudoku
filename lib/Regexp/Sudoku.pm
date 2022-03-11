@@ -14,23 +14,11 @@ use Hash::Util::FieldHash qw [fieldhash];
 use List::Util            qw [min max];
 use Math::Sequence::DeBruijn;
 
+use Regexp::Sudoku::Utils;
 use Regexp::Sudoku::Renban;
 
 our @ISA = qw [Regexp::Sudoku::Renban];
 
-my $DEFAULT_SIZE   = 9;
-my $SENTINEL       = "\n";
-my $CLAUSE_LIST    = ",";
-
-my $NR_OF_DIGITS   =  9;
-my $NR_OF_LETTERS  = 26;
-my $NR_OF_SYMBOLS  = $NR_OF_DIGITS + $NR_OF_LETTERS;
-
-my $ANTI_KNIGHT    = 1;
-my $ANTI_KING      = 2;
-
-my $MAIN_DIAGONAL  = 1;
-my $MINOR_DIAGONAL = 2;
 
 fieldhash my %size;
 fieldhash my %values;
@@ -61,36 +49,6 @@ fieldhash my %cell2battenburgs;
 ################################################################################
 
 sub new ($class) {bless \do {my $v} => $class}
-
-
-################################################################################
-#
-# sub cell_name ($row, $column)
-#
-# Given a row number and a cell number, return the name of the cell.
-#
-# TESTS: 090-cell_name_row_column.t
-#
-################################################################################
-
-sub cell_name ($row, $column) {
-    "R" . $row . "C" . $column
-}
-
-
-################################################################################
-#
-# sub cell_row_column ($cell_name)
-#
-# Given the name of a cell, return its row and column.
-#
-# TESTS: 090-cell_name_row_column.t
-#
-################################################################################
-
-sub cell_row_column ($name) {
-    $name =~ /R([0-9]+)C([0-9]+)/ ? ($1, $2) : (0, 0)
-}
 
 
 ################################################################################
@@ -1099,36 +1057,6 @@ sub semi_debruijn_seq ($self, $values = $values {$self}, $allow_dups = 0) {
     };
 }
 
-
-################################################################################
-#
-# all_pairs ($set1, $set2)
-#
-# Return a string which, foreach character $x from $set1, and $y from $set2,
-# contains the substrings "$x$y" and "$y$x". Furthermore, the string will
-# not contain any substring "$w$z", with $w and $z from the same set.
-#
-# Each set is given as a string.
-#
-# Note: this is *not* a method, as it's independent of any state.
-#
-# TESTS: 131-all_pairs.t
-#
-################################################################################
-
-sub all_pairs ($set1, $set2) {
-    my @chars1 = split // => $set1;
-    my @chars2 = split // => $set2;
-    my $out = "";
-    foreach my $ch1 (@chars1) {
-        foreach my $ch2 (@chars2) {
-            $out .= "$ch1$ch2";
-        }
-    }
-    $out .= $chars1 [0];
-
-    $out;
-}
 
 
 ################################################################################
