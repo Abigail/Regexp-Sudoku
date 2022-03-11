@@ -49,4 +49,8 @@ run_test "Two overlapping Battenburgs",     qw [R3C3 R4C3];
 run_test "Many Battenburgs",                qw [R1C1 R2C2 R3C3 R4C4 R5C5
                                                 R6C6 R7C7 R8C8];
 
+Test::NoWarnings::had_no_warnings () if $r;
+
+done_testing;
+
 __END__

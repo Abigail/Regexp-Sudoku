@@ -1156,12 +1156,13 @@ sub make_cell_statement ($self, $cell) {
 #
 ################################################################################
 
-sub semi_debruijn_seq ($self, $values = $values {$self}) {
+sub semi_debruijn_seq ($self, $values = $values {$self}, $allow_dups = 0) {
     state $cache;
-    $$cache {$values} //= do {
+    $$cache {$values, $allow_dups} //= do {
         my $seq = debruijn ($values, 2);
-        $seq .= substr $seq, 0, 1;  # Copy first char to the end.
-        $seq  =~ s/(.)\g{1}/$1/g;   # Remove duplicates.
+        $seq .= substr $seq, 0, 1;                    # Copy first char to
+                                                      # the end.
+        $seq  =~ s/(.)\g{1}/$1/g unless $allow_dups;  # Remove duplicates.
         $seq;
     };
 }
@@ -1375,6 +1376,7 @@ sub cell2battenburgs ($self, $cell) {
     keys %{$cell2battenburgs {$self} {$cell} || {}}
 }
 
+
 ################################################################################
 #
 # battenburg2cells ($self, $name)
@@ -1389,6 +1391,84 @@ sub battenburg2cells ($self, $name) {
     keys %{$battenburg2cells {$self} {$name} || {}}
 }
 
+
+################################################################################
+#
+# make_same_parity_statement ($self, $cell1, $cell2, $must_differ = 0)
+#
+# Return a statement which forces the two cells to have the same parity
+# (so, both cells are either even, or both cells are odd). Optionally,
+# we can also force the cells to be different.
+#
+# TESTS: 181-make_same_parity_statement.t
+#
+################################################################################
+
+sub make_same_parity_statement ($self, $cell1, $cell2, $must_differ = 0) {
+    my $e = $self -> semi_debruijn_seq (scalar $self -> evens, !$must_differ);
+    my $o = $self -> semi_debruijn_seq (scalar $self -> odds,  !$must_differ);
+    my $subsub = "${e}0${o}";
+    my $er     = "[" . $self -> evens . "]";
+    my $or     = "[" . $self -> odds  . "]";
+    my $subpat = "(?:$er*\\g{$cell1}\\g{$cell2}$er*0$or*|" .
+               "$er*0$or*\\g{$cell1}\\g{$cell2}$or*)";
+
+    map {$_ . $SENTINEL} $subsub, $subpat;
+}
+
+
+################################################################################
+#
+# make_different_parity_statement ($self, $cell1, $cell2)
+#
+# Return a statement which forces the two cells to have different parity.
+# (so, one cell is odd, the other even).
+#
+# TESTS: 182-make_different_parity_statement.t
+#
+################################################################################
+
+sub make_different_parity_statement ($self, $cell1, $cell2) {
+    my $subsub = $self -> evens . 0 . $self -> odds;
+    my $er     = "[" . $self -> evens . "]";
+    my $or     = "[" . $self -> odds  . "]";
+    my $subpat = "(?:$er*\\g{$cell1}$er*0$or*\\g{$cell2}$or*|" .
+                    "$er*\\g{$cell2}$er*0$or*\\g{$cell1}$or*)";
+
+    map {$_ . $SENTINEL} $subsub, $subpat;
+}
+
+
+################################################################################
+#
+# make_battenburg_statement ($self, $cell1, $cell2)
+#
+# Return a statement which implements a Battenburg constraint between
+# the two cells. We will assume the given cells belong to the same
+# Battenburg contraint. If the cells are on the same row or column,
+# the constraint is that they have a different parity. Else, the
+# cells must have the same parity.
+#
+# TESTS: 183-make_battenburg_statement.t
+#
+################################################################################
+
+sub make_battenburg_statement ($self, $cell1, $cell2) {
+    my ($r1, $c1) = cell_row_column ($cell1);
+    my ($r2, $c2) = cell_row_column ($cell2);
+    my ($subsub, $subpat);
+
+    #
+    # Case 1, cells are diagonally opposite.
+    # Then the parity must be the same.
+    #
+    if ($r1 != $r2 && $c1 != $c2) {
+        return $self -> make_same_parity_statement ($cell1, $cell2, 0);
+    }
+    else {
+        return $self -> make_different_parity_statement ($cell1, $cell2);
+    }
+}
 
 
 ################################################################################
