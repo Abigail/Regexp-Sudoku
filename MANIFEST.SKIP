@@ -7,6 +7,7 @@ Variants
 bin/run_sudoku
 xt/100-pod.t
 xt/110-pod_coverage.t
+xt/200-long_lines.t
 xt/800-versions.t
 xt/810-permissions.t
 xt/820-git.t
