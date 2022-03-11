@@ -80,6 +80,7 @@ t/sudokus/odd-even-1
 t/sudokus/odd-even-2
 t/sudokus/renban-1
 t/sudokus/renban-2
+t/sudokus/renban-3
 t/sudokus/sudoku_12-1
 t/sudokus/sudoku_4_25764
 t/sudokus/sudoku_6_fun
