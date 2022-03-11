@@ -1494,7 +1494,8 @@ sub make_battenburg_statement ($self, $cell1, $cell2) {
     # Then the parity must be the same.
     #
     if ($r1 != $r2 && $c1 != $c2) {
-        return $self -> make_same_parity_statement ($cell1, $cell2, 0);
+        my $md = $self -> must_differ ($cell1, $cell2);
+        return $self -> make_same_parity_statement ($cell1, $cell2, $md);
     }
     else {
         return $self -> make_different_parity_statement ($cell1, $cell2);
