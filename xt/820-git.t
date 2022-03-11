@@ -6,11 +6,6 @@ use strict;
 use warnings;
 no  warnings 'syntax';
 
-unless ($ENV {AUTHOR_TESTING}) {
-    plan skip_all => "AUTHOR tests";
-    exit;
-}
-
 unless (-f ".git/config") {
     plan skip_all => "This is not a git repository";
     exit;

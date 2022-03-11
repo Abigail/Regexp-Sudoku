@@ -6,11 +6,6 @@ use strict;
 use warnings;
 no  warnings 'syntax';
 
-unless ($ENV {AUTHOR_TESTING}) {
-    plan skip_all => "AUTHOR tests";
-    exit;
-}
-
 sub version;
 
 SKIP: {
