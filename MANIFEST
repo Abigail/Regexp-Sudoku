@@ -38,6 +38,7 @@ t/180-set_battenburg.t
 t/181-make_same_parity_statement.t
 t/182-make_different_parity_statement.t
 t/183-make_battenburg_statement.t
+t/184-same_battenburg.t
 t/804-sudoku-4.t
 t/806-sudoku-6.t
 t/809-sudoku-9.t

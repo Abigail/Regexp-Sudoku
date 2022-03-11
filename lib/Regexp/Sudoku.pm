@@ -1505,6 +1505,26 @@ sub make_battenburg_statement ($self, $cell1, $cell2) {
 
 ################################################################################
 #
+# same_battenburg ($self, $cell1, $cell2)
+#
+# Return a list of battenburg to which both $cell1 and $cell2 belong.
+# In scalar context, returns the number of battenburg the cells both belong.
+#
+# TESTS: 184-same_battenburg.t
+#
+################################################################################
+
+sub same_battenburg ($self, $cell1, $cell2) {
+    my %seen;
+    $seen {$_} ++ for $self -> cell2battenburgs ($cell1),
+                      $self -> cell2battenburgs ($cell2);
+
+    grep {$seen {$_} > 1} keys %seen;
+}
+
+
+################################################################################
+#
 # subject ($self)
 #
 # Return the subject we're matching against.
