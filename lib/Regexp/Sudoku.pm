@@ -826,7 +826,9 @@ sub cells  ($self, $sorted = 0) {
                        #
                        # Find the *smallest* renban the cell is in
                        #
-                       $$r [$RENBAN]        = (min map {scalar $self -> renban2cells ($_)} $self -> cell2renbans ($_)) // $self -> size;
+                       $$r [$RENBAN]        =
+                           (min map {scalar $self -> renban2cells ($_)}
+                               $self -> cell2renbans ($_)) // $self -> size;
                        $r}
                  @cells;
     }
