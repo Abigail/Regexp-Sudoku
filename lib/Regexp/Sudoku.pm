@@ -18,8 +18,6 @@ use Regexp::Sudoku::Renban;
 
 our @ISA = qw [Regexp::Sudoku::Renban];
 
-use Exporter ();
-
 my $DEFAULT_SIZE   = 9;
 my $SENTINEL       = "\n";
 my $CLAUSE_LIST    = ",";
@@ -52,8 +50,6 @@ fieldhash my %constraints;
 fieldhash my %battenburg2cells;
 fieldhash my %cell2battenburgs;
 
-
-my sub has_bit ($vec) {$vec =~ /[^\x{00}]/}
 
 
 ################################################################################
