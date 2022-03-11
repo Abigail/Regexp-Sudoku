@@ -1,4 +1,5 @@
 lib/Regexp/Sudoku.pm
+lib/Regexp/Sudoku.pod
 Makefile.PL
 MANIFEST
 Changes
