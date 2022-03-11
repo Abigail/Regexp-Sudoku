@@ -253,17 +253,20 @@ sub odds  ($self) {
 
 ################################################################################
 #
-# values_range ($self)
+# values_range ($self, $with_zero = 0)
 #
 # Return the set of values used in the sudoku, as ranges to be used in
-# a character class. Calls $self -> values () to get the values.
+# a character class. If $with_zero is true, we include '0' in the range
+# as well. Note, '0' will *never* be an acceptable value.
 #
 # TESTS: 020_values.t
 #
 ################################################################################
 
-sub values_range ($self) {
-    $values_range {$self}
+sub values_range ($self, $with_zero = 0) {
+    my $range = $values_range {$self};
+       $range =~ s/1/0/ if $with_zero;
+       $range;
 }
 
 
@@ -1170,6 +1173,36 @@ sub semi_debruijn_seq ($self, $values = $values {$self}, $allow_dups = 0) {
 }
 
 
+################################################################################
+#
+# all_pairs ($set1, $set2)
+#
+# Return a string which, foreach character $x from $set1, and $y from $set2,
+# contains the substrings "$x$y" and "$y$x". Furthermore, the string will
+# not contain any substring "$w$z", with $w and $z from the same set.
+#
+# Each set is given as a string.
+#
+# Note: this is *not* a method, as it's independent of any state.
+#
+# TESTS: 131-all_pairs.t
+#
+################################################################################
+
+sub all_pairs ($set1, $set2) {
+    my @chars1 = split // => $set1;
+    my @chars2 = split // => $set2;
+    my $out = "";
+    foreach my $ch1 (@chars1) {
+        foreach my $ch2 (@chars2) {
+            $out .= "$ch1$ch2";
+        }
+    }
+    $out .= $chars1 [0];
+
+    $out;
+}
+
 
 ################################################################################
 #
@@ -1409,11 +1442,9 @@ sub battenburg2cells ($self, $name) {
 sub make_same_parity_statement ($self, $cell1, $cell2, $must_differ = 0) {
     my $e = $self -> semi_debruijn_seq (scalar $self -> evens, !$must_differ);
     my $o = $self -> semi_debruijn_seq (scalar $self -> odds,  !$must_differ);
+    my $range  = $self -> values_range (1);
     my $subsub = "${e}0${o}";
-    my $er     = "[" . $self -> evens . "]";
-    my $or     = "[" . $self -> odds  . "]";
-    my $subpat = "(?:$er*\\g{$cell1}\\g{$cell2}$er*0$or*|" .
-               "$er*0$or*\\g{$cell1}\\g{$cell2}$or*)";
+    my $subpat = "[$range]*\\g{$cell1}\\g{$cell2}[$range]*";
 
     map {$_ . $SENTINEL} $subsub, $subpat;
 }
@@ -1431,11 +1462,9 @@ sub make_same_parity_statement ($self, $cell1, $cell2, $must_differ = 0) {
 ################################################################################
 
 sub make_different_parity_statement ($self, $cell1, $cell2) {
-    my $subsub = $self -> evens . 0 . $self -> odds;
-    my $er     = "[" . $self -> evens . "]";
-    my $or     = "[" . $self -> odds  . "]";
-    my $subpat = "(?:$er*\\g{$cell1}$er*0$or*\\g{$cell2}$or*|" .
-                    "$er*\\g{$cell2}$er*0$or*\\g{$cell1}$or*)";
+    my $range  = $self -> values_range ();
+    my $subsub = all_pairs (scalar $self -> evens, scalar $self -> odds);
+    my $subpat = "[$range]*\\g{$cell1}\\g{$cell2}[$range]*";
 
     map {$_ . $SENTINEL} $subsub, $subpat;
 }

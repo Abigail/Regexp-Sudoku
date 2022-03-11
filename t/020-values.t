@@ -31,19 +31,21 @@ my @tests = (
 foreach my $test (@tests) {
     my ($args, $exp_v, $exp_vr, $exp_e, $exp_o, $name) = @$test;
 
-    my @exp_v = split // => $exp_v;
-    my @exp_e = split // => $exp_e;
-    my @exp_o = split // => $exp_o;
+    my @exp_v   = split // => $exp_v;
+    my @exp_e   = split // => $exp_e;
+    my @exp_o   = split // => $exp_o;
+    my $exp_vr0 = $exp_vr =~ s/1/0/r;
 
     my $sudoku = Regexp::Sudoku:: -> new -> init (%$args);
     subtest "$name" => sub {
-        is         $sudoku -> values,   $exp_v, "values in scalar context";
-        is_deeply [$sudoku -> values], \@exp_v, "values in list context";
-        is         $sudoku -> evens,    $exp_e,  "evens in scalar context";
-        is_deeply [$sudoku -> evens],  \@exp_e,  "evens in list context";
-        is         $sudoku -> odds,     $exp_o,   "odds in scalar context";
-        is_deeply [$sudoku -> odds],   \@exp_o,   "odds in list context";
-        is $sudoku -> values_range,     $exp_vr, "values range";
+        is         $sudoku -> values,   $exp_v,  "values in scalar context";
+        is_deeply [$sudoku -> values], \@exp_v,  "values in list context";
+        is         $sudoku -> evens,    $exp_e,   "evens in scalar context";
+        is_deeply [$sudoku -> evens],  \@exp_e,   "evens in list context";
+        is         $sudoku -> odds,     $exp_o,    "odds in scalar context";
+        is_deeply [$sudoku -> odds],   \@exp_o,    "odds in list context";
+        is $sudoku -> values_range,     $exp_vr,  "values range";
+        is $sudoku -> values_range (1), $exp_vr0, "values range with zero";
     };
 }
 
