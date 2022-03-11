@@ -10,14 +10,20 @@ use experimental 'lexical_subs';
 
 our $VERSION = '2022030401';
 
+use lib qw [lib];
+
 use Hash::Util::FieldHash qw [fieldhash];
 use List::Util            qw [min max];
 use Math::Sequence::DeBruijn;
 
 use Regexp::Sudoku::Utils;
+use Regexp::Sudoku::Battenburg;
 use Regexp::Sudoku::Renban;
 
-our @ISA = qw [Regexp::Sudoku::Renban];
+our @ISA = qw [
+    Regexp::Sudoku::Battenburg
+    Regexp::Sudoku::Renban
+];
 
 
 fieldhash my %size;
@@ -35,9 +41,6 @@ fieldhash my %is_odd;
 fieldhash my %subject;
 fieldhash my %pattern;
 fieldhash my %constraints;
-fieldhash my %battenburg2cells;
-fieldhash my %cell2battenburgs;
-
 
 
 ################################################################################
@@ -1181,66 +1184,6 @@ sub init_subject_and_pattern ($self) {
 }
 
 
-
-################################################################################
-#
-# set_battenburg ($self, @cells)
-#
-# Set one or more batterburg constraints. For each constraint, we give
-# the top left cell. (Multiple cells mean *different* constraints, not
-# the cells of a single constraint)
-#
-# TESTS: 180-set_battenburg.t
-#
-################################################################################
-
-sub set_battenburg ($self, @cells) {
-    foreach my $name (@cells) {
-        #
-        # Calculate all the cells of the constraint
-        #
-        my ($r, $c) = cell_row_column ($name);
-        my @cells = (cell_name ($r,     $c), cell_name ($r,     $c + 1),
-                     cell_name ($r + 1, $c), cell_name ($r + 1, $c + 1));
-        foreach my $cell (@cells) {
-            $cell2battenburgs {$self} {$cell} {$name} = 1;
-            $battenburg2cells {$self} {$name} {$cell} = 1;
-        }
-    }
-    $self;
-}
-
-
-################################################################################
-#
-# cell2battenburgs ($self, $cell)
-#
-# Return a list of battenburgs a cell belongs to.
-#
-# TESTS: 170-set_renban.t
-#
-################################################################################
-
-sub cell2battenburgs ($self, $cell) {
-    keys %{$cell2battenburgs {$self} {$cell} || {}}
-}
-
-
-################################################################################
-#
-# battenburg2cells ($self, $name)
-#
-# Return a list of cells in a battenburg.
-#
-# TESTS: 170-set_battenburg.t
-#
-################################################################################
-
-sub battenburg2cells ($self, $name) {
-    keys %{$battenburg2cells {$self} {$name} || {}}
-}
-
-
 ################################################################################
 #
 # make_same_parity_statement ($self, $cell1, $cell2, $must_differ = 0)
@@ -1281,59 +1224,6 @@ sub make_different_parity_statement ($self, $cell1, $cell2) {
     my $subpat = "[$range]*\\g{$cell1}\\g{$cell2}[$range]*";
 
     map {$_ . $SENTINEL} $subsub, $subpat;
-}
-
-
-################################################################################
-#
-# make_battenburg_statement ($self, $cell1, $cell2)
-#
-# Return a statement which implements a Battenburg constraint between
-# the two cells. We will assume the given cells belong to the same
-# Battenburg contraint. If the cells are on the same row or column,
-# the constraint is that they have a different parity. Else, the
-# cells must have the same parity.
-#
-# TESTS: 183-make_battenburg_statement.t
-#
-################################################################################
-
-sub make_battenburg_statement ($self, $cell1, $cell2) {
-    my ($r1, $c1) = cell_row_column ($cell1);
-    my ($r2, $c2) = cell_row_column ($cell2);
-    my ($subsub, $subpat);
-
-    #
-    # Case 1, cells are diagonally opposite.
-    # Then the parity must be the same.
-    #
-    if ($r1 != $r2 && $c1 != $c2) {
-        my $md = $self -> must_differ ($cell1, $cell2);
-        return $self -> make_same_parity_statement ($cell1, $cell2, $md);
-    }
-    else {
-        return $self -> make_different_parity_statement ($cell1, $cell2);
-    }
-}
-
-
-################################################################################
-#
-# same_battenburg ($self, $cell1, $cell2)
-#
-# Return a list of battenburg to which both $cell1 and $cell2 belong.
-# In scalar context, returns the number of battenburg the cells both belong.
-#
-# TESTS: 184-same_battenburg.t
-#
-################################################################################
-
-sub same_battenburg ($self, $cell1, $cell2) {
-    my %seen;
-    $seen {$_} ++ for $self -> cell2battenburgs ($cell1),
-                      $self -> cell2battenburgs ($cell2);
-
-    grep {$seen {$_} > 1} keys %seen;
 }
 
 

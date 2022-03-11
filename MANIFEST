@@ -1,5 +1,6 @@
 lib/Regexp/Sudoku.pm
 lib/Regexp/Sudoku.pod
+lib/Regexp/Sudoku/Battenburg.pm
 lib/Regexp/Sudoku/Renban.pm
 lib/Regexp/Sudoku/Utils.pm
 Makefile.PL
