@@ -1148,8 +1148,8 @@ sub init_subject_and_pattern ($self) {
         $pattern .= $subpat;
 
         #
-        # Now, for all the previous cells, if there is a constraint
-        # between them, add a clause for them.
+        # Now, for all the previous cells, if there are constraints
+        # between them, add statements for each constraint.
         #
         for my $j (0 .. $i - 1) {
             my $cell2 = $cells [$j];
@@ -1159,15 +1159,23 @@ sub init_subject_and_pattern ($self) {
             #
             next if $self -> clue ($cell1) && $self -> clue ($cell2);
 
-            my ($subsub, $subpat);
+            my ($subsub, $subpat) = ("", "");
+            my  $differs = 0;
 
             if (my @renbans = $self -> same_renban ($cell1, $cell2)) {
-                ($subsub, $subpat) = $self -> make_renban_statement
+                my ($newsub, $newpat) = $self -> make_renban_statement
                                                  ($cell1, $cell2);
+                $subsub .= $newsub;
+                $subpat .= $newpat;
+                $differs = 1;
             }
-            elsif ($self -> must_differ ($cell1, $cell2)) {
-                ($subsub, $subpat) = $self -> make_diff_statement
+
+
+            if (!$differs && $self -> must_differ ($cell1, $cell2)) {
+                my ($newsub, $newpat) = $self -> make_diff_statement
                                                  ($cell1, $cell2);
+                $subsub .= $newsub;
+                $subpat .= $newpat;
             }
 
             if ($subsub && $subpat) {
