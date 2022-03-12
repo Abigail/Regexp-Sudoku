@@ -82,5 +82,6 @@ printf "\nRuntime: %02d:%02d:%07.4f\n", $hours, $minutes, $seconds;
 printf "Lengths: %d (subject) & %d (pattern)\n", length $subject,
                                                  length $pattern;
 printf "Number of statements: %d\n", $subject =~ y/\n/\n/;
+printf "Number of backreferences: %d\n", scalar (() = $pattern =~ /\\g\{/g);
 
 __END__
