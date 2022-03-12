@@ -499,17 +499,17 @@ in Argyll in the Scottish highlands.
 Calling C<< set_argyle () >> is equivalent to calling 
 C<< set_cross_1 () >> and C<< set_cross_4 () >>.
 
-    . \ .  . ^ .  . / .
+    . \ .  . X .  . / .
     \ . \  / . \  / . /
     . \ /  \ . /  \ / .
 
     . / \  . X .  / \ .
-    < . .  X . X  . . >
+    X . .  X . X  . . X
     . \ /  . X .  \ / .
 
     . / \  / . \  / \ .
     / . /  \ . /  \ . \
-    . / .  . V .  . \ .
+    . / .  . X .  . \ .
 
        Argyle Pattern
 
