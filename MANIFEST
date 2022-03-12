@@ -50,7 +50,9 @@ t/831-anti-king.t
 t/840-odd-even.t
 t/850-renban.t
 t/Battenburg/100-set_battenburg.t
+t/Battenburg/105-set_battenburg.t
 t/Battenburg/110-same_battenburg.t
+t/Battenburg/115-same_battenburg.t
 t/Battenburg/120-make_battenburg_statement.t
 t/Renban/100-set_renban.t
 t/Renban/110-same_renban.t

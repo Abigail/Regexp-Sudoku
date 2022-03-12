@@ -1161,24 +1161,23 @@ sub init_subject_and_pattern ($self) {
 
             my ($subsub, $subpat) = ("", "");
             my  $differs = 0;
+            my  @todo;
 
             if (my @renbans = $self -> same_renban ($cell1, $cell2)) {
-                my ($newsub, $newpat) = $self -> make_renban_statement
-                                                 ($cell1, $cell2);
-                $subsub .= $newsub;
-                $subpat .= $newpat;
+                push @todo => "make_renban_statement";
                 $differs = 1;
             }
 
-
-            if (!$differs && $self -> must_differ ($cell1, $cell2)) {
-                my ($newsub, $newpat) = $self -> make_diff_statement
-                                                 ($cell1, $cell2);
-                $subsub .= $newsub;
-                $subpat .= $newpat;
+            if ($self -> same_battenburg ($cell1, $cell2)) {
+                push @todo => "make_battenburg_statement";
             }
 
-            if ($subsub && $subpat) {
+            if (!$differs && $self -> must_differ ($cell1, $cell2)) {
+                push @todo => "make_diff_statement";
+            }
+
+            foreach my $method (@todo) {
+                my ($subsub, $subpat) = $self -> $method ($cell1, $cell2);
                 $subject .= $subsub;
                 $pattern .= $subpat;
             }

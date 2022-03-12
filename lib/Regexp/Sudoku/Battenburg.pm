@@ -16,6 +16,8 @@ use Regexp::Sudoku::Utils;
 
 fieldhash my %battenburg2cells;
 fieldhash my %cell2battenburgs;
+fieldhash my %anti_battenburg2cells;
+fieldhash my %cell2anti_battenburgs;
 
 use List::Util qw [min max];
 
@@ -24,7 +26,7 @@ use List::Util qw [min max];
 #
 # set_battenburg ($self, @cells)
 #
-# Set one or more batterburg constraints. For each constraint, we give
+# Set one or more Battenburg constraints. For each constraint, we give
 # the top left cell. (Multiple cells mean *different* constraints, not
 # the cells of a single constraint)
 #
@@ -51,9 +53,38 @@ sub set_battenburg ($self, @cells) {
     
 ################################################################################
 #
+# set_anti_battenburg ($self, @cells)
+#
+# Set one or more anti Battenburg constraints. For each constraint, we give
+# the top left cell. (Multiple cells mean *different* constraints, not
+# the cells of a single constraint)
+#
+# TESTS: Battenburg/105-set_anti_battenburg.t
+#
+################################################################################
+            
+sub set_anti_battenburg ($self, @cells) {
+    foreach my $name (@cells) {
+        #
+        # Calculate all the cells of the constraint
+        #
+        my ($r, $c) = cell_row_column ($name);
+        my @cells = (cell_name ($r,     $c), cell_name ($r,     $c + 1),
+                     cell_name ($r + 1, $c), cell_name ($r + 1, $c + 1));
+        foreach my $cell (@cells) {  
+            $cell2anti_battenburgs {$self} {$cell} {$name} = 1;
+            $anti_battenburg2cells {$self} {$name} {$cell} = 1;
+        }
+    }
+    $self;
+}
+    
+    
+################################################################################
+#
 # cell2battenburgs ($self, $cell)
 #
-# Return a list of battenburgs a cell belongs to.
+# Return a list of Battenburgs a cell belongs to.
 #
 # TESTS: Battenburg/100-set_battenburg.t
 #
@@ -66,9 +97,24 @@ sub cell2battenburgs ($self, $cell) {
 
 ################################################################################
 #
+# cell2anti_battenburgs ($self, $cell)
+#
+# Return a list of anti-Battenburgs a cell belongs to.
+#
+# TESTS: Battenburg/105-set_anti_battenburg.t
+#
+################################################################################
+ 
+sub cell2anti_battenburgs ($self, $cell) {
+    keys %{$cell2anti_battenburgs {$self} {$cell} || {}}
+}
+  
+
+################################################################################
+#
 # battenburg2cells ($self, $name)
 #
-# Return a list of cells in a battenburg.
+# Return a list of cells in a Battenburg.
 #
 # TESTS: Battenburg/100-set_battenburg.t
 #
@@ -76,6 +122,21 @@ sub cell2battenburgs ($self, $cell) {
         
 sub battenburg2cells ($self, $name) {
     keys %{$battenburg2cells {$self} {$name} || {}}
+}
+            
+
+################################################################################
+#
+# anti_battenburg2cells ($self, $name)
+#
+# Return a list of cells in an anti-Battenburg.
+#
+# TESTS: Battenburg/105-set_anti_battenburg.t
+#
+################################################################################
+        
+sub anti_battenburg2cells ($self, $name) {
+    keys %{$anti_battenburg2cells {$self} {$name} || {}}
 }
             
 
@@ -116,8 +177,8 @@ sub make_battenburg_statement ($self, $cell1, $cell2) {
 #
 # same_battenburg ($self, $cell1, $cell2)
 #
-# Return a list of battenburg to which both $cell1 and $cell2 belong.
-# In scalar context, returns the number of battenburg the cells both belong.
+# Return a list of Battenburgs to which both $cell1 and $cell2 belong.
+# In scalar context, returns the number of Battenburgs the cells both belong.
 #
 # TESTS: Battenburg/110-same_battenburg.t
 #
@@ -131,6 +192,27 @@ sub same_battenburg ($self, $cell1, $cell2) {
     grep {$seen {$_} > 1} keys %seen;
 }
  
+
+################################################################################
+#
+# same_anti_battenburg ($self, $cell1, $cell2)
+#
+# Return a list of anti-Battenburgs to which both $cell1 and $cell2 belong.
+# In scalar context, returns the number of anti-battenburgs the cells
+# both belong.
+#
+# TESTS: Battenburg/115-same_anti_battenburg.t
+#
+################################################################################
+
+sub same_anti_battenburg ($self, $cell1, $cell2) {
+    my %seen;
+    $seen {$_} ++ for $self -> cell2anti_battenburgs ($cell1),
+                      $self -> cell2anti_battenburgs ($cell2);
+
+    grep {$seen {$_} > 1} keys %seen;
+}
+
 
 __END__
 
