@@ -11,8 +11,12 @@ use experimental 'lexical_subs';
 
 use lib qw [lib ../lib];
 
-use Regexp::Sudoku;
 use Time::HiRes qw [time];
+use Getopt::Long;
+
+use Regexp::Sudoku;
+
+GetOptions ('skip-match'  =>  \my $skip_match);
 
 my $input;
 undef $/;
@@ -50,35 +54,37 @@ my $sudoku = eval $create_section or die $@;
 my $subject  = $sudoku -> subject;
 my $pattern  = $sudoku -> pattern;
 
-my $start    = time;
-my $match    = $subject =~ $pattern;
-my $end      = time;
-my $run_time = $end - $start;
-my $hours    = int ($run_time / 3600);
-my $minutes  = int ($run_time /   60) % 60;
-my $seconds  =      $run_time - 3600 * $hours - 60 * $minutes;
+unless ($skip_match) {
+    my $start    = time;
+    my $match    = $subject =~ $pattern;
+    my $end      = time;
+    my $run_time = $end - $start;
+    my $hours    = int ($run_time / 3600);
+    my $minutes  = int ($run_time /   60) % 60;
+    my $seconds  =      $run_time - 3600 * $hours - 60 * $minutes;
 
-if ($match) {
-    my $bw = $sudoku -> box_width;
-    my $bh = $sudoku -> box_height;
-    foreach my $r (1 .. $size) {
-        foreach my $c (1 .. $size) {
-            my $cell = "R${r}C${c}";
-            print " " if $c > 1;
-            print $+ {$cell};
-            if ($c % $bw == 0 && $c != $size) {
-                print " ";
+    if ($match) {
+        my $bw = $sudoku -> box_width;
+        my $bh = $sudoku -> box_height;
+        foreach my $r (1 .. $size) {
+            foreach my $c (1 .. $size) {
+                my $cell = "R${r}C${c}";
+                print " " if $c > 1;
+                print $+ {$cell};
+                if ($c % $bw == 0 && $c != $size) {
+                    print " ";
+                }
             }
+            print "\n" if $r % $bh == 0 && $r != $size;
+            print "\n";
         }
-        print "\n" if $r % $bh == 0 && $r != $size;
-        print "\n";
     }
-}
-else {
-    print "No match!";
+    else {
+        print "No match!";
+    }
+    printf "\nRuntime: %02d:%02d:%07.4f\n", $hours, $minutes, $seconds;
 }
 
-printf "\nRuntime: %02d:%02d:%07.4f\n", $hours, $minutes, $seconds;
 printf "Lengths: %d (subject) & %d (pattern)\n", length $subject,
                                                  length $pattern;
 printf "Number of statements: %d\n", $subject =~ y/\n/\n/;
