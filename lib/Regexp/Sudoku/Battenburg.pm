@@ -138,39 +138,6 @@ sub battenburg2cells ($self, $name) {
 sub anti_battenburg2cells ($self, $name) {
     keys %{$anti_battenburg2cells {$self} {$name} || {}}
 }
-            
-
-################################################################################
-#
-# make_battenburg_statement ($self, $cell1, $cell2)
-#           
-# Return a statement which implements a Battenburg constraint between
-# the two cells. We will assume the given cells belong to the same
-# Battenburg contraint. If the cells are on the same row or column,
-# the constraint is that they have a different parity. Else, the
-# cells must have the same parity.
-# 
-# TESTS: Battenburg/120-make_battenburg_statement.t
-# 
-################################################################################
-
-sub make_battenburg_statement ($self, $cell1, $cell2) {
-    my ($r1, $c1) = cell_row_column ($cell1);
-    my ($r2, $c2) = cell_row_column ($cell2);
-    my ($subsub, $subpat);
-    
-    #
-    # Case 1, cells are diagonally opposite.
-    # Then the parity must be the same.
-    #
-    if ($r1 != $r2 && $c1 != $c2) {
-        my $md = $self -> must_differ ($cell1, $cell2);
-        return $self -> make_same_parity_statement ($cell1, $cell2, $md);
-    }
-    else {
-        return $self -> make_different_parity_statement ($cell1, $cell2);
-    }
-}
  
 
 ################################################################################
@@ -211,6 +178,78 @@ sub same_anti_battenburg ($self, $cell1, $cell2) {
                       $self -> cell2anti_battenburgs ($cell2);
 
     grep {$seen {$_} > 1} keys %seen;
+}
+
+
+################################################################################
+#
+# make_battenburg_statement ($self, $cell1, $cell2)
+#           
+# Return a statement which implements a Battenburg constraint between
+# the two cells. We will assume the given cells belong to the same
+# Battenburg contraint. If the cells are on the same row or column,
+# the constraint is that they have a different parity. Else, the
+# cells must have the same parity.
+# 
+# TESTS: Battenburg/120-make_battenburg_statement.t
+# 
+################################################################################
+
+sub make_battenburg_statement ($self, $cell1, $cell2) {
+    my ($r1, $c1) = cell_row_column ($cell1);
+    my ($r2, $c2) = cell_row_column ($cell2);
+    my ($subsub, $subpat);
+    
+    #
+    # Case 1, cells are diagonally opposite.
+    # Then the parity must be the same.
+    #
+    if ($r1 != $r2 && $c1 != $c2) {
+        my $md = $self -> must_differ ($cell1, $cell2);
+        return $self -> make_same_parity_statement ($cell1, $cell2, $md);
+    }
+    else {
+        return $self -> make_different_parity_statement ($cell1, $cell2);
+    }
+}
+
+
+################################################################################
+#
+# make_anti_battenburg_statement ($self, $anti_battenburg)
+#           
+# Return a (set of) statement(s) which implements the constraints 
+# for an anti-Battenburg. This will be four constraints, of which
+# only one needs to be true (exactly 1 is not possible, it's either 0,
+# 2, or 4 -- but all we care about is that it's not 0).
+# 
+# TESTS: Battenburg/125-make_anti_battenburg_statement.t
+# 
+################################################################################
+
+sub make_anti_battenburg_statement ($self, $anti_battenburg) {
+    #
+    # We will make use of the fact that an anti-Battenburg is 
+    # identified with it's top-left cell. We can just calculate
+    # the other cells.
+    #
+    my  $cell1    = $anti_battenburg;
+    my ($r1, $c1) = cell_row_column ($cell1);   # Top-left
+    my ($r2, $c2) = ($r1,     $c1 + 1);         # Top-right
+    my ($r3, $c3) = ($r1 + 1, $c1 + 1);         # Bottom-right
+    my ($r4, $c4) = ($r1 + 1, $c1);             # Bottom-left
+    my  $cell2    = cell_name ($r2, $c2);
+    my  $cell3    = cell_name ($r3, $c3);
+    my  $cell4    = cell_name ($r4, $c4);
+
+    my $subsub    = $self -> make_same_parity_subject;
+    my $range     = $self -> values_range (1);
+    my $subpat    = "[$range]*(?:\\g{$cell1}\\g{$cell2}|" .
+                                "\\g{$cell2}\\g{$cell3}|" .
+                                "\\g{$cell3}\\g{$cell4}|" .
+                                "\\g{$cell4}\\g{$cell1})[$range]*";
+
+    map {$_ . $SENTINEL} $subsub, $subpat;
 }
 
 

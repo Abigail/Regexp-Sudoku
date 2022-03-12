@@ -54,6 +54,7 @@ t/Battenburg/105-set_battenburg.t
 t/Battenburg/110-same_battenburg.t
 t/Battenburg/115-same_battenburg.t
 t/Battenburg/120-make_battenburg_statement.t
+t/Battenburg/125-make_anti_battenburg_statement.t
 t/Renban/100-set_renban.t
 t/Renban/110-same_renban.t
 t/Renban/120-make_renban_statement.t
