@@ -220,7 +220,7 @@ __END__
 
 =head1 NAME
 
-Regexp::Sudoku::Battenburg -- Battenburg related method
+Regexp::Sudoku::Battenburg -- Battenburg related methods
 
 =head1 DESCRIPTION
 
