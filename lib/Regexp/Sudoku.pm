@@ -1137,6 +1137,8 @@ sub init_subject_and_pattern ($self) {
 
     my @cells   = $self -> cells (1);
 
+    my %seen;
+
     for my $i (keys @cells) {
         #
         # First the part which picks up a value for this cell
@@ -1146,6 +1148,8 @@ sub init_subject_and_pattern ($self) {
         my ($subsub, $subpat) = $self -> make_cell_statement ($cell1);
         $subject .= $subsub;
         $pattern .= $subpat;
+
+        $seen {$cell1} = 1;
 
         #
         # Now, for all the previous cells, if there are constraints
@@ -1182,6 +1186,21 @@ sub init_subject_and_pattern ($self) {
                 $pattern .= $subpat;
             }
         }
+
+        #
+        # If the cell is part of an anti-Battenburg, and if the cell
+        # is the last cell seen of that anti-Battenburg, add the
+        # contraints.
+        #
+        foreach my $anti_battenburg ($self -> cell2anti_battenburgs ($cell1)) {
+            my @cells = $self -> anti_battenburg2cells ($anti_battenburg);
+            if (@cells == grep {$seen {$_}} @cells) {
+                my ($subsub, $subpat) =
+                    $self -> make_anti_battenburg_statement ($anti_battenburg);
+                $subject .= $subsub;
+                $pattern .= $subpat;
+            }
+        }
     }
 
     $subject {$self} =       $subject;
@@ -1203,14 +1222,18 @@ sub init_subject_and_pattern ($self) {
 #
 ################################################################################
 
-sub make_same_parity_statement ($self, $cell1, $cell2, $must_differ = 0) {
+sub make_same_parity_subject ($self, $must_differ = 0) {
     my $e = $self -> semi_debruijn_seq (scalar $self -> evens, !$must_differ);
     my $o = $self -> semi_debruijn_seq (scalar $self -> odds,  !$must_differ);
+    "${e}0${o}";
+}
+
+sub make_same_parity_statement ($self, $cell1, $cell2, $must_differ = 0) {
     my $range  = $self -> values_range (1);
-    my $subsub = "${e}0${o}";
     my $subpat = "[$range]*\\g{$cell1}\\g{$cell2}[$range]*";
 
-    map {$_ . $SENTINEL} $subsub, $subpat;
+    map {$_ . $SENTINEL} $self -> make_same_parity_subject ($must_differ),
+                         $subpat;
 }
 
 

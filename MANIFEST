@@ -49,6 +49,7 @@ t/830-anti-knight.t
 t/831-anti-king.t
 t/840-odd-even.t
 t/850-renban.t
+t/860-battenburg.t
 t/Battenburg/100-set_battenburg.t
 t/Battenburg/105-set_battenburg.t
 t/Battenburg/110-same_battenburg.t
@@ -70,6 +71,7 @@ t/sudokus/argyle-2
 t/sudokus/asterisk-1
 t/sudokus/asterisk-2
 t/sudokus/asterisk-3
+t/sudokus/battenburg-1
 t/sudokus/center-dot-1
 t/sudokus/diagonal_25374
 t/sudokus/diagonal_25434
