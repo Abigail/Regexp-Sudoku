@@ -51,9 +51,9 @@ t/840-odd-even.t
 t/850-renban.t
 t/860-battenburg.t
 t/Battenburg/100-set_battenburg.t
-t/Battenburg/105-set_battenburg.t
+t/Battenburg/105-set_anti_battenburg.t
 t/Battenburg/110-same_battenburg.t
-t/Battenburg/115-same_battenburg.t
+t/Battenburg/115-same_anti_battenburg.t
 t/Battenburg/120-make_battenburg_statement.t
 t/Battenburg/125-make_anti_battenburg_statement.t
 t/Renban/100-set_renban.t
