@@ -18,10 +18,12 @@ use Math::Sequence::DeBruijn;
 
 use Regexp::Sudoku::Utils;
 use Regexp::Sudoku::Battenburg;
+use Regexp::Sudoku::Diagonal;
 use Regexp::Sudoku::Renban;
 
 our @ISA = qw [
     Regexp::Sudoku::Battenburg
+    Regexp::Sudoku::Diagonal
     Regexp::Sudoku::Renban
 ];
 
@@ -569,132 +571,6 @@ sub set_center_dot_house ($self) {
 }
 
 
-################################################################################
-#
-# sub init_diagonal ($self, $args)
-#
-# If we have diagonals, it means cells on one or more diagonals 
-# should differ. This method initializes the houses for that.
-#
-# The main diagonal for a 9 x 9 sudoku is defined as follows:
-#
-#     * . .  . . .  . . .
-#     . * .  . . .  . . .
-#     . . *  . . .  . . .
-#
-#     . . .  * . .  . . .
-#     . . .  . * .  . . .
-#     . . .  . . *  . . .
-#
-#     . . .  . . .  * . .
-#     . . .  . . .  . * .
-#     . . .  . . .  . . *
-#
-# The minor diagonal for a 9 x 9 sudoku is defined as follows:
-#
-#     . . .  . . .  . . *
-#     . . .  . . .  . * .
-#     . . .  . . .  * . .
-#
-#     . . .  . . *  . . .
-#     . . .  . * .  . . .
-#     . . .  * . .  . . .
-#
-#     . . *  . . .  . . .
-#     . * .  . . .  . . .
-#     * . .  . . .  . . .
-#
-# TESTS: 050-set_diagonals.t
-#        051-set_diagonals.t
-#        052-set_diagonals.t
-#
-################################################################################
-
-my sub init_diagonal ($self, $type, $offset = 0) {
-    my $size = $self -> size;
-
-    return $self if $offset >= $size;
-
-    my @cells;
-    for (my ($r, $c) = $type == $MAIN_DIAGONAL
-                        ? ($offset >= 0 ? (1,               1 + $offset)
-                                        : (1 - $offset,     1))
-                        : ($offset >= 0 ? ($size,           1 + $offset)
-                                        : ($size + $offset, 1));
-        0 < $r && $r <= $size && 0 < $c && $c <= $size;
-        ($r, $c) = $type == $MAIN_DIAGONAL ? ($r + 1, $c + 1)
-                                           : ($r - 1, $c + 1)) {
-        push @cells => cell_name ($r, $c);
-    }
-
-    my $name;
-    if ($type == $MAIN_DIAGONAL) {
-        $name = "DM";
-        if ($offset) {
-            $name .= $offset > 0 ? "S" : "s";
-            $name .= "-" . abs ($offset);
-        }
-    }
-    else {
-        $name = "Dm";
-        if ($offset) {
-            $name .= $offset < 0 ? "S" : "s";
-            $name .= "-" . abs ($offset);
-        }
-    }
-
-    $self -> create_house ($name => @cells);
-}
-
-sub set_diagonal_main ($self) {
-    init_diagonal ($self, $MAIN_DIAGONAL);
-}
-sub set_diagonal_minor ($self) {
-    init_diagonal ($self, $MINOR_DIAGONAL);
-}
-sub set_cross ($self) {
-    $self -> set_diagonal_main
-          -> set_diagonal_minor
-}
-sub set_diagonal_double ($self) {
-    $self -> set_cross_1
-}
-sub set_diagonal_triple ($self) {
-    $self -> set_cross_1
-          -> set_cross
-}
-sub set_argyle ($self) {
-    $self -> set_cross_1
-          -> set_cross_4
-}
-
-
-foreach my $offset (1 .. $NR_OF_SYMBOLS - 1) {
-    no strict 'refs';
-
-    *{"set_diagonal_main_super_$offset"} =  sub ($self) {
-        init_diagonal ($self, $MAIN_DIAGONAL,    $offset);
-    };
-
-    *{"set_diagonal_main_sub_$offset"} =  sub ($self) {
-        init_diagonal ($self, $MAIN_DIAGONAL,  - $offset);
-    };
-
-    *{"set_diagonal_minor_super_$offset"} =  sub ($self) {
-        init_diagonal ($self, $MINOR_DIAGONAL, - $offset);
-    };
-
-    *{"set_diagonal_minor_sub_$offset"} =  sub ($self) {
-        init_diagonal ($self, $MINOR_DIAGONAL,   $offset);
-    };
-
-    *{"set_cross_$offset"} =  sub ($self) {
-        init_diagonal ($self, $MAIN_DIAGONAL,    $offset);
-        init_diagonal ($self, $MAIN_DIAGONAL,  - $offset);
-        init_diagonal ($self, $MINOR_DIAGONAL, - $offset);
-        init_diagonal ($self, $MINOR_DIAGONAL,   $offset);
-    };
-}
 
 
 ################################################################################

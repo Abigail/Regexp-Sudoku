@@ -1,6 +1,7 @@
 lib/Regexp/Sudoku.pm
 lib/Regexp/Sudoku.pod
 lib/Regexp/Sudoku/Battenburg.pm
+lib/Regexp/Sudoku/Diagonal.pm
 lib/Regexp/Sudoku/Renban.pm
 lib/Regexp/Sudoku/Utils.pm
 Makefile.PL
@@ -20,9 +21,6 @@ t/046-set_nrc_houses.t
 t/047-set_asterisk_house.t
 t/048-set_girandola_house.t
 t/049-set_center_dot_house.t
-t/050-set_diagonals.t
-t/051-set_diagonals.t
-t/052-set_diagonals.t
 t/080-set_clues.t
 t/081-is_even_odd.t
 t/100-make_empty_statement.t
@@ -56,6 +54,9 @@ t/Battenburg/110-same_battenburg.t
 t/Battenburg/115-same_anti_battenburg.t
 t/Battenburg/120-make_battenburg_statement.t
 t/Battenburg/125-make_anti_battenburg_statement.t
+t/Diagonal/100-set_diagonals.t
+t/Diagonal/101-set_diagonals.t
+t/Diagonal/102-set_diagonals.t
 t/Renban/100-set_renban.t
 t/Renban/110-same_renban.t
 t/Renban/120-make_renban_statement.t
