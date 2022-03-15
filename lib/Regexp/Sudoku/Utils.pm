@@ -17,9 +17,9 @@ our @ISA    = qw [Exporter];
 our @EXPORT = qw [$SENTINEL $DEFAULT_SIZE $NR_OF_DIGITS $NR_OF_LETTERS
                   $NR_OF_LETTERS $NR_OF_SYMBOLS $ANTI_KING $ANTI_KNIGHT
                   $MAIN_DIAGONAL $MINOR_DIAGONAL  
-                  cell_name cell_row_column all_pairs];
+                  cell_name cell_row_column all_pairs semi_debruijn_seq];
 
-
+use Math::Sequence::DeBruijn;
 
 our $SENTINEL       = "\n";
 
@@ -95,6 +95,34 @@ sub all_pairs ($set1, $set2) {
  
     $out;
 }
+
+
+
+################################################################################
+#
+# semi_debruijn_seq ($values, $allow_dups = 0)
+#
+# Return, for the given values, a De Bruijn sequence of size 2 with
+#  1) Duplicates removed and
+#  2) The first character copied to the end
+#
+# TESTS: Utils/130-semi_debruijn_seq.t
+#
+################################################################################
+
+sub semi_debruijn_seq ($values, $allow_dups = 0) {
+    state $cache;
+    $$cache {$values, $allow_dups} //= do {
+        my $seq = debruijn ($values, 2);
+        $seq .= substr $seq, 0, 1;                    # Copy first char to
+                                                      # the end.
+        $seq  =~ s/(.)\g{1}/$1/g unless $allow_dups;  # Remove duplicates.
+        $seq;
+    };
+}
+
+
+
 
 
 1;

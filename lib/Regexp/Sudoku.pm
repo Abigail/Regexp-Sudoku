@@ -14,7 +14,6 @@ use lib qw [lib];
 
 use Hash::Util::FieldHash qw [fieldhash];
 use List::Util            qw [min max];
-use Math::Sequence::DeBruijn;
 
 use Regexp::Sudoku::Utils;
 use Regexp::Sudoku::Battenburg;
@@ -915,31 +914,6 @@ sub make_cell_statement ($self, $cell) {
 
 ################################################################################
 #
-# semi_debruijn_seq
-#
-# Return, for the given values, a De Bruijn sequence of size 2 with
-#  1) Duplicates removed and
-#  2) The first character copied to the end
-#
-# TESTS: 130-semi_debruijn_seq.t
-#
-################################################################################
-
-sub semi_debruijn_seq ($self, $values = $values {$self}, $allow_dups = 0) {
-    state $cache;
-    $$cache {$values, $allow_dups} //= do {
-        my $seq = debruijn ($values, 2);
-        $seq .= substr $seq, 0, 1;                    # Copy first char to
-                                                      # the end.
-        $seq  =~ s/(.)\g{1}/$1/g unless $allow_dups;  # Remove duplicates.
-        $seq;
-    };
-}
-
-
-
-################################################################################
-#
 # make_diff_statement ($self, $cell1, $cell2)
 #
 # Given two cell names, return a sub subject and a sub pattern which matches
@@ -954,7 +928,7 @@ sub make_diff_statement ($self, $cell1, $cell2) {
     my @values = $self -> values;
     my $range  = $self -> values_range;
 
-    my $seq = $self -> semi_debruijn_seq;
+    my $seq = semi_debruijn_seq (scalar $self -> values);
     my $pat = "[$range]*\\g{$cell1}\\g{$cell2}[$range]*";
 
     map {$_ . $SENTINEL} $seq, $pat;
@@ -1099,8 +1073,8 @@ sub init_subject_and_pattern ($self) {
 ################################################################################
 
 sub make_same_parity_subject ($self, $must_differ = 0) {
-    my $e = $self -> semi_debruijn_seq (scalar $self -> evens, !$must_differ);
-    my $o = $self -> semi_debruijn_seq (scalar $self -> odds,  !$must_differ);
+    my $e = semi_debruijn_seq (scalar $self -> evens, !$must_differ);
+    my $o = semi_debruijn_seq (scalar $self -> odds,  !$must_differ);
     "${e}0${o}";
 }
 

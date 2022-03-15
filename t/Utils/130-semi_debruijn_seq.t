@@ -6,18 +6,20 @@ use strict;
 use warnings;
 no  warnings 'syntax';
 
-use lib qw [lib ../lib];
+use lib qw [lib ../lib ../../lib];
 
 use Test::More 0.88;
 
 our $r = eval "require Test::NoWarnings; 1";
 
-use Regexp::Sudoku;
+use Regexp::Sudoku::Utils;
+
+my @vals = (1 .. 9, 'A' .. 'Z');
 
 for my $size (4, 9, 16) {
-    my $sudoku = Regexp::Sudoku:: -> new -> init (size => $size);
-    my $seq    = $sudoku -> semi_debruijn_seq;
-    my @values = $sudoku -> values;
+    my @values = @vals [0 .. $size - 1];
+    my $values = join "" => @values;
+    my $seq    = semi_debruijn_seq ($values);
 
     subtest "Size: $size", sub {
         subtest "Pairs in sequence" => sub {

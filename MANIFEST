@@ -26,7 +26,6 @@ t/081-is_even_odd.t
 t/100-make_empty_statement.t
 t/110-make_clue_statement.t
 t/120-make_cell_statement.t
-t/130-semi_debruijn_seq.t
 t/140-make_diff_statement.t
 t/150-must_differ.t
 t/151-must_differ.t
@@ -61,6 +60,7 @@ t/Renban/100-set_renban.t
 t/Renban/110-same_renban.t
 t/Renban/120-make_renban_statement.t
 t/Utils/100-cell_name_row_column.t
+t/Utils/130-semi_debruijn_seq.t
 t/Utils/150-all_pairs.t
 t/Test.pm
 t/sudokus/anti-king-1
