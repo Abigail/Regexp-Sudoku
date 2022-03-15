@@ -18,27 +18,25 @@ use List::Util            qw [min max];
 use Regexp::Sudoku::Utils;
 use Regexp::Sudoku::Battenburg;
 use Regexp::Sudoku::Diagonal;
+use Regexp::Sudoku::Parity;
 use Regexp::Sudoku::Renban;
 
 our @ISA = qw [
     Regexp::Sudoku::Battenburg
     Regexp::Sudoku::Diagonal
+    Regexp::Sudoku::Parity
     Regexp::Sudoku::Renban
 ];
 
 
 fieldhash my %size;
 fieldhash my %values;
-fieldhash my %evens;
-fieldhash my %odds;
 fieldhash my %box_width;
 fieldhash my %box_height;
 fieldhash my %values_range;
 fieldhash my %cell2houses;
 fieldhash my %house2cells;
 fieldhash my %clues;
-fieldhash my %is_even;
-fieldhash my %is_odd;
 fieldhash my %subject;
 fieldhash my %pattern;
 fieldhash my %constraints;
@@ -127,14 +125,9 @@ sub init_values ($self, $args = {}) {
                 ($NR_OF_DIGITS + 1) .. min $size, $NR_OF_SYMBOLS;
     }
 
-    my $evens = do {my $i = 1; join "" => grep {$i = !$i} split // => $values};
-    my $odds  = do {my $i = 0; join "" => grep {$i = !$i} split // => $values};
-
     $values {$self} = $values;
-    $evens  {$self} = $evens;
-    $odds   {$self} = $odds;
-
     $self -> init_values_range ($args);
+    $self;
 }
 
 
@@ -176,38 +169,6 @@ sub init_values_range ($self, $args = {}) {
 
 sub values ($self) {
     wantarray ? split // => $values {$self} : $values {$self};
-}
-
-
-################################################################################
-#
-# evens ($self)
-#
-# Return the set of even values used in the sudoku. In list context, this will
-# be an array of characters; in scalar context, a string.
-#
-# TESTS: 020_values.t
-#
-################################################################################
-
-sub evens ($self) {
-    wantarray ? split // => $evens  {$self} : $evens  {$self};
-}
-
-
-################################################################################
-#
-# odds ($self)
-#
-# Return the set of odd values used in the sudoku. In list context, this will
-# be an array of characters; in scalar context, a string.
-#
-# TESTS: 020_values.t
-#
-################################################################################
-
-sub odds  ($self) {
-    wantarray ? split // => $odds   {$self} : $odds   {$self};
 }
 
 
@@ -710,8 +671,6 @@ sub houses ($self) {
 
 sub set_clues ($self, $in_clues) {
     my $clues   = {};
-    my $is_even = {};
-    my $is_odd  = {};
     #
     # Turn a string into an array
     #
@@ -724,14 +683,12 @@ sub set_clues ($self, $in_clues) {
             my $val  = $$in_clues [$r] [$c];
             next if !$val || $val eq ".";
             my $cell = cell_name $r + 1, $c + 1;
-            if    ($val eq 'e') {$$is_even {$cell} = 1}
-            elsif ($val eq 'o') {$$is_odd  {$cell} = 1}
+            if    ($val eq 'e') {$self -> set_is_even ($cell)}
+            elsif ($val eq 'o') {$self -> set_is_odd  ($cell)}
             else                {$$clues   {$cell} = $val}
         }
     }
     $clues   {$self} = $clues;
-    $is_even {$self} = $is_even;
-    $is_odd  {$self} = $is_odd;
 
     $self;
 }
@@ -765,25 +722,6 @@ sub clues ($self) {
 
 sub clue     ($self , $cell) {
     $clues   {$self} {$cell}
-}
-
-
-################################################################################
-#
-# is_even ($self, $cell)
-# is_odd  ($self, $cell)
-#
-# Returns wether the cell is given to be even/odd. 
-#
-# TESTS: 081-is_even_odd.t
-#
-################################################################################
-
-sub is_even  ($self,  $cell) {
-    $is_even {$self} {$cell}
-}
-sub is_odd   ($self,  $cell) {
-    $is_odd  {$self} {$cell}
 }
 
 
@@ -880,12 +818,6 @@ sub make_empty_statement ($self, $cell, $method = "values") {
 
 sub make_any_statement  ($self, $cell) {
     $self -> make_empty_statement ($cell, "values")
-}
-sub make_even_statement ($self, $cell) {
-    $self -> make_empty_statement ($cell, "evens")
-}
-sub make_odd_statement  ($self, $cell) {
-    $self -> make_empty_statement ($cell, "odds")
 }
 
 
@@ -1057,53 +989,6 @@ sub init_subject_and_pattern ($self) {
     $pattern {$self} = "^" . $pattern . '$';
 
     $self;
-}
-
-
-################################################################################
-#
-# make_same_parity_statement ($self, $cell1, $cell2, $must_differ = 0)
-#
-# Return a statement which forces the two cells to have the same parity
-# (so, both cells are either even, or both cells are odd). Optionally,
-# we can also force the cells to be different.
-#
-# TESTS: 181-make_same_parity_statement.t
-#
-################################################################################
-
-sub make_same_parity_subject ($self, $must_differ = 0) {
-    my $e = semi_debruijn_seq (scalar $self -> evens, !$must_differ);
-    my $o = semi_debruijn_seq (scalar $self -> odds,  !$must_differ);
-    "${e}0${o}";
-}
-
-sub make_same_parity_statement ($self, $cell1, $cell2, $must_differ = 0) {
-    my $range  = $self -> values_range (1);
-    my $subpat = "[$range]*\\g{$cell1}\\g{$cell2}[$range]*";
-
-    map {$_ . $SENTINEL} $self -> make_same_parity_subject ($must_differ),
-                         $subpat;
-}
-
-
-################################################################################
-#
-# make_different_parity_statement ($self, $cell1, $cell2)
-#
-# Return a statement which forces the two cells to have different parity.
-# (so, one cell is odd, the other even).
-#
-# TESTS: 182-make_different_parity_statement.t
-#
-################################################################################
-
-sub make_different_parity_statement ($self, $cell1, $cell2) {
-    my $range  = $self -> values_range ();
-    my $subsub = all_pairs (scalar $self -> evens, scalar $self -> odds);
-    my $subpat = "[$range]*\\g{$cell1}\\g{$cell2}[$range]*";
-
-    map {$_ . $SENTINEL} $subsub, $subpat;
 }
 
 

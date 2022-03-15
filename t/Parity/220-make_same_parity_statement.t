@@ -9,14 +9,14 @@ no  warnings 'syntax';
 use experimental 'signatures';
 use experimental 'lexical_subs';
 
-use lib qw [lib ../lib];
+use lib qw [lib ../lib ../../lib];
 
 use Test::More 0.88;
 
 our $r = eval "require Test::NoWarnings; 1";
 
 use Regexp::Sudoku;
-my $SENTINEL = "\n";
+use Regexp::Sudoku::Utils;
 
 my $sudoku = Regexp::Sudoku:: -> new -> init;
 

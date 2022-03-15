@@ -22,7 +22,6 @@ t/047-set_asterisk_house.t
 t/048-set_girandola_house.t
 t/049-set_center_dot_house.t
 t/080-set_clues.t
-t/081-is_even_odd.t
 t/100-make_empty_statement.t
 t/110-make_clue_statement.t
 t/120-make_cell_statement.t
@@ -30,8 +29,6 @@ t/140-make_diff_statement.t
 t/150-must_differ.t
 t/151-must_differ.t
 t/160-diff_statement.t
-t/181-make_same_parity_statement.t
-t/182-make_different_parity_statement.t
 t/804-sudoku-4.t
 t/806-sudoku-6.t
 t/809-sudoku-9.t
@@ -56,6 +53,11 @@ t/Battenburg/125-make_anti_battenburg_statement.t
 t/Diagonal/100-set_diagonals.t
 t/Diagonal/101-set_diagonals.t
 t/Diagonal/102-set_diagonals.t
+t/Parity/010-evens_odds.t
+t/Parity/100-is_even_odd.t
+t/Parity/200-make_even_odd_statement.t
+t/Parity/220-make_same_parity_statement.t
+t/Parity/230-make_different_parity_statement.t
 t/Renban/100-set_renban.t
 t/Renban/110-same_renban.t
 t/Renban/120-make_renban_statement.t
