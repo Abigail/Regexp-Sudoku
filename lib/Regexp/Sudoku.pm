@@ -93,8 +93,7 @@ sub init_size ($self, $args = {}) {
 #
 # size ($self)
 #
-# Returns the size of the sudoku. If there is no size supplied, use 
-# the default (9).
+# Returns the size of the sudoku.
 #
 # TESTS: 010_size.t
 #
