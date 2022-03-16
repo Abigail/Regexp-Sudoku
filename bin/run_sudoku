@@ -53,15 +53,16 @@ my $sudoku = eval $create_section or die $@;
 
 my $subject  = $sudoku -> subject;
 my $pattern  = $sudoku -> pattern;
+my ($hours, $minutes, $seconds);
 
 unless ($skip_match) {
     my $start    = time;
     my $match    = $subject =~ $pattern;
     my $end      = time;
     my $run_time = $end - $start;
-    my $hours    = int ($run_time / 3600);
-    my $minutes  = int ($run_time /   60) % 60;
-    my $seconds  =      $run_time - 3600 * $hours - 60 * $minutes;
+       $hours    = int ($run_time / 3600);
+       $minutes  = int ($run_time /   60) % 60;
+       $seconds  =      $run_time - 3600 * $hours - 60 * $minutes;
 
     if ($match) {
         my $bw = $sudoku -> box_width;
@@ -80,14 +81,28 @@ unless ($skip_match) {
         }
     }
     else {
-        print "No match!";
+        print "No match!\n";
     }
-    printf "\nRuntime: %02d:%02d:%07.4f\n", $hours, $minutes, $seconds;
+    print "\n";
 }
 
-printf "Lengths: %d (subject) & %d (pattern)\n", length $subject,
-                                                 length $pattern;
-printf "Number of statements: %d\n", $subject =~ y/\n/\n/;
-printf "Number of backreferences: %d\n", scalar (() = $pattern =~ /\\g\{/g);
+sub format_time ($hours, $minutes, $seconds) {
+    return sprintf "%d hours %d minutes"   => $hours,   $minutes if $hours;
+    return sprintf "%d minutes %d seconds" => $minutes, $seconds if $minutes;
+    return sprintf "%.2f seconds"          => $seconds;
+}
+sub format_number ($number) {
+    $number =~ s/[0-9]\K(?=(?:[0-9][0-9][0-9])+$)/,/rg;
+}
+
+printf "Subject: %s characters\n"       => format_number length $subject;
+printf "Pattern: %s characters\n"       => format_number length $pattern;
+
+printf "Number of statements: %s\n"     => format_number $subject =~ y/\n/\n/;
+printf "Number of backreferences: %s\n" =>
+                  format_number scalar (() = $pattern =~ /\\g\{/g);
+
+printf "Runtime: %s\n", format_time $hours, $minutes, $seconds
+        unless $skip_match;
 
 __END__
