@@ -598,6 +598,30 @@ an unsolvable Sudoku.
 This method can be called more than once, and should be called more
 than once if a Sudoku has more than one Renban line/area.
 
+=head3 C<< set_german_whisper (LIST) >>
+
+A I<< German Whisper >> line consists of two and more cells, where
+two consecutive cells should differ by at least 5 (or, for Sudoku's
+which aren't of size 9, at least half the size). So, a C<< 7 >> may
+be next to a C<< 1 >> or C<< 2 >>, but not next to any other number.
+The order of the cells matter: they should be in the same order
+as the German Whisper line.
+
+The same number may appear more than once on a German Whisper line,
+if it doesn't violate any other constraint. The length of a German
+Whisper line is at least 2, but it can be longer than the size of
+the Sudoku.
+
+This method takes a list of cell names as argument, where each name
+is of the form C<< RxCy >>, with C<< 1 <= x, y <= N >>, where C<< N >>
+is the size of the Sudoku.
+
+No validation of cell names is performed. Names which aren't of the
+form C<< RxCy >>, or which are outside of the Sudoku have no effect.
+
+This method can be called more than once, and should be called more
+than once if a Sudoku has more than one German Whisper line.
+
 =head3 C<< set_battenburg (LIST) >>, C<< set_anti_battenburg (LIST) >>
 
 A I<< Battenburg >> is a C<< 2 x 2 >> block of cells with the odd

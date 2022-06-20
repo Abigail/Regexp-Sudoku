@@ -20,12 +20,14 @@ use Regexp::Sudoku::Battenburg;
 use Regexp::Sudoku::Diagonal;
 use Regexp::Sudoku::Parity;
 use Regexp::Sudoku::Renban;
+use Regexp::Sudoku::German_Whisper;
 
 our @ISA = qw [
     Regexp::Sudoku::Battenburg
     Regexp::Sudoku::Diagonal
     Regexp::Sudoku::Parity
     Regexp::Sudoku::Renban
+    Regexp::Sudoku::German_Whisper
 ];
 
 
@@ -591,6 +593,7 @@ sub cells  ($self, $sorted = 0) {
         state $CLUES_SEEN   = $EVEN_ODD     + 1;
         state $NR_OF_HOUSES = $CLUES_SEEN   + 1;
         state $RENBAN       = $NR_OF_HOUSES + 1;
+        state $GERMAN       = $RENBAN       + 1;
 
         #
         # For each cell, determine how many different clues it sees.
@@ -611,6 +614,7 @@ sub cells  ($self, $sorted = 0) {
                        $$b [$EVEN_ODD]     <=> $$a [$EVEN_ODD]       ||      
                        $$b [$CLUES_SEEN]   <=> $$a [$CLUES_SEEN]     ||   
                        $$a [$RENBAN]       <=> $$b [$RENBAN]         ||
+                       $$a [$GERMAN]       <=> $$a [$GERMAN]         ||
                        $$b [$NR_OF_HOUSES] <=> $$a [$NR_OF_HOUSES]   ||
                        $$a [$CELL_NAME]    cmp $$b [$CELL_NAME]}
                  map  {my $r = [];
@@ -619,7 +623,8 @@ sub cells  ($self, $sorted = 0) {
                        $$r [$EVEN_ODD]      =  $self -> is_even ($_) ||
                                                $self -> is_odd  ($_) ? 1 : 0;
                        $$r [$CLUES_SEEN]    =  keys (%{$sees {$_}    || {}});
-                       $$r [$NR_OF_HOUSES]  =  $self -> cell2houses ($_);
+                       $$r [$NR_OF_HOUSES]  =  $self -> cell2houses  ($_);
+                       $$r [$GERMAN]        =  $self -> cell2germans ($_);
                        #
                        # Find the *smallest* renban the cell is in
                        #
@@ -955,6 +960,11 @@ sub init_subject_and_pattern ($self) {
 
             if ($self -> same_battenburg ($cell1, $cell2)) {
                 push @todo => "make_battenburg_statement";
+            }
+
+            if ($self -> consecutive_in_german_whisper ($cell1, $cell2)) {
+                push @todo => "make_german_whisper_statement";
+                $differs = 1;
             }
 
             if (!$differs && $self -> must_differ ($cell1, $cell2)) {
