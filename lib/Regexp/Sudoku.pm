@@ -17,6 +17,7 @@ use List::Util            qw [min max];
 
 use Regexp::Sudoku::Utils;
 use Regexp::Sudoku::Battenburg;
+use Regexp::Sudoku::Quadruple;
 use Regexp::Sudoku::Diagonal;
 use Regexp::Sudoku::Parity;
 use Regexp::Sudoku::Renban;
@@ -24,6 +25,7 @@ use Regexp::Sudoku::German_Whisper;
 
 our @ISA = qw [
     Regexp::Sudoku::Battenburg
+    Regexp::Sudoku::Quadruple
     Regexp::Sudoku::Diagonal
     Regexp::Sudoku::Parity
     Regexp::Sudoku::Renban
@@ -594,6 +596,7 @@ sub cells  ($self, $sorted = 0) {
         state $NR_OF_HOUSES = $CLUES_SEEN   + 1;
         state $RENBAN       = $NR_OF_HOUSES + 1;
         state $GERMAN       = $RENBAN       + 1;
+        state $QUADRUPLE    = $GERMAN       + 1;
 
         #
         # For each cell, determine how many different clues it sees.
@@ -614,7 +617,8 @@ sub cells  ($self, $sorted = 0) {
                        $$b [$EVEN_ODD]     <=> $$a [$EVEN_ODD]       ||      
                        $$b [$CLUES_SEEN]   <=> $$a [$CLUES_SEEN]     ||   
                        $$a [$RENBAN]       <=> $$b [$RENBAN]         ||
-                       $$a [$GERMAN]       <=> $$a [$GERMAN]         ||
+                       $$b [$GERMAN]       <=> $$a [$GERMAN]         ||
+                       $$b [$QUADRUPLE]    <=> $$a [$QUADRUPLE]      ||
                        $$b [$NR_OF_HOUSES] <=> $$a [$NR_OF_HOUSES]   ||
                        $$a [$CELL_NAME]    cmp $$b [$CELL_NAME]}
                  map  {my $r = [];
@@ -631,6 +635,20 @@ sub cells  ($self, $sorted = 0) {
                        $$r [$RENBAN]        =
                            (min map {scalar $self -> renban2cells ($_)}
                                $self -> cell2renbans ($_)) // $self -> size;
+
+                       #
+                       # Assign quadruple points for each cell. A cell
+                       # gets points for each quadruple it is, and more
+                       # points the more values are in the quadruple.
+                       # More quadruples counts for more though.
+                       #
+                       $$r [$QUADRUPLE]     = 0;
+                       foreach my $quadruple ($self -> cell2quadruples ($_)) {
+                           $$r [$QUADRUPLE] += 10;
+                           $$r [$QUADRUPLE] ++ for
+                                $self -> quadruple_values ($quadruple);
+                       }
+
                        $r}
                  @cells;
     }
@@ -990,6 +1008,23 @@ sub init_subject_and_pattern ($self) {
                     $self -> make_anti_battenburg_statement ($anti_battenburg);
                 $subject .= $subsub;
                 $pattern .= $subpat;
+            }
+        }
+
+        #
+        # If the cell is part of a quadruple constraint, and if the cell
+        # is the last cell seen of this quadruple, add the constraints
+        # for the quadruple.
+        #
+        foreach my $quadruple ($self -> cell2quadruples ($cell1)) {
+            my @cells = $self -> quadruple2cells ($quadruple);
+            if (@cells == grep {$seen {$_}} @cells) {
+                my ($subsubs, $subpats) =
+                    $self -> make_quadruple_statements ($quadruple);
+                foreach my $i (keys @$subsubs) {
+                    $subject .= $$subsubs [$i];
+                    $pattern .= $$subpats [$i];
+                }
             }
         }
     }
