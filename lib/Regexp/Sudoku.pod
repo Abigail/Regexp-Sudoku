@@ -576,7 +576,7 @@ the cells which are a kings move away from the cell marked C<< O >>.
 
    Anti King Constraint
 
-=head2 Retricted lines and areas
+=head2 Restricted lines and areas
 
 =head3 C<< set_renban (LIST) >>
 
@@ -650,6 +650,29 @@ signals that the four cells C<< R6C3 >>, C<< R6C4 >>, C<< R7C4 >>
 and C<< R7C3 >> do not form a Battenburg pattern with their odd
 and even values, and that the same is true for the four cells
 C<< R7C6 >>, C<< R7C7 >>, C<< R8C7 >>, and C<< R8C6 >>.
+
+=head3 C<< set_quadruples (HASH) >>
+
+A I<< quadruple >> constraint is a set of one to four numbers which must
+appear on a C<< 2 x 2 >> block. The set of numbers may contain duplicates,
+but a number appearing three times or more is impossible, as each
+C<< 2 x 2 >> block is covered by no more than two rows (and two columns)
+and values should be unique in each row and column.
+
+The C<< 2 x 2 >> blocks are identified by the name of their upper left
+corner cell. The C<< HASH >> which is taken as an argument to this
+method maps cell names (the ones identifying the C<< 2 x 2 >> block) to
+an arrayref containing the values.
+
+  set_quadruples (R2C2 => [6, 7],
+                  R6C5 => [3, 4, 5, 5])
+
+This means the that at least one of the cells C<< R2C2 >>, C<< R2C3 >>,
+C<< R2C3 >> and C<< R3C3 >> contain the number C<< 6 >>, and the same
+set of cells contains at least one C<< 7 >>. And the set of cells
+C<< R6C5 >>, C<< R6C6 >>, C<< R7C5 >>, and C<< R7C6 >> contain a
+C<< 3 >>, a C<< 4 >> and two C<< 5 >>'s.
+                 
 
 =head1 BUGS
 
@@ -757,15 +780,7 @@ Nabner
 
 =item *
 
-German Whisper
-
-=item *
-
 Clones
-
-=item *
-
-Quadruple
 
 =item *
 
