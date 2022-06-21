@@ -8,7 +8,7 @@ no  warnings 'syntax';
 use experimental 'signatures';
 use experimental 'lexical_subs';
 
-our $VERSION = '2022030401';
+our $VERSION = '2022062101';
 
 use lib qw [lib];
 
