@@ -12,7 +12,9 @@ use experimental 'lexical_subs';
 our $VERSION = '2022030401';
 
 use Hash::Util::FieldHash qw [fieldhash];
+use Regexp::Logic_Puzzles::Utils;
 use Regexp::Sudoku::Utils;
+use Regexp::Sudoku::Constants;
 
 ################################################################################
 #

@@ -1,4 +1,4 @@
-package Regexp::Sudoku::Utils;
+package Regexp::Logic_Puzzles::Utils;
 
 use 5.028;
 
@@ -9,74 +9,42 @@ no  warnings 'syntax';
 use experimental 'signatures';
 use experimental 'lexical_subs';
 
-our $VERSION = '2022030401';
+our $VERSION = '2023112701';
 
 use Exporter ();
 
 our @ISA    = qw [Exporter];
-our @EXPORT = qw [all_pairs semi_debruijn_seq];
-
-use Math::Sequence::DeBruijn;
-
+our @EXPORT = qw [cell_name cell_row_column];
 
 
 ################################################################################
 #
-# all_pairs ($set1, $set2)
-#   
-# Return a string which, foreach character $x from $set1, and $y from $set2,
-# contains the substrings "$x$y" and "$y$x". Furthermore, the string will
-# not contain any substring "$w$z", with $w and $z from the same set.
+# sub cell_name ($row, $column)
 #
-# Each set is given as a string.
+# Given a row number and a cell number, return the name of the cell.
 #
-# Note: this is *not* a method, as it's independent of any state.
+# TESTS: Utils/100-cell_name_row_column.t
 #
-# TESTS: Utils/150-all_pairs.t
-#           
 ################################################################################
-         
-sub all_pairs ($set1, $set2) {
-    my @chars1 = split // => $set1;
-    my @chars2 = split // => $set2;
-    my $out = "";
-    foreach my $ch1 (@chars1) {
-        foreach my $ch2 (@chars2) {
-            $out .= "$ch1$ch2";
-        }
-    }
-    $out .= $chars1 [0];
- 
-    $out;
+
+sub cell_name ($row, $column) {
+    "R" . $row . "C" . $column
 }
 
 
-
 ################################################################################
 #
-# semi_debruijn_seq ($values, $allow_dups = 0)
+# sub cell_row_column ($cell_name)
 #
-# Return, for the given values, a De Bruijn sequence of size 2 with
-#  1) Duplicates removed and
-#  2) The first character copied to the end
-#
-# TESTS: Utils/130-semi_debruijn_seq.t
+# Given the name of a cell, return its row and column.
+# 
+# TESTS: Utils/100-cell_name_row_column.t
 #
 ################################################################################
 
-sub semi_debruijn_seq ($values, $allow_dups = 0) {
-    state $cache;
-    $$cache {$values, $allow_dups} //= do {
-        my $seq = debruijn ($values, 2);
-        $seq .= substr $seq, 0, 1;                    # Copy first char to
-                                                      # the end.
-        $seq  =~ s/(.)\g{1}/$1/g unless $allow_dups;  # Remove duplicates.
-        $seq;
-    };
+sub cell_row_column ($name) {
+    $name =~ /R([0-9]+)C([0-9]+)/ ? ($1, $2) : (0, 0)
 }
-
-
-
 
 
 1;
@@ -88,11 +56,11 @@ __END__
 
 =head1 NAME
 
-Regexp::Sudoku::Utils -- Utilities for Regexp::Sudoku
+Regexp::Logic_Puzzles::Utils -- Utilities for various Regexp::* modules.
 
 =head1 DESCRIPTION
 
-This module is part of C<< Regexp::Sudoku >> and is not intended
+This module is part of C<< Regexp::Sudoku >> (and friends) and is not intended
 as a standalone module.
 
 See L<< Regexp::Sudoku >> for the documentation.
@@ -108,7 +76,7 @@ Abigail, L<< mailto:cpan@abigail.freedom.nl >>.
 
 =head1 COPYRIGHT and LICENSE
 
-Copyright (C) 2021-2022 by Abigail.
+Copyright (C) 2021-2023 by Abigail.
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),

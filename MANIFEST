@@ -1,6 +1,8 @@
+lib/Regexp/Logic_Puzzles/Utils.pm
 lib/Regexp/Sudoku.pm
 lib/Regexp/Sudoku.pod
 lib/Regexp/Sudoku/Battenburg.pm
+lib/Regexp/Sudoku/Constants.pm
 lib/Regexp/Sudoku/Diagonal.pm
 lib/Regexp/Sudoku/Renban.pm
 lib/Regexp/Sudoku/Utils.pm
@@ -53,6 +55,7 @@ t/Battenburg/125-make_anti_battenburg_statement.t
 t/Diagonal/100-set_diagonals.t
 t/Diagonal/101-set_diagonals.t
 t/Diagonal/102-set_diagonals.t
+t/Logic_Puzzles/Utils/100-cell_name_row_column.t
 t/Parity/010-evens_odds.t
 t/Parity/100-is_even_odd.t
 t/Parity/200-make_even_odd_statement.t
@@ -61,7 +64,6 @@ t/Parity/230-make_different_parity_statement.t
 t/Renban/100-set_renban.t
 t/Renban/110-same_renban.t
 t/Renban/120-make_renban_statement.t
-t/Utils/100-cell_name_row_column.t
 t/Utils/130-semi_debruijn_seq.t
 t/Utils/150-all_pairs.t
 t/Test.pm

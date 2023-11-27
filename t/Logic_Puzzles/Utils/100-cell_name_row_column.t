@@ -12,7 +12,7 @@ use Test::More 0.88;
 
 our $r = eval "require Test::NoWarnings; 1";
 
-use Regexp::Sudoku::Utils;
+use Regexp::Logic_Puzzles::Utils;
 
 foreach my $r (1 .. 9) {
     foreach my $c (1 .. 9) {

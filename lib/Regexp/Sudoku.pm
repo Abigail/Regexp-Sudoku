@@ -15,6 +15,8 @@ use lib qw [lib];
 use Hash::Util::FieldHash qw [fieldhash];
 use List::Util            qw [min max];
 
+use Regexp::Logic_Puzzles::Utils;
+use Regexp::Sudoku::Constants;
 use Regexp::Sudoku::Utils;
 use Regexp::Sudoku::Battenburg;
 use Regexp::Sudoku::Quadruple;

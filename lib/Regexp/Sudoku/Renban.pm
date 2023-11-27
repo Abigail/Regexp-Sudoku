@@ -13,6 +13,7 @@ our $VERSION = '2022030401';
 
 use Hash::Util::FieldHash qw [fieldhash];
 use Regexp::Sudoku::Utils;
+use Regexp::Sudoku::Constants;
 
 fieldhash my %renban2cells;
 fieldhash my %cell2renbans;
