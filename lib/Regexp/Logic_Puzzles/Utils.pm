@@ -1,5 +1,13 @@
 package Regexp::Logic_Puzzles::Utils;
 
+################################################################################
+#
+# This module contains utility functions shared by various logical puzzles
+#
+# All test files are in t/100-Utils
+#
+################################################################################
+
 use 5.028;
 
 use strict;
@@ -23,7 +31,7 @@ our @EXPORT = qw [cell_name cell_row_column];
 #
 # Given a row number and a cell number, return the name of the cell.
 #
-# TESTS: Utils/100-cell_name_row_column.t
+# TESTS: 100-cell_name_row_column.t
 #
 ################################################################################
 
@@ -38,7 +46,7 @@ sub cell_name ($row, $column) {
 #
 # Given the name of a cell, return its row and column.
 # 
-# TESTS: Utils/100-cell_name_row_column.t
+# TESTS: 100-cell_name_row_column.t
 #
 ################################################################################
 
