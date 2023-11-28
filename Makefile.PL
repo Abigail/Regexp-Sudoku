@@ -8,7 +8,7 @@ no  warnings 'syntax';
 
 use ExtUtils::MakeMaker;
 
-my  $PACKAGE      =  'Regexp::Sudoku';
+my  $PACKAGE      =  'Regexp::Logic_Puzzles';
 
 my  $LIB_FILE     =  "lib/$PACKAGE.pm";
     $LIB_FILE     =~  s!::!/!g;
@@ -26,7 +26,7 @@ my  $REPOSITORY   =  "git://$REPO_HOST/$ME/$REPO.git";
 my %args = (
     NAME                 =>  $PACKAGE,
     VERSION_FROM         =>  $LIB_FILE,
-    ABSTRACT_FROM        =>  $POD_FILE,
+  # ABSTRACT_FROM        =>  $POD_FILE,
     PREREQ_PM            => {
         'strict'                     =>  0,
         'warnings'                   =>  0,
