@@ -24,7 +24,9 @@ Solution
 5 6 1  9 3 4  7 2 8
 ==
 Create
-Regexp::Sudoku:: -> new -> init
+Regexp::Logic_Puzzles::Sudoku::
+                 -> new
+                 -> init
                  -> set_german_whisper (qw [R6C3 R5C2 R4C3 R3C4 R2C5 R1C6
                                             R1C7 R2C8 R3C8 R4C7 R5C6 R6C6
                                             R7C6 R8C5 R7C4])

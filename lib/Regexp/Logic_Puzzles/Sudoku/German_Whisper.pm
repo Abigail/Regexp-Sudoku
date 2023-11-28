@@ -1,4 +1,4 @@
-package Regexp::Sudoku::German_Whisper;
+package Regexp::Logic_Puzzles::Sudoku::German_Whisper;
 
 use 5.028;
 
@@ -9,10 +9,11 @@ no  warnings 'syntax';
 use experimental 'signatures';
 use experimental 'lexical_subs';
 
-our $VERSION = '2022061901';
+our $VERSION = '2023112801';
 
 use Hash::Util::FieldHash qw [fieldhash];
-use Regexp::Sudoku::Utils;
+use Regexp::Logic_Puzzles::Sudoku::Constants;
+use Regexp::Logic_Puzzles::Sudoku::Utils;
 
 fieldhash my %german2cells;
 fieldhash my %cell2germans;
@@ -154,14 +155,14 @@ __END__
 
 =head1 NAME
 
-Regexp::Sudoku::German_Whisper -- German_Whisper related method
+Regexp::Logic_Puzzles::Sudoku::German_Whisper -- German_Whisper related method
 
 =head1 DESCRIPTION
 
-This module is part of C<< Regexp::Sudoku >> and is not intended
+This module is part of C<< Regexp::Logic_Puzzles::Sudoku >> and is not intended
 as a standalone module.
 
-See L<< Regexp::Sudoku >> for the documentation.
+See L<< Regexp::Logic_Puzzles::Sudoku >> for the documentation.
 
 =head1 DEVELOPMENT
 

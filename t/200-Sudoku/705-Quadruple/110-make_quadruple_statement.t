@@ -9,13 +9,13 @@ no  warnings 'syntax';
 use experimental 'signatures';
 use experimental 'lexical_subs';
 
-use lib qw [lib ../lib ../../lib];
+use lib qw [lib ../lib ../../lib ../../../lib];
 
 use Test::More 0.88;
 
 our $r = eval "require Test::NoWarnings; 1";
 
-use Regexp::Sudoku;
+use Regexp::Logic_Puzzles::Sudoku;
 my $SENTINEL = "\n";
 
 
@@ -26,7 +26,7 @@ sub run_tests ($name, @values) {
     my @cells     = qw [R2C3 R2C4 R3C3 R3C4];
     my $exp_pat   = "\\g{R2C3}?\\g{R2C4}?\\g{R3C3}?\\g{R3C4}?$SENTINEL";
 
-    my $sudoku = Regexp::Sudoku:: -> new -> init;
+    my $sudoku = Regexp::Logic_Puzzles::Sudoku:: -> new -> init;
        $sudoku -> set_quadruples ($cell => \@values);
 
     my ($got_subs, $got_pats) =

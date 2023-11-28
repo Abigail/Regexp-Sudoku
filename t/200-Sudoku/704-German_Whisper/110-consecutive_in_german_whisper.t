@@ -9,15 +9,15 @@ no  warnings 'syntax';
 use experimental 'signatures';
 use experimental 'lexical_subs';
 
-use lib qw [lib ../lib ../../lib];
+use lib qw [lib ../lib ../../lib ../../../lib];
 
 use Test::More 0.88;
 
 our $r = eval "require Test::NoWarnings; 1";
 
-use Regexp::Sudoku;
+use Regexp::Logic_Puzzles::Sudoku;
 
-my $sudoku = Regexp::Sudoku:: -> new -> init
+my $sudoku = Regexp::Logic_Puzzles::Sudoku:: -> new -> init
              -> set_german_whisper (qw [R2C1 R2C2 R2C3 R2C4 R2C5
                                         R2C6 R2C7 R2C8 R2C9])
              -> set_german_whisper (qw [R8C1 R8C2 R8C3 R8C4 R8C5

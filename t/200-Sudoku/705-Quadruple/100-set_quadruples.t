@@ -9,18 +9,18 @@ no  warnings 'syntax';
 use experimental 'signatures';
 use experimental 'lexical_subs';
 
-use lib qw [lib ../lib ../../lib];
+use lib qw [lib ../lib ../../lib ../../../lib];
 
 use Test::More 0.88;
 
 our $r = eval "require Test::NoWarnings; 1";
 
-use Regexp::Sudoku;
+use Regexp::Logic_Puzzles::Sudoku;
 
 sub run_test ($name, %quadruples) {
     subtest $name => sub {
         my %exp;
-        my $sudoku = Regexp::Sudoku:: -> new -> init;
+        my $sudoku = Regexp::Logic_Puzzles::Sudoku:: -> new -> init;
         $sudoku -> set_quadruples (%quadruples);
 
         foreach my $cell (keys %quadruples) {

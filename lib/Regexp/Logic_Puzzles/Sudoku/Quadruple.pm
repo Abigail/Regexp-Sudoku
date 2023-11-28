@@ -1,4 +1,4 @@
-package Regexp::Sudoku::Quadruple;
+package Regexp::Logic_Puzzles::Sudoku::Quadruple;
 
 use 5.028;
 
@@ -9,10 +9,12 @@ no  warnings 'syntax';
 use experimental 'signatures';
 use experimental 'lexical_subs';
 
-our $VERSION = '2022062001';
+our $VERSION = '2023112801';
 
 use Hash::Util::FieldHash qw [fieldhash];
-use Regexp::Sudoku::Utils;
+use Regexp::Logic_Puzzles::Utils;
+use Regexp::Logic_Puzzles::Sudoku::Constants;
+use Regexp::Logic_Puzzles::Sudoku::Utils;
 
 fieldhash my %quadruple2cells;
 fieldhash my %cell2quadruples;
@@ -146,14 +148,14 @@ __END__
 
 =head1 NAME
 
-Regexp::Sudoku::Quadruple -- Quadruple related methods
+Regexp::Logic_Puzzles::Sudoku::Quadruple -- Quadruple related methods
 
 =head1 DESCRIPTION
 
-This module is part of C<< Regexp::Sudoku >> and is not intended
+This module is part of C<< Regexp::Logic_Puzzles::Sudoku >> and is not intended
 as a standalone module.
 
-See L<< Regexp::Sudoku >> for the documentation.
+See L<< Regexp::Logic_Puzzles::Sudoku >> for the documentation.
 
 =head1 DEVELOPMENT
 

@@ -20,14 +20,18 @@ use Regexp::Logic_Puzzles::Sudoku::Constants;
 use Regexp::Logic_Puzzles::Sudoku::Utils;
 use Regexp::Logic_Puzzles::Sudoku::Battenburg;
 use Regexp::Logic_Puzzles::Sudoku::Diagonal;
+use Regexp::Logic_Puzzles::Sudoku::German_Whisper;
 use Regexp::Logic_Puzzles::Sudoku::Parity;
 use Regexp::Logic_Puzzles::Sudoku::Renban;
+use Regexp::Logic_Puzzles::Sudoku::Quadruple;
 
 our @ISA = qw [
     Regexp::Logic_Puzzles::Sudoku::Battenburg
     Regexp::Logic_Puzzles::Sudoku::Diagonal
+    Regexp::Logic_Puzzles::Sudoku::German_Whisper
     Regexp::Logic_Puzzles::Sudoku::Parity
     Regexp::Logic_Puzzles::Sudoku::Renban
+    Regexp::Logic_Puzzles::Sudoku::Quadruple
 ];
 
 
