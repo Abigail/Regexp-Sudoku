@@ -24,6 +24,7 @@ use Exporter ();
 our @ISA    = qw [Exporter];
 our @EXPORT = qw [cell_name cell_row_column];
 
+our $SENTINEL       = "\n";
 
 ################################################################################
 #
@@ -54,6 +55,58 @@ sub cell_row_column ($name) {
     $name =~ /R([0-9]+)C([0-9]+)/ ? ($1, $2) : (0, 0)
 }
 
+
+################################################################################
+#
+# sub cell_value (%args)
+#
+# Returns a subject/pattern which can be used to select the value of a cell.
+#
+# For now, we have two moves:
+#     - Select a value from a range      (range)
+#     - Either empty, or a single value  (select)
+#
+#    IN:  - name:     The name of the cell.
+#         - row:      The row number of the cell; used if name is not given.
+#                     Defaults to 0.
+#         - col:      The column number of the cell; used if name is not given.
+#                     Defaults to 0.
+#         - max:      The maximum value of a cell.                 (range)
+#         - min:      The minumum value of a cell (default 1).     (range)
+#         - select:   Either select this value, or be empty        (select)
+# 
+# TESTS:
+#
+################################################################################
+
+sub cell_value (%args) {
+    my $name = $args {name} // cell_name ($args {row} || 0,
+                                          $args {col} || 0);
+
+    my ($sub, $pat);
+
+    if (exists $args {select}) {
+        my $value = $args {select};
+        $sub =             $value;
+        $pat = "(?<$name>\Q$value\E?)\Q$value\E?";
+    }
+    elsif (exists $args {max}) {
+        my $max    = $args {max};
+        my $min    = $args {min} // 1;
+        die "The maximum value cannot exceed the minimum value\n"
+                                                        if $max < $min;
+        die "The maximum value cannot exceed 36\n"      if $max > 36;
+        die "The minimum value cannot be less than 0\n" if $min <  0;
+
+        my $values = join "" => map {$_ >= 10 ? chr (ord ('A') + $_ - 10) : $_}
+                                     $min .. $max;
+
+        $sub =   $values;
+        $pat = "[$values]*(?<$name>[$values])[$values]*";
+    }
+
+    map {$_ . $SENTINEL} $sub, $pat;
+}
 
 1;
 
