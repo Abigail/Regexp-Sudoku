@@ -22,24 +22,61 @@ our $VERSION = '2023112701';
 use Exporter ();
 
 our @ISA    = qw [Exporter];
-our @EXPORT = qw [cell_name cell_row_column];
+our @EXPORT = qw [cell cell_name cell_row_column];
 
 our $SENTINEL       = "\n";
 
+
+
 ################################################################################
 #
-# sub cell_name ($row, $column)
+# sub cell (%args) 
 #
-# Given a row number and a cell number, return the name of the cell.
+# Given a set of arguments, return a cell name, in a "R<number>C<number>"
+# format.
 #
-# TESTS: 100-cell_name_row_column.t
+#    IN:  - cell:     If given, use this name.
+#         - row:      The row number of the cell; used if cell is not given.
+#                     Defaults to 0.
+#         - col:      The column number of the cell; used if cell is not given.
+#                     Defaults to 0.
+#         - column:   Alias for 'col'; 'col' takes priority.
+#
+#   OUT:  - Cell name.
+#
+# EXCEP:  "No acceptable cell name can be formed" if no cell name can be
+#          formed.
+#
+# TESTS: 100-cell.t
 #
 ################################################################################
 
-sub cell_name ($row, $column) {
-    "R" . $row . "C" . $column
+sub cell (%args) {
+    my $cell = $args {cell} //
+                     "R" . ($args {row}                   || 0) .
+                     "C" . ($args {col} || $args {column} || 0);
+
+    die "No acceptable cell name can be formed" if $cell !~ /^R[0-9]+C[0-9]+$/;
+    return $cell;
 }
 
+
+################################################################################
+#
+# sub cell_name ($row, $col)
+#
+# Wrapper around cell. Mostly here for backwards compatability.
+#
+#    IN:  - $row:  The row the cell is in.
+#         - $col:  The column the cell is in.
+#
+#   OUT:  Cell name of the form "R<number>C<number>
+#
+################################################################################
+
+sub cell_name ($row, $col) {
+    cell row => $row, col => $col
+}
 
 ################################################################################
 #
@@ -47,7 +84,7 @@ sub cell_name ($row, $column) {
 #
 # Given the name of a cell, return its row and column.
 # 
-# TESTS: 100-cell_name_row_column.t
+# TESTS: 100-cell.t
 #
 ################################################################################
 
@@ -80,8 +117,7 @@ sub cell_row_column ($name) {
 ################################################################################
 
 sub cell_value (%args) {
-    my $name = $args {name} // cell_name ($args {row} || 0,
-                                          $args {col} || 0);
+    my $name = cell %args;
 
     my ($sub, $pat);
 
