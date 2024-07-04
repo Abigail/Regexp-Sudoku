@@ -22,7 +22,7 @@ our $VERSION = '2023112701';
 use Exporter ();
 
 our @ISA      = qw [Exporter];
-our @EXPORT   = qw [cell cell_name cell_row_column
+our @EXPORT   = qw [cell cell_name cell_row_column set_to_character_class
                     statement_clue];
 
 our $SENTINEL = "\n";
@@ -92,6 +92,49 @@ sub cell_name ($row, $col) {
 sub cell_row_column ($name) {
     $name =~ /R([0-9]+)C([0-9]+)/ ? ($1, $2) : (0, 0)
 }
+
+
+################################################################################
+#
+# sub set_to_character_class (@chars)
+#
+# Given a set of characters, return a character class (or single character)
+# matching the set of charactes. 
+#
+# It is assumed none of the given characters is special
+# ("[", "]", "^", "-", etc)
+#
+#    IN:  - @chars: List of characters
+# 
+#   OUT:  - Character class
+#
+# TESTS: 110-set_to_character_class.t
+#
+################################################################################
+
+sub set_to_character_class (@chars) {
+    return $chars [0] if @chars == 1;
+    @chars = sort {$a cmp $b} @chars;
+    my $class = "[";
+    while (@chars > 2) {
+        my $i = 0;
+        while ($i + 1 < @chars && ord ($chars [0]) + $i + 1 ==
+                                  ord ($chars       [$i + 1])) {
+            $i ++;
+        }
+        if ($i <= 1) {
+            $class .= shift @chars for 0 .. $i;
+        }
+        else {
+            $class .= $chars [0] . "-" . $chars [$i];
+            splice @chars, 0, $i + 1;
+        }
+    }
+    $class .= join "" => @chars;
+    $class .= "]";
+    return $class;
+}
+
 
 
 ################################################################################
