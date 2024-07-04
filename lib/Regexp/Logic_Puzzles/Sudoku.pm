@@ -812,11 +812,7 @@ sub init ($self, %args) {
 ################################################################################
 
 sub make_clue_statement ($self, $cell) {
-    my $value  = $self -> clue ($cell);
-    my $subsub = $value;
-    my $subpat = "(?<$cell>$value)";
-
-    map {$_ . $SENTINEL} $subsub, $subpat;
+    statement_clue (cell => $cell, clue => $self -> clue ($cell));
 }
 
 
