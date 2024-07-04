@@ -21,11 +21,12 @@ our $VERSION = '2023112701';
 
 use Exporter ();
 
-our @ISA    = qw [Exporter];
-our @EXPORT = qw [cell cell_name cell_row_column];
+our @ISA      = qw [Exporter];
+our @EXPORT   = qw [cell cell_name cell_row_column
+                    statement_clue];
 
-our $SENTINEL       = "\n";
-
+our $SENTINEL = "\n";
+my  $ALLOWED  = "[A-Za-z0-9_\\N{U+A1}-\\N{U+10FFFF}]";
 
 
 ################################################################################
@@ -91,6 +92,40 @@ sub cell_name ($row, $col) {
 sub cell_row_column ($name) {
     $name =~ /R([0-9]+)C([0-9]+)/ ? ($1, $2) : (0, 0)
 }
+
+
+################################################################################
+#
+# sub statement_clue (%args)
+#
+# Retuns a subjec/pattern pair which can be used to set the appropriate
+# backreference for the clue.
+#
+#    IN:  - cell:     The name of the cell.
+#         - row:      The row number of the cell; used if cell is not given.
+#                     Defaults to 0.
+#         - col:      The column number of the cell; used if cell is not given.
+#                     Defaults to 0.
+#         - clue:     The value of the clue. (Ought to be a single character)
+#
+#   OUT:  ($subject, $pattern)
+#
+################################################################################
+
+sub statement_clue (%args) {
+    my $cell = cell %args;
+    my $clue = $args {clue};
+    die "'clue' must be a single character"
+                unless defined $clue && length ($clue) == 1;
+    die "'clue' contains an invalid character"
+                if $clue !~ /^$ALLOWED$/;
+
+    my $statement = $clue;
+    my $pattern   = "(?<$cell>$clue)";
+
+    map {$_ . $SENTINEL} $statement, $pattern;
+}
+
 
 
 ################################################################################
