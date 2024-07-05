@@ -16,6 +16,7 @@ MANIFEST
 Changes
 README
 t/100-Utils/100-cell.t
+t/100-Utils/105-char_is_ok.t
 t/100-Utils/110-set_to_range.t
 t/100-Utils/200-statement_clue.t
 t/200-Sudoku/000-Utils/130-semi_debruijn_seq.t

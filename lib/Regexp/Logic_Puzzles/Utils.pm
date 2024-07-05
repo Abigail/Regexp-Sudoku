@@ -23,6 +23,7 @@ use Exporter ();
 
 our @ISA      = qw [Exporter];
 our @EXPORT   = qw [cell cell_name cell_row_column set_to_character_class
+                    char_is_ok
                     statement_clue];
 
 our $SENTINEL = "\n";
@@ -91,6 +92,37 @@ sub cell_name ($row, $col) {
 
 sub cell_row_column ($name) {
     $name =~ /R([0-9]+)C([0-9]+)/ ? ($1, $2) : (0, 0)
+}
+
+################################################################################
+#
+# sub char_is_ok ($value)
+#
+# Returns true iff $value is a character which we allow in a logic puzzle
+# (One character string, its value either an ASCII word character, an
+# underscore, or a printable, non-space, non-combining, Unicode character
+# exceeding 0xA0.
+#
+#    IN:  - $value:  String
+#
+#   OUT:  - True iff we allow the character to be in the puzzle.
+#
+# TESTS: 105-char_is_ok.t
+#
+################################################################################
+
+
+sub char_is_ok ($value) {
+    return defined ($value)      &&
+           length  ($value) == 1 &&
+                   ($value  =~ /\p{PerlWord}/ ||
+               ord ($value) >   0xA0
+                 && $value  =~ /\p{XPosixPrint}/
+                 && $value  =~ /\S/
+                 && $value  =~ /\P{Control}/
+                 && $value  =~ /\P{Combining_Diacritical_Marks_Extended}/
+                 && $value  =~ /\P{Combining_Mark}/
+                 && $value  =~ /\P{Combining_Marks_For_Symbols}/)
 }
 
 
