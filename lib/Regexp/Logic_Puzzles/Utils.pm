@@ -23,12 +23,9 @@ use Exporter ();
 
 our @ISA      = qw [Exporter];
 our @EXPORT   = qw [cell cell_name cell_row_column set_to_character_class
-                    char_is_ok
-                    statement_clue];
+                    char_is_ok statement_clue statement_select];
 
 our $SENTINEL = "\n";
-my  $ALLOWED  = "[A-Za-z0-9_\\N{U+A1}-\\N{U+10FFFF}]";
-
 
 ################################################################################
 #
@@ -185,6 +182,8 @@ sub set_to_character_class (@chars) {
 #
 #   OUT:  ($subject, $pattern)
 #
+# TESTS:  200-statement_clue.t
+#
 ################################################################################
 
 sub statement_clue (%args) {
@@ -193,7 +192,7 @@ sub statement_clue (%args) {
     die "'clue' must be a single character"
                 unless defined $clue && length ($clue) == 1;
     die "'clue' contains an invalid character"
-                if $clue !~ /^$ALLOWED$/;
+                unless char_is_ok ($clue);
 
     my $statement = $clue;
     my $pattern   = "(?<$cell>$clue)";
@@ -205,53 +204,56 @@ sub statement_clue (%args) {
 
 ################################################################################
 #
-# sub cell_value (%args)
+# sub statement_select (%args)
 #
 # Returns a subject/pattern which can be used to select the value of a cell.
 #
-# For now, we have two moves:
-#     - Select a value from a range      (range)
-#     - Either empty, or a single value  (select)
+# For now, we have two options:
+#     - Select a value from a set        (set or range)
+#     - Either empty, or a single value  (optional)
 #
 #    IN:  - name:     The name of the cell.
 #         - row:      The row number of the cell; used if name is not given.
 #                     Defaults to 0.
 #         - col:      The column number of the cell; used if name is not given.
 #                     Defaults to 0.
-#         - max:      The maximum value of a cell.                 (range)
-#         - min:      The minumum value of a cell (default 1).     (range)
-#         - select:   Either select this value, or be empty        (select)
+#         - set:      Pick a value from the given set
+#         - optional: Either select this value, or the cell will be empty
+#
+# Exactly one of set or optional must be given.
+#
+#   OUT:  ($subject, $pattern)
 # 
-# TESTS:
+# TESTS:  210-statement_select-optional.t
+#         211-statement_select-set.t
 #
 ################################################################################
 
-sub cell_value (%args) {
-    my $name = cell %args;
+sub statement_select (%args) {
+    my $cell = cell %args;
 
-    my ($sub, $pat);
+    die "cell_value () needs either 'set' or 'optional' as parameter"
+         unless exists $args {set} xor exists $args {optional};
 
-    if (exists $args {select}) {
-        my $value = $args {select};
-        $sub =             $value;
-        $pat = "(?<$name>\Q$value\E?)\Q$value\E?";
+    my ($subject, $pattern);
+
+    my $optional = $args {optional};
+
+    if (defined $optional) {
+        die "'optional' contains an illegal value" unless char_is_ok $optional;
+        $subject = $optional;
+        $pattern = "(?<$cell>$optional?)$optional?";
     }
-    elsif (exists $args {max}) {
-        my $max    = $args {max};
-        my $min    = $args {min} // 1;
-        die "The maximum value cannot exceed the minimum value\n"
-                                                        if $max < $min;
-        die "The maximum value cannot exceed 36\n"      if $max > 36;
-        die "The minimum value cannot be less than 0\n" if $min <  0;
-
-        my $values = join "" => map {$_ >= 10 ? chr (ord ('A') + $_ - 10) : $_}
-                                     $min .. $max;
-
-        $sub =   $values;
-        $pat = "[$values]*(?<$name>[$values])[$values]*";
+    else {
+        my @chars = @{$args {set}};
+        die "'set' contains one or more illegal values" if
+              grep {!char_is_ok $_} @chars;
+        my $charset = set_to_character_class @chars;
+        $subject = join "" => @chars;
+        $pattern = "$charset*(?<$cell>$charset)$charset*";
     }
 
-    map {$_ . $SENTINEL} $sub, $pat;
+    map {$_ . $SENTINEL} $subject, $pattern;
 }
 
 1;
