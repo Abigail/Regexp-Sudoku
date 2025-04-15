@@ -829,11 +829,8 @@ sub make_clue_statement ($self, $cell) {
 ################################################################################
 
 sub make_empty_statement ($self, $cell, $method = "values") {
-    my $subsub = $self -> $method;
-    my $range  = $self -> values_range;
-    my $subpat = "[$range]*(?<$cell>[$range])[$range]*";
-
-    map {$_ . $SENTINEL} $subsub, $subpat;
+    statement_select cell => $cell,
+                     set  => [$self -> values];
 }
 
 sub make_any_statement  ($self, $cell) {

@@ -212,7 +212,7 @@ sub statement_clue (%args) {
 #     - Select a value from a set        (set or range)
 #     - Either empty, or a single value  (optional)
 #
-#    IN:  - name:     The name of the cell.
+#    IN:  - cell:     The name of the cell.
 #         - row:      The row number of the cell; used if name is not given.
 #                     Defaults to 0.
 #         - col:      The column number of the cell; used if name is not given.

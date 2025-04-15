@@ -14,6 +14,7 @@ our $VERSION = '2022030401';
 use Hash::Util::FieldHash qw [fieldhash];
 use Regexp::Logic_Puzzles::Sudoku::Utils;
 use Regexp::Logic_Puzzles::Sudoku::Constants;
+use Regexp::Logic_Puzzles::Utils;
 
 fieldhash my %evens;
 fieldhash my %odds;
@@ -118,10 +119,12 @@ sub     is_odd  ($self, $cell) {$is_odd  {$self} {$cell}}
 ################################################################################
 
 sub make_even_statement ($self, $cell) {
-    $self -> make_empty_statement ($cell, "evens")
+    statement_select cell => cell,
+                     set  => [$self -> evens];
 }
 sub make_odd_statement  ($self, $cell) {
-    $self -> make_empty_statement ($cell, "odds")
+    statement_select cell => cell,
+                     set  => [$self -> odds];
 }
  
 
